@@ -3,11 +3,12 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
+import { Treemap } from 'recharts';
 
 export default function Home() {
     const columns = [
         {
-            cell: row => <img src={row.picture} alt={row.title} width="30px" />,
+            cell: row => <img src={row.picture} alt={row.title} width="30px" className="w3-circle" />,
             width: '30px',
             style: {
                 padding: '10px'
@@ -43,11 +44,12 @@ export default function Home() {
     ];
 
     const [trends, setTrends] = useState(null);
+    const [treeMapData, setTreeMapData] = useState(null);
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await axios.get('https://trends-1-d9762565.deta.app');
+                const res = await axios.get('https://trends-1-d9762565.deta.app?code=US');
                 const trendingsearches = res.data;
                 const data = trendingsearches.map(trendingsearch => ({
                     title: trendingsearch['title'],
@@ -57,6 +59,8 @@ export default function Home() {
                     picture: trendingsearch['ht:picture'],
                 }));
                 setTrends(data);
+                const _ = data.map(({ title, approx_traffic }) => ({ name: title, size: parseInt(approx_traffic.replace(/,/g, '').replace(/\+/g, ''), 10) }))
+                setTreeMapData(_)
             } catch (error) {
                 console.log(error.message);
             }
@@ -105,6 +109,11 @@ export default function Home() {
                     pagination
                 />
             )}
+            {
+                treeMapData && (
+                    <Treemap width={1000} height={600} data={treeMapData} dataKey="size" aspectRatio={4 / 3} stroke="#fff" fill="#B8B8B8" />
+                )
+            }
         </div>
     );
 }
