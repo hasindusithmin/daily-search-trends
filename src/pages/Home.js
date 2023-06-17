@@ -2,10 +2,14 @@ import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Treemap } from 'recharts';
+import { toast,ToastContainer } from 'react-toastify';
 
 export default function Home() {
+
+    const navigate = useNavigate();
+
     const columns = [
         {
             cell: row => <img src={row.picture} alt={row.title} width="30px" className="w3-circle" />,
@@ -49,7 +53,7 @@ export default function Home() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await axios.get('https://trends-1-d9762565.deta.app?code=US');
+                const res = await axios.get('https://trends-1-d9762565.deta.app');
                 const trendingsearches = res.data;
                 const data = trendingsearches.map(trendingsearch => ({
                     title: trendingsearch['title'],
@@ -62,7 +66,7 @@ export default function Home() {
                 const _ = data.map(({ title, approx_traffic }) => ({ name: title, size: parseInt(approx_traffic.replace(/,/g, '').replace(/\+/g, ''), 10) }))
                 setTreeMapData(_)
             } catch (error) {
-                console.log(error.message);
+                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true })
             }
         })();
     }, []);
@@ -99,8 +103,14 @@ export default function Home() {
         },
     };
 
+    const treeMapHandler = (e) => {
+        navigate(`/analytics/${e.name}`)
+    }
+
     return (
         <div className="w3-content">
+            <ToastContainer />
+            <div className="w3-center w3-xxlarge w3-padding">Daily Search Trends</div>
             {trends && (
                 <DataTable
                     columns={columns}
@@ -111,9 +121,20 @@ export default function Home() {
             )}
             {
                 treeMapData && (
-                    <Treemap width={1000} height={600} data={treeMapData} dataKey="size" aspectRatio={4 / 3} stroke="#fff" fill="#B8B8B8" />
+                    <Treemap
+                        width={1000}
+                        height={600}
+                        data={treeMapData}
+                        dataKey="size"
+                        aspectRatio={4 / 3}
+                        stroke="#fff"
+                        fill="#7F7F7F"
+                        onClick={treeMapHandler}
+                        style={{ cursor: 'pointer' }}
+                    />
                 )
             }
+            <hr />
         </div>
     );
 }

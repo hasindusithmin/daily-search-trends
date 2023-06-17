@@ -1992,3 +1992,10 @@ a {
 .w3-hover-border-pale-blue:hover {
   border-color: #e7ffff !important
 }
+
+.chart-details {
+  font-weight: 1000;
+  font-size: 18px;
+  text-align: center;
+  opacity: 0.75;
+}
