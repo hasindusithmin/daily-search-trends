@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link, useNavigate } from "react-router-dom";
 import { Treemap } from 'recharts';
-import { toast,ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function Home() {
 
@@ -110,7 +110,8 @@ export default function Home() {
     return (
         <div className="w3-content">
             <ToastContainer />
-            <div className="w3-center w3-xxlarge w3-padding">Daily Search Trends</div>
+            <div className="w3-center w3-xxlarge w3-padding">Daily Search Trends <span><Link to="/keywords" style={{ textDecoration: "none" }}>📌</Link></span></div>
+            <p className="w3-center">The 10 countries with the highest amount of internet users</p>
             {trends && (
                 <DataTable
                     columns={columns}
