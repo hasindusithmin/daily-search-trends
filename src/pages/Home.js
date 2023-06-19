@@ -2,13 +2,13 @@ import axios from "axios";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
+import CustomizedContent from "../components/CustomContentTreemap";
+import BarModal from "../components/BarModal";
 
 export default function Home() {
-
-    const navigate = useNavigate();
 
     const columns = [
         {
@@ -20,25 +20,28 @@ export default function Home() {
         },
         {
             name: 'Keyword',
-            selector: row => row.title,
+            selector: row => row.keyword,
             sortable: true
         },
         {
             name: 'Traffic',
-            selector: row => row.approx_traffic,
+            selector: row => row.traffic,
+            format: row => formatNumberAbbreviation(row.traffic) + '+',
             sortable: true
-        },
-        {
-            name: 'Description',
-            selector: row => row.description,
         },
         {
             name: 'Public Date',
-            selector: row => row.pub_date,
+            selector: row => row.pubDate,
+            format: row => formatToBrowserTimezone(row.pubDate),
             sortable: true
         },
         {
-            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large">View</Link>,
+            name: 'Country',
+            selector: row => row.country,
+            sortable: true
+        },
+        {
+            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="People also ask">PAS</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -49,23 +52,51 @@ export default function Home() {
 
     const [trends, setTrends] = useState(null);
     const [treeMapData, setTreeMapData] = useState(null);
+    const [rawData, setRawData] = useState([]);
+
+    function formatNumberAbbreviation(number) {
+        const suffixes = ['', 'K', 'M', 'B', 'T'];
+        const suffixNum = Math.floor(('' + number).length / 3);
+        let shortNumber = parseFloat((suffixNum !== 0 ? (number / Math.pow(1000, suffixNum)) : number).toPrecision(2));
+        if (shortNumber % 1 !== 0) {
+            shortNumber = shortNumber.toFixed(1);
+        }
+        return shortNumber + suffixes[suffixNum];
+    }
+
+    function formatToBrowserTimezone(datetimeString) {
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric"
+        };
+
+        return new Date(datetimeString).toLocaleString(undefined, options);
+    }
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await axios.get('https://trends-1-d9762565.deta.app');
+                // const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
+                const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
                 const trendingsearches = res.data;
-                const data = trendingsearches.map(trendingsearch => ({
-                    title: trendingsearch['title'],
-                    approx_traffic: trendingsearch['ht:approx_traffic'],
-                    description: trendingsearch['description'],
-                    pub_date: moment(trendingsearch['pubDate'], "ddd, DD MMM YYYY HH:mm:ss Z").format("ddd, DD MMM YYYY HH:mm A"),
-                    picture: trendingsearch['ht:picture'],
-                }));
-                setTrends(data);
-                const _ = data.map(({ title, approx_traffic }) => ({ name: title, size: parseInt(approx_traffic.replace(/,/g, '').replace(/\+/g, ''), 10) }))
-                setTreeMapData(_)
+                setRawData(trendingsearches);
+                const data = []
+                const forTreeMap = []
+                for (const { country, trends, flag } of trendingsearches) {
+                    const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
+                    forTreeMap.push({ name: country, size: totalTraffic })
+                    for (const trend of trends) {
+                        data.push({ ...trend, country: `${country} ${flag}` })
+                    }
+                }
+                setTrends(data.sort((a, b) => b.traffic - a.traffic));
+                setTreeMapData(forTreeMap)
             } catch (error) {
+                console.log(error.message);
                 toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true })
             }
         })();
@@ -103,23 +134,30 @@ export default function Home() {
         },
     };
 
+    const [country, setCountry] = useState(null);
+    const [color, setColor] = useState(null);
+    const [chartData, setChartData] = useState(null);
+
     const treeMapHandler = (e) => {
-        navigate(`/analytics/${e.name}`)
+        console.log(e);
+        const data = rawData.filter(({ country }) => country === e.name)
+        if (data.length === 0) return
+        const trends = data[0]['trends']
+        if (!trends) return
+        setCountry(e.name);
+        setColor(e.fill);
+        setChartData(trends);
     }
 
     return (
         <div className="w3-content">
             <ToastContainer />
-            <div className="w3-center w3-xxlarge w3-padding">Daily Search Trends <span><Link to="/keywords" style={{ textDecoration: "none" }}>📌</Link></span></div>
-            <p className="w3-center">The 10 countries with the highest amount of internet users</p>
-            {trends && (
-                <DataTable
-                    columns={columns}
-                    data={trends}
-                    customStyles={customStyles}
-                    pagination
-                />
-            )}
+            <div className="w3-center w3-padding-64">
+                <div className="w3-xlarge">
+                    Daily Search Trends <span><Link to="/keywords" style={{ textDecoration: "none" }}>📌</Link></span>
+                </div>
+                <p>Embark on a Journey to Discover the World's Current Search Trends!</p>
+            </div>
             {
                 treeMapData && (
                     <Treemap
@@ -129,11 +167,26 @@ export default function Home() {
                         dataKey="size"
                         aspectRatio={4 / 3}
                         stroke="#fff"
-                        fill="#7F7F7F"
+                        content={<CustomizedContent colors={
+                            ['#e91e6396', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D', '#CC99FF', '#FFCCCC', '#00bcd4b8', '#99EEFF']
+                        } />}
                         onClick={treeMapHandler}
                         style={{ cursor: 'pointer' }}
                     />
                 )
+            }
+            <hr/>
+            {trends && (
+                <DataTable
+                    columns={columns}
+                    data={trends}
+                    customStyles={customStyles}
+                    pagination
+                />
+            )}
+            {
+                country && chartData &&
+                <BarModal country={country} chartData={chartData} setChartData={setChartData} />
             }
             <hr />
         </div>
