@@ -41,7 +41,7 @@ export default function Home() {
             sortable: true
         },
         {
-            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="People also ask">PAS</Link>,
+            cell: row => <Link to={`/analytics/${row.keyword}`} className="w3-button w3-light-gray w3-round-large" title="People also ask">PAS</Link>,
             allowOverflow: true,
             button: true,
             style: {
