@@ -1,5 +1,4 @@
 import axios from "axios";
-import moment from "moment";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
@@ -7,6 +6,8 @@ import { Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
 import BarModal from "../components/BarModal";
+import { Typewriter } from 'react-simple-typewriter';
+import radar from "../images/radar.gif"
 
 export default function Home() {
 
@@ -80,8 +81,8 @@ export default function Home() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
-                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
+                // const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
+                const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
                 const trendingsearches = res.data;
                 setRawData(trendingsearches);
                 const data = []
@@ -154,10 +155,19 @@ export default function Home() {
             <ToastContainer />
             <div className="w3-center w3-padding-64">
                 <div className="w3-xlarge">
-                    Daily Search Trends <span><Link to="/keywords" style={{ textDecoration: "none" }}>📌</Link></span>
+                    Daily Search Trends
                 </div>
                 <p>Embark on a Journey to Discover the World's Current Search Trends!</p>
             </div>
+            <p className="w3-center">
+                <img src={radar} alt="radar"  width={150} height={150}/>
+            </p>
+            <p className="w3-padding w3-center">
+                <Typewriter
+                    words={['Discover the latest search trends worldwide with Daily Search Trends.Stay informed and entertained as we bring you the most popular topics people are searching for each day.Click, explore, and stay connected. Start your search journey now!']}
+                    typeSpeed={70}
+                />
+            </p>
             {
                 treeMapData && (
                     <Treemap
@@ -175,20 +185,20 @@ export default function Home() {
                     />
                 )
             }
-            <hr/>
             {trends && (
-                <DataTable
-                    columns={columns}
-                    data={trends}
-                    customStyles={customStyles}
-                    pagination
-                />
+                <div className="w3-padding-32 w3-center">
+                    <DataTable
+                        columns={columns}
+                        data={trends}
+                        customStyles={customStyles}
+                        pagination
+                    />
+                </div>
             )}
             {
                 country && chartData &&
                 <BarModal country={country} chartData={chartData} setChartData={setChartData} />
             }
-            <hr />
         </div>
     );
 }

@@ -1,7 +1,8 @@
 import Modal from 'react-modal';
+import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-export default function BarModal({ country,chartData, setChartData }) {
+export default function BarModal({ country, chartData, setChartData }) {
 
     const flags = {
         "India": "🇮🇳",
@@ -46,6 +47,9 @@ export default function BarModal({ country,chartData, setChartData }) {
                 <Legend />
                 <Bar dataKey="traffic" fill={'#333'} />
             </BarChart>
+            <div className='w3-padding w3-center'>
+                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>👁️‍🗨️ ALL 📌</Link>
+            </div>
         </Modal>
     )
 }
