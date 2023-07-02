@@ -181,7 +181,7 @@ export default function Analytics({ match }) {
                     <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
                 }
                 {
-                    all && all.length === 50 &&
+                    all && all.length > 40 &&
                     (
                         <div className='w3-center'>
                             <h3 className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></h3>
