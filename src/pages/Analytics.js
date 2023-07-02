@@ -1,7 +1,8 @@
-import { useParams,Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { Typewriter } from 'react-simple-typewriter';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, AreaChart } from 'recharts';
 
 
@@ -13,6 +14,7 @@ export default function Analytics({ match }) {
     const [commentsRank, setCommentsRank] = useState(null)
     const [sharesRank, setSharesRank] = useState(null)
     const [viewsRank, setViewsRank] = useState(null)
+    const [notFound, setNotFound] = useState(null)
 
     useEffect(() => {
         if (keyword) getData()
@@ -20,10 +22,14 @@ export default function Analytics({ match }) {
 
     const getData = async () => {
         const toastID = toast("Processing, Please Wait...", { autoClose: false, hideProgressBar: true })
+        setOverview('')
+        setOverviewErr('')
         try {
+            setNotFound(null);
             const res = await axios.get(`https://alsoask-1-r9997761.deta.app/v2?keyword=${encodeURIComponent(keyword)}`)
             const data = res.data;
-            const _ = data.map(({ id, question, upvotes, comments, shares, views, time }) => ({ id, question, upvotes, comments, shares, views, time }));
+            if (data.length < 5) throw Error("Results not found")
+            const _ = data.map(({ question, upvotes, comments, shares, views, time }) => ({ question, upvotes, comments, shares, views, time }));
             const __ = data.map(({ question, upvotes }) => ({ question, upvotes }))
             const ___ = data.map(({ question, comments }) => ({ question, comments }))
             const ____ = data.map(({ question, shares }) => ({ question, shares }))
@@ -33,21 +39,100 @@ export default function Analytics({ match }) {
             setCommentsRank(___)
             setSharesRank(____)
             setViewsRank(_____)
-            toast.update(toastID, { type: toast.TYPE.SUCCESS, autoClose: 1500 })
+            toast.update(toastID, { type: toast.TYPE.SUCCESS, autoClose: 1000 })
         } catch (error) {
-            toast.update(toastID, { type: toast.TYPE.ERROR, autoClose: 1500 })
+            setNotFound(error.message);
+            toast.update(toastID, { type: toast.TYPE.ERROR, autoClose: 1000 })
         }
     }
 
+    function convertToMarkdown(data) {
+        let markdown = "";
+
+        data.forEach((item) => {
+            for (const [key, value] of Object.entries(item)) {
+                markdown += `${key}: ${value}\n`;
+            }
+            markdown += "\n";
+        });
+
+        return markdown;
+    }
+
+    const [analyzing, setAnalyzing] = useState(false);
+    const [overview, setOverview] = useState('');
+    const [overviewErr, setOverviewErr] = useState('');
+
+    const analyseData = async () => {
+        let prompt = convertToMarkdown(all);
+        prompt += 'Write a complete overview of the above data by identifying trends and patterns based on the following criteria:\n'
+        prompt += '- It should be useful\n'
+        prompt += '- It should be silly\n'
+        prompt += '- It should spark creativity'
+        if (overview || overviewErr) {
+            toast.info("Already analyzed", { autoClose: 1000, hideProgressBar: true })
+            return
+        }
+        setOverview('')
+        setOverviewErr('')
+        setAnalyzing(true)
+        try {
+            const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
+                auth: {
+                    username: process.env.REACT_APP_UNAME,
+                    password: process.env.REACT_APP_PWORD
+                }
+            })
+            setAnalyzing(false)
+            setOverview(res.data)
+        } catch (error) {
+            setOverviewErr(error.message)
+            setAnalyzing(false)
+        }
+    }
 
     return (
         <>
             <ToastContainer />
             <div className="w3-content">
                 <div className="w3-center w3-xxlarge w3-padding">
-                    <Link to="/" style={{textDecoration:'none'}}>Daily Search Trends</Link>
+                    <Link to="/" style={{ textDecoration: 'none' }}>Daily Search Trends</Link>
                 </div>
                 <hr />
+                {
+                    all && all.length === 50 &&
+                    (
+                        <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI Analytics' : <span>Analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
+                    )
+                }
+                {
+                    overview && (
+                        <div className='w3-padding-32'>
+                            <div className='w3-card w3-padding w3-round-large w3-text-blue-grey' style={{ fontWeight: "bold" }}>
+                                {overview.split('\n').map(sentence => {
+                                    if (sentence) return (
+                                        <div style={{ lineHeight: 1.8 }}>
+                                            <Typewriter words={[sentence]} typeSpeed={25} />
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    overviewErr && (
+                        <div className='w3-padding-32'>
+                            <div className='w3-card w3-padding w3-round-large w3-text-red' style={{ fontWeight: "bold" }}>
+                                <Typewriter words={[overviewErr]} typeSpeed={25} cursor cursorBlinking={true} />
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    notFound &&
+                    <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
+                }
                 {
                     all &&
                     <div className=''>

@@ -45,10 +45,10 @@ export default function BarModal({ country, chartData, setChartData }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="traffic" fill={'#333'} />
+                <Bar dataKey="traffic" fill={'#2196f3c7'} />
             </BarChart>
             <div className='w3-padding w3-center'>
-                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>👁️‍🗨️ ALL 📌</Link>
+                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>View All Countries 🗺</Link>
             </div>
         </Modal>
     )
