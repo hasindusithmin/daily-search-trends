@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Treemap, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Link } from "react-router-dom";
 import CustomizedContent from "../components/CustomContentTreemap";
-
+import { Typewriter } from "react-simple-typewriter";
 export default function Keywords() {
 
     const [colors, setColors] = useState(null);
@@ -64,12 +64,16 @@ export default function Keywords() {
 
     return (
         <div className="w3-content">
-            <div className="w3-center w3-padding">
-                <Link to="/" style={{ textDecoration: 'none' }} className="w3-xxlarge">Daily Search Trends</Link>
-                <p className="w3-center">The 10 countries with the highest amount of internet users</p>
+            <div className="w3-center w3-padding-64">
+                <div className="w3-xlarge">
+                    Daily Search Trends
+                </div>
+                <p>
+                    <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
+                </p>
+                <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
             </div>
             <div className="w3-padding-32">
-                <div className="w3-large w3-center"><b>Daily Trends</b></div>
                 {
                     treeMapData &&
                     <Treemap
