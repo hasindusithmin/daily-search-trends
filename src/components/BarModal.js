@@ -1,7 +1,7 @@
 import Modal from 'react-modal';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-
+import { Typewriter } from 'react-simple-typewriter';
 export default function BarModal({ country, chartData, setChartData }) {
 
     const flags = {
@@ -34,7 +34,11 @@ export default function BarModal({ country, chartData, setChartData }) {
             style={customStyles}
         >
             <span onClick={() => { setChartData(null) }} className="w3-button w3-display-topright w3-padding">✖️</span>
-            <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b>Daily Search Trends - {country} {flags[country]}</b></div>
+            <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b></b></div>
+            <div className='w3-center w3-padding-32 w3-large w3-opacity'>
+                <b><Typewriter words={[`Here are today's top trending keywords in the ${flags[country]} ${country.toUpperCase()}`]}/></b>
+            </div>
+
             <BarChart
                 width={1000}
                 height={600}

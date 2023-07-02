@@ -4,9 +4,77 @@ import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { Typewriter } from 'react-simple-typewriter';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, AreaChart } from 'recharts';
-
+import DataTable from 'react-data-table-component';
 
 export default function Analytics({ match }) {
+
+    function truncateText(text) {
+        if (text.length <= 20) {
+            return text;
+        } else {
+            return text.slice(0, 25) + '...';
+        }
+    }
+
+    const columns = [
+        {
+            name: 'Question',
+            cell: row => <div title={row.question}>{truncateText(row.question)}</div>,
+            sortable: true
+        },
+        {
+            name: 'Upvotes',
+            selector: row => row.upvotes,
+            sortable: true
+        },
+        {
+            name: 'Comments',
+            selector: row => row.comments,
+            sortable: true
+        },
+        {
+            name: 'Shares',
+            selector: row => row.shares,
+            sortable: true
+        },
+        {
+            name: 'Views',
+            selector: row => row.views,
+            sortable: true
+        }
+    ];
+
+    const customStyles = {
+        headCells: {
+            style: {
+                backgroundColor: '#f2f2f2',
+                fontWeight: 'bold',
+                paddingLeft: '12px',
+                paddingRight: '12px',
+            },
+        },
+        cells: {
+            style: {
+                paddingLeft: '12px',
+                paddingRight: '12px',
+                fontSize: '14px',
+            },
+        },
+        rows: {
+            style: {
+                borderBottomStyle: 'solid',
+                borderBottomWidth: '1px',
+                borderBottomColor: '#f2f2f2',
+                minHeight: '56px',
+            },
+            selectedHighlightStyle: {
+                backgroundColor: '#e6e6e6',
+            },
+            highlightOnHoverStyle: {
+                backgroundColor: '#f5f5f5',
+            },
+        },
+    };
 
     let { keyword } = useParams();
     const [all, setAll] = useState(null)
@@ -95,14 +163,31 @@ export default function Analytics({ match }) {
         <>
             <ToastContainer />
             <div className="w3-content">
-                <div className="w3-center w3-xxlarge w3-padding">
-                    <Link to="/" style={{ textDecoration: 'none' }}>Daily Search Trends</Link>
+                <div className="w3-center w3-padding-64">
+                    <div className="w3-xlarge">
+                        Daily Search Trends
+                    </div>
+                    <p>
+                        <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
+                    </p>
+                    <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
                 </div>
+                {
+                    keyword && <h5 className='w3-center w3-text-grey'><b>{keyword}</b></h5>
+                }
                 <hr />
+                {
+                    notFound &&
+                    <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
+                }
                 {
                     all && all.length === 50 &&
                     (
-                        <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI Analytics' : <span>Analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
+                        <div className='w3-center'>
+                            <h3 className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></h3>
+                            &nbsp;&nbsp;
+                            <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
+                        </div>
                     )
                 }
                 {
@@ -130,13 +215,21 @@ export default function Analytics({ match }) {
                     )
                 }
                 {
-                    notFound &&
-                    <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
+                    all && (
+                        <div className="w3-padding-32 w3-center">
+                            <DataTable
+                                columns={columns}
+                                data={all}
+                                customStyles={customStyles}
+                                pagination
+                            />
+                        </div>
+                    )
                 }
                 {
                     all &&
                     <div className=''>
-                        <h3 className="chart-details">The chart shows the number of upvotes, comments, and shares for a set of questions about <code>{keyword}</code>.</h3>
+                        <h3 className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
                         <div>
                             <BarChart
                                 width={1000}
@@ -159,7 +252,7 @@ export default function Analytics({ match }) {
                                 <Bar dataKey="shares" stackId="a" fill="#FF851B" />
                             </BarChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of upvotes for a set of questions about <code>{keyword}</code>.</h3>
+                        <h3 className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</h3>
                         <div>
                             <AreaChart
                                 width={1000}
@@ -179,7 +272,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of comments for a set of questions about <code>{keyword}</code>.</h3>
+                        <h3 className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</h3>
                         <div>
                             <AreaChart
                                 width={1000}
@@ -199,7 +292,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of shares for a set of questions about <code>{keyword}</code>.</h3>
+                        <h3 className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
                         <div>
                             <AreaChart
                                 width={1000}
@@ -219,7 +312,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of views for a set of questions about <code>{keyword}</code>.</h3>
+                        <h3 className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</h3>
                         <div>
                             <AreaChart
                                 width={1000}

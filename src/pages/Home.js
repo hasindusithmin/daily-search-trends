@@ -157,16 +157,15 @@ export default function Home() {
                 <div className="w3-xlarge">
                     Daily Search Trends
                 </div>
-                <p>Embark on a Journey to Discover the World's Current Search Trends!</p>
+                <p>
+                    <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
+                </p>
             </div>
             <p className="w3-center">
-                <img src={radar} alt="radar"  width={150} height={150}/>
+                <img src={radar} alt="radar" width={150} height={150} />
             </p>
             <p className="w3-padding w3-center">
-                <Typewriter
-                    words={['Discover the latest search trends worldwide with Daily Search Trends.Stay informed and entertained as we bring you the most popular topics people are searching for each day.Click, explore, and stay connected. Start your search journey now!']}
-                    typeSpeed={70}
-                />
+                <div className="w3-padding">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
             </p>
             {
                 treeMapData && (
@@ -187,6 +186,9 @@ export default function Home() {
             }
             {trends && (
                 <div className="w3-padding-32 w3-center">
+                    <p className="w3-padding w3-center">
+                        <div className="w3-padding">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
+                    </p>
                     <DataTable
                         columns={columns}
                         data={trends}
