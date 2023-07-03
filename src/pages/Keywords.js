@@ -6,22 +6,9 @@ import CustomizedContent from "../components/CustomContentTreemap";
 import { Typewriter } from "react-simple-typewriter";
 export default function Keywords() {
 
-    const [colors, setColors] = useState(null);
     const [treeMapData, setTreeMapData] = useState(null);
     const [treeMapDataObj, setTreeMapDataObj] = useState({});
 
-    const nationalColors = {
-        "India": "#FF9933",
-        "United States": "#B22234",
-        "Indonesia": "#CE1126",
-        "Brazil": "#009B3A",
-        "Russia": "#D52B1E",
-        "Japan": "#BC002D",
-        "Nigeria": "#008751",
-        "Mexico": "#006847",
-        "Germany": "#000000",
-        "Canada": "#FF0000"
-    }
     const flags = {
         "India": "🇮🇳",
         "United States": "🇺🇸",
@@ -39,22 +26,28 @@ export default function Keywords() {
         (async () => {
             try {
                 const res = await axios.get('https://trendsapi-1-q3464257.deta.app')
+                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
                 const Countries = res.data;
                 const treeMapDataArr = []
                 const treeMapDataObj = {}
-                const colorsArr = []
                 for (const Country of Countries) {
                     const obj = {};
                     const { country, trends, flag } = Country;
-                    colorsArr.push(nationalColors[country])
                     obj['name'] = `${flag} ${country}`;
-                    obj['children'] = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }))
+                    const data = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }));
+                    data.sort((a, b) => b.size - a.size);
+                    obj['children'] = data
+                    obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
                     treeMapDataArr.push(obj);
-                    treeMapDataObj[country] = trends.map(({ keyword, traffic }) => ({ keyword, traffic }));
+                    treeMapDataObj[`${flag} ${country}`] = trends.map(({ keyword, traffic }) => ({ keyword, traffic }));
                 }
-                setColors(colorsArr);
+                treeMapDataArr.sort((a, b) => b.traffic - a.traffic);
+                const countryRank = treeMapDataArr.map(({ name }) => name)
+                const sortedTreeMapDataObj = Object.fromEntries(
+                    countryRank.map(name => [name, treeMapDataObj[name]])
+                );
                 setTreeMapData(treeMapDataArr);
-                setTreeMapDataObj(treeMapDataObj)
+                setTreeMapDataObj(sortedTreeMapDataObj)
             } catch (error) {
                 console.error(error.message);
             }
@@ -69,6 +62,20 @@ export default function Keywords() {
         }
     }
 
+    const colors = [
+        "#004400",  // dark green
+        "#006600",  // pakistan green
+        "#008000",  // office green
+        "#228B22",  // forest green
+        "#32CD32",  // lime green
+        "#3CB371",  // medium sea green
+        "#66CDAA",  // medium aquamarine
+        "#98FB98",  // pale green
+        "#ADFF2F",  // green yellow
+        "#ccffcc"   // honeydew
+    ];
+
+
 
     return (
         <div className="w3-content">
@@ -82,6 +89,7 @@ export default function Keywords() {
                 <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
             </div>
             <div className="w3-padding-32">
+                <h5 className="w3-center w3-opacity" style={{ fontWeight: 'bold' }}>🗺 Countries with the highest number of internet users</h5>
                 {
                     treeMapData &&
                     <div className={window && isMobile() ? 'w3-responsive' : ''}>
@@ -120,7 +128,7 @@ export default function Keywords() {
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="traffic" fill={nationalColors[country]} background={{ fill: '#F0F0F0' }} />
+                                <Bar dataKey="traffic" fill={colors[index]} />
                             </BarChart>
                         </div>
                     </div>

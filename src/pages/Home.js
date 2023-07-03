@@ -54,9 +54,11 @@ export default function Home() {
     ];
 
     const [trends, setTrends] = useState(null);
-    const [trendsCopy, setTrendsCopy] = useState([])
+    const [trendsCopy, setTrendsCopy] = useState([]);
     const [treeMapData, setTreeMapData] = useState(null);
     const [rawData, setRawData] = useState([]);
+    const [countryRank,setCountryRank] = useState([]);
+    const [color,setColor] = useState('');
 
     function formatNumberAbbreviation(number) {
         const suffixes = ['', 'K', 'M', 'B', 'T'];
@@ -81,6 +83,19 @@ export default function Home() {
         return new Date(datetimeString).toLocaleString(undefined, options);
     }
 
+    const colors = [
+        "#004400",  // dark green
+        "#006600",  // pakistan green
+        "#008000",  // office green
+        "#228B22",  // forest green
+        "#32CD32",  // lime green
+        "#3CB371",  // medium sea green
+        "#66CDAA",  // medium aquamarine
+        "#98FB98",  // pale green
+        "#ADFF2F",  // green yellow
+        "#ccffcc"   // honeydew 
+    ];
+
     useEffect(() => {
         (async () => {
             try {
@@ -97,6 +112,8 @@ export default function Home() {
                         data.push({ ...trend, country: `${country} ${flag}` })
                     }
                 }
+                forTreeMap.sort((a, b) => b.size - a.size);
+                setCountryRank(forTreeMap.map(({name})=>name));
                 setTrends(data.sort((a, b) => b.traffic - a.traffic));
                 setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
                 setTreeMapData(forTreeMap)
@@ -140,7 +157,6 @@ export default function Home() {
     };
 
     const [country, setCountry] = useState(null);
-    const [color, setColor] = useState(null);
     const [chartData, setChartData] = useState(null);
 
     const treeMapHandler = (e) => {
@@ -156,7 +172,8 @@ export default function Home() {
         const trends = data[0]['trends']
         if (!trends) return
         setCountry(e.name);
-        setColor(e.fill);
+        const indexOf = countryRank.indexOf(e.name)
+        setColor(colors[indexOf]);
         setChartData(trends);
     }
 
@@ -232,9 +249,7 @@ export default function Home() {
                             dataKey="size"
                             aspectRatio={4 / 3}
                             stroke="#fff"
-                            content={<CustomizedContent colors={
-                                ['#e91e6396', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D', '#CC99FF', '#FFCCCC', '#00bcd4b8', '#99EEFF']
-                            } />}
+                            content={<CustomizedContent colors={colors} />}
                             onClick={treeMapHandler}
                             style={{ cursor: 'pointer' }}
                         />
@@ -276,7 +291,7 @@ export default function Home() {
             )}
             {
                 country && chartData &&
-                <BarModal country={country} chartData={chartData} setChartData={setChartData} />
+                <BarModal country={country} color={color} chartData={chartData} setChartData={setChartData} />
             }
         </div>
     );

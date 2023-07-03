@@ -2,7 +2,7 @@ import Modal from 'react-modal';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
-export default function BarModal({ country, chartData, setChartData }) {
+export default function BarModal({ country, color, chartData, setChartData }) {
 
     const flags = {
         "India": "🇮🇳",
@@ -37,7 +37,7 @@ export default function BarModal({ country, chartData, setChartData }) {
             <span onClick={() => { setChartData(null) }} className="w3-button w3-display-topright w3-padding">✖️</span>
             <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b></b></div>
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
-                <b><Typewriter words={[`Here are today's top trending keywords in the ${flags[country]} ${country.toUpperCase()}`]}/></b>
+                <b><Typewriter words={[`Here are today's top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={10}/></b>
             </div>
 
             <BarChart
@@ -50,7 +50,7 @@ export default function BarModal({ country, chartData, setChartData }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="traffic" fill={'#2196f3c7'} />
+                <Bar dataKey="traffic" fill={color} />
             </BarChart>
             <div className='w3-padding w3-center'>
                 <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>View All Countries 🗺</Link>
