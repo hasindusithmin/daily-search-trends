@@ -5,6 +5,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Typewriter } from 'react-simple-typewriter';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, AreaChart } from 'recharts';
 import DataTable from 'react-data-table-component';
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 
 export default function Analytics({ match }) {
 
@@ -193,14 +196,8 @@ export default function Analytics({ match }) {
                 {
                     overview && (
                         <div className='w3-padding-32'>
-                            <div className='w3-card w3-padding w3-round-large w3-text-blue-grey' style={{ fontWeight: "bold" }}>
-                                {overview.split('\n').map(sentence => {
-                                    if (sentence) return (
-                                        <div style={{ lineHeight: 1.8 }}>
-                                            <Typewriter words={[sentence]} typeSpeed={25} />
-                                        </div>
-                                    )
-                                })}
+                            <div className='w3-card w3-padding w3-round-large w3-text-blue-grey w3-white' style={{ fontWeight: "bold" }}>
+                                <ReactMarkdown children={overview} remarkPlugins={[remarkGfm]} />
                             </div>
                         </div>
                     )
