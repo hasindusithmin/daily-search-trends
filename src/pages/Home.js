@@ -54,6 +54,7 @@ export default function Home() {
     ];
 
     const [trends, setTrends] = useState(null);
+    const [trendsCopy, setTrendsCopy] = useState([])
     const [treeMapData, setTreeMapData] = useState(null);
     const [rawData, setRawData] = useState([]);
 
@@ -97,6 +98,7 @@ export default function Home() {
                     }
                 }
                 setTrends(data.sort((a, b) => b.traffic - a.traffic));
+                setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
                 setTreeMapData(forTreeMap)
             } catch (error) {
                 console.log(error.message);
@@ -144,9 +146,9 @@ export default function Home() {
     const treeMapHandler = (e) => {
         if (isMobile()) {
             toast.warn("Modal View Unavailable on Mobile", { autoClose: 1000, hideProgressBar: true });
-            setTimeout(()=>{
+            setTimeout(() => {
                 navigate('/keywords')
-            },1500)
+            }, 1500)
             return
         }
         const data = rawData.filter(({ country }) => country === e.name)
@@ -164,6 +166,43 @@ export default function Home() {
         } else {
             return false
         }
+    }
+
+    const [filterText, setFilterText] = useState('');
+
+    const filterKeywords = (e) => {
+        const inputValue = e.target.value.toLowerCase();
+
+        if (e.nativeEvent.inputType === 'insertText') {
+            setFilterText(inputValue);
+            const filteredData = trends.filter(
+                trend => trend.keyword && trend.keyword.toLowerCase().includes(inputValue)
+            );
+            setTrends(filteredData);
+        } else {
+            setFilterText(inputValue);
+
+            if (inputValue === '') {
+                setTrends(trendsCopy);
+                return;
+            }
+
+            if (trendsCopy.length === 0) {
+                console.log('reset trends');
+                setTrends(trendsCopy);
+                return;
+            }
+
+            const filteredData = trendsCopy.filter(
+                trend => trend.keyword.toLowerCase().includes(inputValue)
+            );
+            setTrends(filteredData);
+        }
+    };
+
+    const resetFilter = () => {
+        setFilterText('');
+        setTrends(trendsCopy);
     }
 
     return (
@@ -206,6 +245,26 @@ export default function Home() {
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
                         <div className="w3-padding">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
+                    </p>
+                    <p style={{ paddingBottom: 32 }}>
+                        <span className="w3-right">
+                            <input
+                                type="text"
+                                size="25"
+                                value={filterText}
+                                className="w3-border"
+                                placeholder="Search keyword..."
+                                style={{ padding: '10px 5px' }}
+                                onInput={filterKeywords}
+                            />
+                            <button
+                                className="w3-button w3-border w3-blue"
+                                style={{ padding: '10px' }}
+                                onClick={resetFilter}
+                            >
+                                ❌
+                            </button>
+                        </span>
                     </p>
                     <DataTable
                         columns={columns}
