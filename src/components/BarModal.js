@@ -32,6 +32,7 @@ export default function BarModal({ country, chartData, setChartData }) {
         <Modal
             isOpen={chartData}
             style={customStyles}
+            ariaHideApp={false}
         >
             <span onClick={() => { setChartData(null) }} className="w3-button w3-display-topright w3-padding">✖️</span>
             <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b></b></div>

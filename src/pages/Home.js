@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
@@ -10,6 +10,8 @@ import { Typewriter } from 'react-simple-typewriter';
 import radar from "../images/radar.gif"
 
 export default function Home() {
+
+    const navigate = useNavigate()
 
     const columns = [
         {
@@ -81,8 +83,8 @@ export default function Home() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
-                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
+                // const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
+                const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
                 const trendingsearches = res.data;
                 setRawData(trendingsearches);
                 const data = []
@@ -140,7 +142,13 @@ export default function Home() {
     const [chartData, setChartData] = useState(null);
 
     const treeMapHandler = (e) => {
-        console.log(e);
+        if (isMobile()) {
+            toast.warn("Modal View Unavailable on Mobile", { autoClose: 1000, hideProgressBar: true });
+            setTimeout(()=>{
+                navigate('/keywords')
+            },1500)
+            return
+        }
         const data = rawData.filter(({ country }) => country === e.name)
         if (data.length === 0) return
         const trends = data[0]['trends']
@@ -148,6 +156,14 @@ export default function Home() {
         setCountry(e.name);
         setColor(e.fill);
         setChartData(trends);
+    }
+
+    const isMobile = () => {
+        if (/Android|iPhone/i.test(window.navigator.userAgent)) {
+            return true
+        } else {
+            return false
+        }
     }
 
     return (
@@ -169,19 +185,21 @@ export default function Home() {
             </p>
             {
                 treeMapData && (
-                    <Treemap
-                        width={1000}
-                        height={600}
-                        data={treeMapData}
-                        dataKey="size"
-                        aspectRatio={4 / 3}
-                        stroke="#fff"
-                        content={<CustomizedContent colors={
-                            ['#e91e6396', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D', '#CC99FF', '#FFCCCC', '#00bcd4b8', '#99EEFF']
-                        } />}
-                        onClick={treeMapHandler}
-                        style={{ cursor: 'pointer' }}
-                    />
+                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <Treemap
+                            width={1000}
+                            height={600}
+                            data={treeMapData}
+                            dataKey="size"
+                            aspectRatio={4 / 3}
+                            stroke="#fff"
+                            content={<CustomizedContent colors={
+                                ['#e91e6396', '#9597E4', '#8DC77B', '#A5D297', '#E2CF45', '#F8C12D', '#CC99FF', '#FFCCCC', '#00bcd4b8', '#99EEFF']
+                            } />}
+                            onClick={treeMapHandler}
+                            style={{ cursor: 'pointer' }}
+                        />
+                    </div>
                 )
             }
             {trends && (

@@ -137,9 +137,8 @@ export default function Analytics({ match }) {
     const analyseData = async () => {
         let prompt = convertToMarkdown(all);
         prompt += 'Write a complete overview of the above data by identifying trends and patterns based on the following criteria:\n'
-        prompt += '- It should be useful\n'
-        prompt += '- It should be silly\n'
-        prompt += '- It should spark creativity'
+        prompt += '- It should be clear and organized\n'
+        prompt += '- It should be Contextual\n'
         if (overview || overviewErr) {
             toast.info("Already analyzed", { autoClose: 1000, hideProgressBar: true })
             return
@@ -159,6 +158,14 @@ export default function Analytics({ match }) {
         } catch (error) {
             setOverviewErr(error.message)
             setAnalyzing(false)
+        }
+    }
+
+    const isMobile = () => {
+        if (/Android|iPhone/i.test(window.navigator.userAgent)) {
+            return true
+        } else {
+            return false
         }
     }
 
@@ -225,9 +232,9 @@ export default function Analytics({ match }) {
                 }
                 {
                     all &&
-                    <div className=''>
+                    <div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div>
+                        <div className={window && isMobile() ? 'w3-responsive':''}>
                             <BarChart
                                 width={1000}
                                 height={600}
@@ -250,7 +257,7 @@ export default function Analytics({ match }) {
                             </BarChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div>
+                        <div className={window && isMobile() ? 'w3-responsive':''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -270,7 +277,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div>
+                        <div className={window && isMobile() ? 'w3-responsive':''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -290,7 +297,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div>
+                        <div className={window && isMobile() ? 'w3-responsive':''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -310,7 +317,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div>
+                        <div className={window && isMobile() ? 'w3-responsive':''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
