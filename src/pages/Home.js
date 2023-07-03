@@ -84,8 +84,8 @@ export default function Home() {
     useEffect(() => {
         (async () => {
             try {
-                // const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
-                const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
+                const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
+                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
                 const trendingsearches = res.data;
                 setRawData(trendingsearches);
                 const data = []
