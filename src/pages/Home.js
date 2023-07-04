@@ -57,8 +57,8 @@ export default function Home() {
     const [trendsCopy, setTrendsCopy] = useState([]);
     const [treeMapData, setTreeMapData] = useState(null);
     const [rawData, setRawData] = useState([]);
-    const [countryRank,setCountryRank] = useState([]);
-    const [color,setColor] = useState('');
+    const [countryRank, setCountryRank] = useState([]);
+    const [color, setColor] = useState('');
 
     function formatNumberAbbreviation(number) {
         const suffixes = ['', 'K', 'M', 'B', 'T'];
@@ -97,32 +97,76 @@ export default function Home() {
     ];
 
     useEffect(() => {
-        (async () => {
+        initialize()
+    }, []);
+
+    const initialize = () => {
+        const changeState = (trendingsearches) => {
+            setRawData(trendingsearches);
+            const data = []
+            const forTreeMap = []
+            for (const { country, trends, flag } of trendingsearches) {
+                const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
+                forTreeMap.push({ name: country, size: totalTraffic })
+                for (const trend of trends) {
+                    data.push({ ...trend, country: `${country} ${flag}` })
+                }
+            }
+            forTreeMap.sort((a, b) => b.size - a.size);
+            setCountryRank(forTreeMap.map(({ name }) => name));
+            setTrends(data.sort((a, b) => b.traffic - a.traffic));
+            setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
+            setTreeMapData(forTreeMap)
+        }
+
+        const getDataFromAPI = async () => {
+            const toastID = toast.loading("Processing, Please Wait...")
             try {
                 const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
-                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
-                const trendingsearches = res.data;
-                setRawData(trendingsearches);
-                const data = []
-                const forTreeMap = []
-                for (const { country, trends, flag } of trendingsearches) {
-                    const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
-                    forTreeMap.push({ name: country, size: totalTraffic })
-                    for (const trend of trends) {
-                        data.push({ ...trend, country: `${country} ${flag}` })
-                    }
-                }
-                forTreeMap.sort((a, b) => b.size - a.size);
-                setCountryRank(forTreeMap.map(({name})=>name));
-                setTrends(data.sort((a, b) => b.traffic - a.traffic));
-                setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
-                setTreeMapData(forTreeMap)
+                toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return res.data
             } catch (error) {
-                console.log(error.message);
-                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true })
+                toast.update(toastID, { render: error.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return []
             }
-        })();
-    }, []);
+        }
+
+        const fetchRenderSave = async () => {
+            // get data from API 
+            const apiData = await getDataFromAPI();
+            if (apiData.length === 0) {
+                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
+                return
+            }
+            // do state changes 
+            changeState(apiData);
+            // save data in local storage 
+            const store_data = {
+                "created": Date.now(),
+                "resource": JSON.stringify(apiData)
+            }
+            localStorage.setItem('treasure', JSON.stringify(store_data))
+        }
+
+        const treasure = localStorage.getItem('treasure');
+        if (!treasure) {
+            // If there is no data in the local storage
+            console.log('there is no data in the local storage');
+            fetchRenderSave();
+            return
+        }
+        const { created, resource } = JSON.parse(treasure);
+        const now = Date.now();
+        const is_data_old = (now - created) > (15 * 60 * 1000)
+        if (is_data_old) {
+            // If the data is more than 15 minutes old
+            console.log('data is more than 15 minutes old');
+            fetchRenderSave();
+            return
+        }
+        // do state changes 
+        changeState(JSON.parse(resource));
+    }
 
     const customStyles = {
         headCells: {

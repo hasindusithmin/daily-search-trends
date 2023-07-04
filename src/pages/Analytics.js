@@ -88,18 +88,16 @@ export default function Analytics({ match }) {
     const [notFound, setNotFound] = useState(null)
 
     useEffect(() => {
-        if (keyword) getData()
+        if (keyword) initialize()
     }, [])
 
-    const getData = async () => {
-        const toastID = toast("Processing, Please Wait...", { autoClose: false, hideProgressBar: true })
-        setOverview('')
-        setOverviewErr('')
-        try {
-            setNotFound(null);
-            const res = await axios.get(`https://alsoask-1-r9997761.deta.app/v2?keyword=${encodeURIComponent(keyword)}`)
-            const data = res.data;
-            if (data.length < 5) throw Error("Results not found")
+    const initialize = async () => {
+
+        const changeState = (data) => {
+            if (data.length < 5) {
+                setNotFound("Results not found");
+                return
+            }
             const _ = data.map(({ question, upvotes, comments, shares, views, time }) => ({ question, upvotes, comments, shares, views, time }));
             const __ = data.map(({ question, upvotes }) => ({ question, upvotes }))
             const ___ = data.map(({ question, comments }) => ({ question, comments }))
@@ -110,11 +108,57 @@ export default function Analytics({ match }) {
             setCommentsRank(___)
             setSharesRank(____)
             setViewsRank(_____)
-            toast.update(toastID, { type: toast.TYPE.SUCCESS, autoClose: 1000 })
-        } catch (error) {
-            setNotFound(error.message);
-            toast.update(toastID, { type: toast.TYPE.ERROR, autoClose: 1000 })
         }
+
+        const getDataFromAPI = async () => {
+            const toastID = toast.loading("Processing, Please Wait...")
+            try {
+                setOverview('')
+                setOverviewErr('')
+                const res = await axios.get(`https://alsoask-1-r9997761.deta.app/v2?keyword=${encodeURIComponent(keyword)}`);
+                toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return res.data
+            } catch (error) {
+                toast.update(toastID, { render: error.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return []
+            }
+        }
+
+        const fetchRenderSave = async () => {
+            // get data from API 
+            const apiData = await getDataFromAPI();
+            if (apiData.length === 0) {
+                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
+                return
+            }
+            // do state changes 
+            changeState(apiData);
+            // save data in local storage 
+            const store_data = {
+                "created": Date.now(),
+                "resource": JSON.stringify(apiData)
+            }
+            localStorage.setItem(keyword, JSON.stringify(store_data))
+        }
+
+        const treasure = localStorage.getItem(keyword);
+        if (!treasure) {
+            // If there is no data in the local storage
+            console.log('there is no data in the local storage');
+            fetchRenderSave();
+            return
+        }
+        const { created, resource } = JSON.parse(treasure);
+        const now = Date.now();
+        const is_data_old = (now - created) > (15 * 60 * 1000)
+        if (is_data_old) {
+            // If the data is more than 15 minutes old
+            console.log('data is more than 15 minutes old');
+            fetchRenderSave();
+            return
+        }
+        // do state changes 
+        changeState(JSON.parse(resource));
     }
 
     function convertToMarkdown(data) {
@@ -234,7 +278,7 @@ export default function Analytics({ match }) {
                     all &&
                     <div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive':''}>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
                             <BarChart
                                 width={1000}
                                 height={600}
@@ -257,7 +301,7 @@ export default function Analytics({ match }) {
                             </BarChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive':''}>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -277,7 +321,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive':''}>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -297,7 +341,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive':''}>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -317,7 +361,7 @@ export default function Analytics({ match }) {
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive':''}>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
                             <AreaChart
                                 width={1000}
                                 height={600}

@@ -4,6 +4,8 @@ import { Treemap, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } 
 import { Link } from "react-router-dom";
 import CustomizedContent from "../components/CustomContentTreemap";
 import { Typewriter } from "react-simple-typewriter";
+import { toast, ToastContainer } from 'react-toastify';
+
 export default function Keywords() {
 
     const [treeMapData, setTreeMapData] = useState(null);
@@ -23,36 +25,81 @@ export default function Keywords() {
     }
 
     useEffect(() => {
-        (async () => {
-            try {
-                const res = await axios.get('https://trendsapi-1-q3464257.deta.app')
-                // const res = await axios.get('https://gist.githubusercontent.com/hasindusithmin/8d411a5eb73b290aaceebb5fcb8626ad/raw/9291d0baf760841e755fa30380eb003b15c3eba8/keywords.json');
-                const Countries = res.data;
-                const treeMapDataArr = []
-                const treeMapDataObj = {}
-                for (const Country of Countries) {
-                    const obj = {};
-                    const { country, trends, flag } = Country;
-                    obj['name'] = `${flag} ${country}`;
-                    const data = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }));
-                    data.sort((a, b) => b.size - a.size);
-                    obj['children'] = data
-                    obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
-                    treeMapDataArr.push(obj);
-                    treeMapDataObj[`${flag} ${country}`] = trends.map(({ keyword, traffic }) => ({ keyword, traffic }));
-                }
-                treeMapDataArr.sort((a, b) => b.traffic - a.traffic);
-                const countryRank = treeMapDataArr.map(({ name }) => name)
-                const sortedTreeMapDataObj = Object.fromEntries(
-                    countryRank.map(name => [name, treeMapDataObj[name]])
-                );
-                setTreeMapData(treeMapDataArr);
-                setTreeMapDataObj(sortedTreeMapDataObj)
-            } catch (error) {
-                console.error(error.message);
-            }
-        })()
+        initialize()
     }, [])
+
+    const initialize = () => {
+        const changeState = (Countries) => {
+            const treeMapDataArr = []
+            const treeMapDataObj = {}
+            for (const Country of Countries) {
+                const obj = {};
+                const { country, trends, flag } = Country;
+                obj['name'] = `${flag} ${country}`;
+                const data = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }));
+                data.sort((a, b) => b.size - a.size);
+                obj['children'] = data
+                obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
+                treeMapDataArr.push(obj);
+                treeMapDataObj[`${flag} ${country}`] = trends.map(({ keyword, traffic }) => ({ keyword, traffic }));
+            }
+            treeMapDataArr.sort((a, b) => b.traffic - a.traffic);
+            const countryRank = treeMapDataArr.map(({ name }) => name)
+            const sortedTreeMapDataObj = Object.fromEntries(
+                countryRank.map(name => [name, treeMapDataObj[name]])
+            );
+            setTreeMapData(treeMapDataArr);
+            setTreeMapDataObj(sortedTreeMapDataObj)
+        }
+
+        const getDataFromAPI = async () => {
+            const toastID = toast.loading("Processing, Please Wait...")
+            try {
+                const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
+                toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return res.data
+            } catch (error) {
+                toast.update(toastID, { render: error.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return []
+            }
+        }
+
+        const fetchRenderSave = async () => {
+            // get data from API 
+            const apiData = await getDataFromAPI();
+            if (apiData.length === 0) {
+                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
+                return
+            }
+            // do state changes 
+            changeState(apiData);
+            // save data in local storage 
+            const store_data = {
+                "created": Date.now(),
+                "resource": JSON.stringify(apiData)
+            }
+            localStorage.setItem('treasure', JSON.stringify(store_data))
+        }
+
+        const treasure = localStorage.getItem('treasure');
+        if (!treasure) {
+            // If there is no data in the local storage
+            console.log('there is no data in the local storage');
+            fetchRenderSave();
+            return
+        }
+        const { created, resource } = JSON.parse(treasure);
+        const now = Date.now();
+        const is_data_old = (now - created) > (15 * 60 * 1000)
+        if (is_data_old) {
+            // If the data is more than 15 minutes old
+            console.log('data is more than 15 minutes old');
+            fetchRenderSave();
+            return
+        }
+        // do state changes 
+        changeState(JSON.parse(resource));
+    }
 
     const isMobile = () => {
         if (/Android|iPhone/i.test(window.navigator.userAgent)) {
@@ -79,6 +126,7 @@ export default function Keywords() {
 
     return (
         <div className="w3-content">
+            <ToastContainer />
             <div className="w3-center w3-padding-64">
                 <div className="w3-xlarge">
                     Daily Search Trends
