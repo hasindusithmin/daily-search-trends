@@ -2,6 +2,7 @@ import Modal from 'react-modal';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
+import { toast } from "react-toastify"
 export default function BarModal({ country, color, chartData, setChartData }) {
 
     const flags = {
@@ -28,6 +29,16 @@ export default function BarModal({ country, color, chartData, setChartData }) {
         },
     };
 
+    function copyToClipboard(text) {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        toast.success(`Copy To Clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
+    }
+
     return (
         <Modal
             isOpen={chartData}
@@ -37,7 +48,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
             <span onClick={() => { setChartData(null) }} className="w3-button w3-display-topright w3-padding">✖️</span>
             <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b></b></div>
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
-                <b><Typewriter words={[`Here are today's top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={10}/></b>
+                <b><Typewriter words={[`Here are today's top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={10} /></b>
             </div>
 
             <BarChart
@@ -50,7 +61,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="traffic" fill={color} />
+                <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e) }} />
             </BarChart>
             <div className='w3-padding w3-center'>
                 <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>View All Countries 🗺</Link>

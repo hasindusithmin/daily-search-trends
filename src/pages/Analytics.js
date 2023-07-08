@@ -219,7 +219,7 @@ export default function Analytics({ match }) {
             <div className="w3-content">
                 <div className="w3-center w3-padding-64">
                     <div className="w3-xlarge">
-                        Daily Search Trends
+                        Daily Search Trends | {keyword}
                     </div>
                     <p>
                         <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />

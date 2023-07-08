@@ -7,7 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
 import BarModal from "../components/BarModal";
 import { Typewriter } from 'react-simple-typewriter';
-import radar from "../images/radar.gif"
+import autoComplete from "@tarekraafat/autocomplete.js";
 
 export default function Home() {
 
@@ -200,6 +200,28 @@ export default function Home() {
         },
     };
 
+    setTimeout(() => {
+        const autoCompleteJS = new autoComplete({
+            placeHolder: "Search for Countries...",
+            data: {
+                src: ['Australia', 'Argentina', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Czechia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Malaysia', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Türkiye', 'Ukraine', 'United Kingdom', 'United States', 'Vietnam'],
+                cache: true,
+            },
+            resultItem: {
+                highlight: true
+            },
+            events: {
+                input: {
+                    selection: (event) => {
+                        const selection = event.detail.selection.value;
+                        autoCompleteJS.input.value = selection;
+                        navigate(`/country/${selection}`)
+                    }
+                }
+            }
+        });
+    }, 1000)
+
     const [country, setCountry] = useState(null);
     const [chartData, setChartData] = useState(null);
 
@@ -277,8 +299,19 @@ export default function Home() {
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
             </div>
+        
             <p className="w3-center">
-                <img src={radar} alt="radar" width={150} height={150} />
+                <div className="autoComplete_wrapper">
+                    <input
+                        id="autoComplete"
+                        type="search"
+                        dir="ltr"
+                        spellCheck="false"
+                        autoCorrect="off"
+                        autoComplete="off"
+                        autoCapitalize="off"
+                    />
+                </div>
             </p>
             <p className="w3-padding w3-center">
                 <div className="w3-padding">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>

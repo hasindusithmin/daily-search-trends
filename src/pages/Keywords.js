@@ -122,6 +122,16 @@ export default function Keywords() {
         "#ccffcc"   // honeydew
     ];
 
+    function copyToClipboard(text) {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        toast.success(`Copy To Clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
+    }
+
 
 
     return (
@@ -176,7 +186,7 @@ export default function Keywords() {
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="traffic" fill={colors[index]} />
+                                <Bar dataKey="traffic" fill={colors[index]} onClick={e => { copyToClipboard(e) }} />
                             </BarChart>
                         </div>
                     </div>
