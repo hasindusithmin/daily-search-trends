@@ -61,7 +61,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e) }} />
+                <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e.keyword) }} />
             </BarChart>
             <div className='w3-padding w3-center'>
                 <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>View All Countries 🗺</Link>
