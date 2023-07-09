@@ -2,7 +2,7 @@ import Modal from 'react-modal';
 import { Link } from 'react-router-dom';
 import { Treemap } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart } from '../utils/commons';
+import { downloadChart, copyToClipboard } from '../utils/commons';
 import CustomizedContent from './CustomContentTreemap';
 
 export default function BarModal({ country, color, chartData, setChartData }) {
@@ -52,6 +52,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                     stroke="#fff"
                     content={<CustomizedContent colors={new Array(20).fill(color)} />}
                     style={{ cursor: 'pointer' }}
+                    onClick={e => {copyToClipboard(e['name'])}}
                 />
             </p>
             <div className='w3-padding w3-center'>
