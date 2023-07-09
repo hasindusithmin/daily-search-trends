@@ -109,7 +109,6 @@ export default function Analytics({ match }) {
             setCommentsRank(___)
             setSharesRank(____)
             setViewsRank(_____)
-            axios.get('https://claudeapi.onrender.com')
         }
 
         const getDataFromAPI = async () => {

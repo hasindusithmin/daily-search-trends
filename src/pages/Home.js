@@ -99,7 +99,8 @@ export default function Home() {
     ];
 
     useEffect(() => {
-        initialize()
+        initialize();
+        axios.get('https://claudeapi.onrender.com')
     }, []);
 
     const initialize = () => {
@@ -262,7 +263,7 @@ export default function Home() {
 
     const treeMapHandler2 = (e) => {
         copyToClipboard(e.name)
-        toast.info(`${e.name} = ${formatNumberAbbreviation(e.size)}+`, { autoClose: 200, position: 'bottom-center', hideProgressBar: true })
+        toast.info(`${e.name} ${formatNumberAbbreviation(e.size)}+`, { autoClose: 500, position: 'bottom-center', hideProgressBar: true })
     }
 
     const isMobile = () => {
@@ -310,6 +311,15 @@ export default function Home() {
         setTrends(trendsCopy);
     }
 
+    const copyKeywordsToClipBoard = () => {
+        let keywordsStr = '';
+        trends.forEach(({ keyword }) => {
+            keywordsStr += `${keyword}, `
+        })
+        let allKeywords = keywordsStr.slice(0, -2);
+        copyToClipboard(allKeywords)
+    }
+
     return (
         <div className="w3-content">
             <ToastContainer />
@@ -338,7 +348,7 @@ export default function Home() {
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
-                        <div className="chart-details">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
+                        <div className="chart-details">Analyzing Keyword Traffic and Public Release Dates across Countries <span style={{cursor:'copy'}} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
                     </p>
                     <p style={{ paddingBottom: 32 }}>
                         <span className="w3-right">
@@ -355,9 +365,8 @@ export default function Home() {
                                 className="w3-button w3-border w3-blue"
                                 style={{ padding: '10px' }}
                                 onClick={resetFilter}
-                            >
-                                ❌
-                            </button>
+                                title="Clear"
+                            >✖️</button>
                         </span>
                     </p>
                     <DataTable
@@ -372,7 +381,7 @@ export default function Home() {
                 treeMapData1 && (
                     <div>
                         <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
+                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries With The Highest Number Of Internet Users</div>
                         </p>
                         <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
                         <p id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>

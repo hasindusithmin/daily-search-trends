@@ -150,6 +150,7 @@ export default function Keywords() {
                                 stroke="#fff"
                                 fill="#8884d8"
                                 content={<CustomizedContent colors={colors} />}
+                                onClick={e => {copyToClipboard(e['name'])}}
                             />
                         </div>
                     </>
@@ -173,13 +174,14 @@ export default function Keywords() {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={e => { copyToClipboard(e) }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />
-                                <Bar dataKey="traffic" fill={colors[index]} onClick={e => { copyToClipboard(e) }} />
+                                <Bar dataKey="traffic" fill={colors[index]} />
                             </BarChart>
                         </div>
                     </div>

@@ -7,6 +7,8 @@ import DataTable from "react-data-table-component";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
 import { downloadChart, copyToClipboard } from "../utils/commons";
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export default function Country() {
 
@@ -239,6 +241,45 @@ export default function Country() {
         }
     }
 
+    const copyKeywordsToClipBoard = () => {
+        let keywordsStr = '';
+        trends.forEach(({ keyword }) => {
+            keywordsStr += `${keyword}, `
+        })
+        let allKeywords = keywordsStr.slice(0, -2);
+        copyToClipboard(allKeywords)
+    }
+
+    const [categorization, setCategorization] = useState(null);
+    const [categorizationErr, setCategorizationErr] = useState(null);
+    const [processing, setProcessing] = useState(false);
+    const categorizeKeywords = async () => {
+        try {
+            if (categorization) return
+            let prompt = 'categorize these keywords:\n';
+            let keywordsStr = '';
+            trends.forEach(({ keyword }) => {
+                keywordsStr += `${keyword}, `
+            })
+            let allKeywords = keywordsStr.slice(0, -2);
+            prompt += allKeywords;
+            prompt += '\nprovide me to categorization of these keywords without anyother words';
+            setProcessing(true);
+            const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
+                auth: {
+                    username: process.env.REACT_APP_UNAME,
+                    password: process.env.REACT_APP_PWORD
+                }
+            })
+            setProcessing(false);
+            setCategorization(res.data);
+            console.log(res.data);
+        } catch (error) {
+            setCategorizationErr(true)
+            toast.error(error.message, { hideProgressBar: true, autoClose: 1500 })
+        }
+    }
+
     return (
         <div className="w3-content">
             <ToastContainer />
@@ -251,11 +292,23 @@ export default function Country() {
                 </p>
                 <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
             </div>
-            <div className={window && isMobile() ? 'w3-responsive' : ''}>
+            <div >
+                <div className={window && isMobile() ? 'w3-padding' : ''}>
+                    <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</button>
+                    <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="categorize all keywords" onClick={categorizeKeywords}>
+                        {
+                            processing ? <i className="fa fa-refresh w3-spin"></i> : '➗'
+                        }
+                    </button>
+                    {
+                        categorization &&
+                        <ReactMarkdown children={categorization} remarkPlugins={[remarkGfm]} className="w3-panel w3-border w3-round-large w3-white w3-leftbar w3-hover-sand" />
+                    }
+                </div>
                 {/* datatable  */}
                 {
                     trends &&
-                    <div className="w3-padding-32 w3-center">
+                    <div className={window && isMobile() ? 'w3-responsive' : 'w3-padding-32 w3-center'}>
                         <DataTable
                             columns={columns}
                             data={trends}
