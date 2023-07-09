@@ -335,39 +335,6 @@ export default function Home() {
                     />
                 </div>
             </p>
-            {trends && (
-                <div className="w3-padding-32 w3-center">
-                    <p className="w3-padding w3-center">
-                        <div className="chart-details">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
-                    </p>
-                    <p style={{ paddingBottom: 32 }}>
-                        <span className="w3-right">
-                            <input
-                                type="text"
-                                size="25"
-                                value={filterText}
-                                className="w3-border"
-                                placeholder="Search keyword..."
-                                style={{ padding: '10px 5px' }}
-                                onInput={filterKeywords}
-                            />
-                            <button
-                                className="w3-button w3-border w3-blue"
-                                style={{ padding: '10px' }}
-                                onClick={resetFilter}
-                            >
-                                ❌
-                            </button>
-                        </span>
-                    </p>
-                    <DataTable
-                        columns={columns}
-                        data={trends}
-                        customStyles={customStyles}
-                        pagination
-                    />
-                </div>
-            )}
             {
                 treeMapData1 && (
                     <div className={window && isMobile() ? 'w3-responsive' : ''}>
@@ -410,8 +377,40 @@ export default function Home() {
                         </p>
                     </div>
                 )
-
             }
+            {trends && (
+                <div className="w3-padding-32 w3-center">
+                    <p className="w3-padding w3-center">
+                        <div className="chart-details">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
+                    </p>
+                    <p style={{ paddingBottom: 32 }}>
+                        <span className="w3-right">
+                            <input
+                                type="text"
+                                size="25"
+                                value={filterText}
+                                className="w3-border"
+                                placeholder="Search keyword..."
+                                style={{ padding: '10px 5px' }}
+                                onInput={filterKeywords}
+                            />
+                            <button
+                                className="w3-button w3-border w3-blue"
+                                style={{ padding: '10px' }}
+                                onClick={resetFilter}
+                            >
+                                ❌
+                            </button>
+                        </span>
+                    </p>
+                    <DataTable
+                        columns={columns}
+                        data={trends}
+                        customStyles={customStyles}
+                        pagination
+                    />
+                </div>
+            )}
             {
                 country && chartData &&
                 <Modal country={country} color={color} chartData={chartData} setChartData={setChartData} />
