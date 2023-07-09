@@ -100,3 +100,13 @@ export const downloadChart = (parent) => {
         toast.error("Sorry, can't download chart at this moment", { autoClose: 250, hideProgressBar: true })
     }
 }
+
+export function copyToClipboard(text) {
+  var textarea = document.createElement('textarea');
+  textarea.value = text;
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+  toast.success(`Copied to the clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
+}

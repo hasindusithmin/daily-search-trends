@@ -8,7 +8,7 @@ import CustomizedContent from "../components/CustomContentTreemap";
 import BarModal from "../components/BarModal";
 import { Typewriter } from 'react-simple-typewriter';
 import autoComplete from "@tarekraafat/autocomplete.js";
-import { downloadChart } from "../utils/download-chart";
+import { copyToClipboard, downloadChart } from "../utils/commons";
 
 export default function Home() {
 
@@ -56,7 +56,8 @@ export default function Home() {
 
     const [trends, setTrends] = useState(null);
     const [trendsCopy, setTrendsCopy] = useState([]);
-    const [treeMapData, setTreeMapData] = useState(null);
+    const [treeMapData1, setTreeMapData1] = useState(null);
+    const [treeMapData2, setTreeMapData2] = useState(null);
     const [rawData, setRawData] = useState([]);
     const [countryRank, setCountryRank] = useState([]);
     const [color, setColor] = useState('');
@@ -105,19 +106,32 @@ export default function Home() {
         const changeState = (trendingsearches) => {
             setRawData(trendingsearches);
             const data = []
-            const forTreeMap = []
+            const treeMapDataArr1 = []
+            const treeMapDataArr2 = []
             for (const { country, trends, flag } of trendingsearches) {
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
-                forTreeMap.push({ name: country, size: totalTraffic })
+                treeMapDataArr1.push({ name: country, size: totalTraffic })
                 for (const trend of trends) {
                     data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
-            forTreeMap.sort((a, b) => b.size - a.size);
-            setCountryRank(forTreeMap.map(({ name }) => name));
+            treeMapDataArr1.sort((a, b) => b.size - a.size);
+            setTreeMapData1(treeMapDataArr1)
+            for (const Country of trendingsearches) {
+                const obj = {};
+                const { country, trends, flag } = Country;
+                obj['name'] = country;
+                const data = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }));
+                data.sort((a, b) => b.size - a.size);
+                obj['children'] = data
+                obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
+                treeMapDataArr2.push(obj);
+            }
+            treeMapDataArr2.sort((a, b) => b.traffic - a.traffic);
+            setTreeMapData2(treeMapDataArr2);
+            setCountryRank(treeMapDataArr1.map(({ name }) => name));
             setTrends(data.sort((a, b) => b.traffic - a.traffic));
             setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
-            setTreeMapData(forTreeMap)
         }
 
         const getDataFromAPI = async () => {
@@ -226,7 +240,7 @@ export default function Home() {
     const [country, setCountry] = useState(null);
     const [chartData, setChartData] = useState(null);
 
-    const treeMapHandler = (e) => {
+    const treeMapHandler1 = (e) => {
         if (isMobile()) {
             toast.warn("Modal View Unavailable on Mobile", { autoClose: 1000, hideProgressBar: true });
             setTimeout(() => {
@@ -242,6 +256,11 @@ export default function Home() {
         const indexOf = countryRank.indexOf(e.name)
         setColor(colors[indexOf]);
         setChartData(trends);
+    }
+
+    const treeMapHandler2 = (e) => {
+        copyToClipboard(e.name)
+        toast.info(`${e.name} = ${formatNumberAbbreviation(e.size)}+`, { autoClose: 200, position: 'bottom-center', hideProgressBar: true })
     }
 
     const isMobile = () => {
@@ -314,29 +333,6 @@ export default function Home() {
                     />
                 </div>
             </p>
-            <p className="w3-padding w3-center">
-                <div className="w3-padding">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
-            </p>
-            {
-                treeMapData && (
-                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
-                        <p id="treemap">
-                            <Treemap
-                                width={1000}
-                                height={600}
-                                data={treeMapData}
-                                dataKey="size"
-                                aspectRatio={4 / 3}
-                                stroke="#fff"
-                                content={<CustomizedContent colors={colors} />}
-                                onClick={treeMapHandler}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </p>
-                    </div>
-                )
-            }
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
@@ -370,6 +366,50 @@ export default function Home() {
                     />
                 </div>
             )}
+            <p className="w3-padding w3-center">
+                <div className="w3-padding">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
+            </p>
+            {
+                treeMapData1 && (
+                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
+                        <p id="treemap">
+                            <Treemap
+                                width={1000}
+                                height={600}
+                                data={treeMapData1}
+                                dataKey="size"
+                                aspectRatio={4 / 3}
+                                stroke="#fff"
+                                content={<CustomizedContent colors={colors} />}
+                                onClick={treeMapHandler1}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </p>
+                    </div>
+                )
+            }
+            {
+                treeMapData2 && (
+                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
+                        <p id="treemap2">
+                            <Treemap
+                                width={1000}
+                                height={600}
+                                data={treeMapData2}
+                                dataKey="size"
+                                aspectRatio={4 / 3}
+                                stroke="#fff"
+                                content={<CustomizedContent colors={colors} />}
+                                onClick={treeMapHandler2}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </p>
+                    </div>
+                )
+
+            }
             {
                 country && chartData &&
                 <BarModal country={country} color={color} chartData={chartData} setChartData={setChartData} />

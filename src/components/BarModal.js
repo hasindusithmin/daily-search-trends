@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
 import { toast } from "react-toastify"
-import { downloadChart } from '../utils/download-chart';
+import { downloadChart, copyToClipboard } from '../utils/commons';
 export default function BarModal({ country, color, chartData, setChartData }) {
 
     const flags = {
@@ -30,16 +30,6 @@ export default function BarModal({ country, color, chartData, setChartData }) {
         },
     };
 
-    function copyToClipboard(text) {
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        toast.success(`Copy To Clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
-    }
-
     return (
         <Modal
             isOpen={chartData}
@@ -56,13 +46,14 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                     width={1000}
                     height={600}
                     data={chartData}
+                    onClick={e => { copyToClipboard(e['activeLabel']) }}
                 >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e.keyword) }} />
+                    <Bar dataKey="traffic" fill={color} />
                 </BarChart>
             </p>
             <div className='w3-padding w3-center'>

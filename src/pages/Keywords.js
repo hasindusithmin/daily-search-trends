@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import CustomizedContent from "../components/CustomContentTreemap";
 import { Typewriter } from "react-simple-typewriter";
 import { toast, ToastContainer } from 'react-toastify';
-import { downloadChart } from "../utils/download-chart";
+import { downloadChart, copyToClipboard } from "../utils/commons";
 
 export default function Keywords() {
 
@@ -122,18 +122,6 @@ export default function Keywords() {
         "#ADFF2F",  // green yellow
         "#ccffcc"   // honeydew
     ];
-
-    function copyToClipboard(text) {
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        toast.success(`Copy To Clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
-    }
-
-
 
     return (
         <div className="w3-content">

@@ -6,7 +6,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
-import { downloadChart } from "../utils/download-chart";
+import { downloadChart, copyToClipboard } from "../utils/commons";
 
 export default function Country() {
 
@@ -33,16 +33,6 @@ export default function Country() {
             shortNumber = shortNumber.toFixed(1);
         }
         return shortNumber + suffixes[suffixNum];
-    }
-
-    function copyToClipboard(text) {
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        toast.success(`Copy To Clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
     }
 
     const columns = [
@@ -184,7 +174,6 @@ export default function Country() {
             setTrends(trendingsearches);
             setBarData(trendingsearches.map(({ keyword, traffic }) => ({ keyword, traffic })));
             setTreeMapData(trendingsearches.map(({ keyword, traffic }) => ({ name: keyword, size: traffic })))
-            console.log(treeMapData);
         }
 
         const getDataFromAPI = async () => {
@@ -239,6 +228,7 @@ export default function Country() {
     const treeMapHandler = (e) => {
         const traffic = e.value;
         toast.info(formatNumberAbbreviation(traffic) + '+', { hideProgressBar: true, autoClose: 250, position: 'bottom-center' })
+        copyToClipboard(e.name)
     }
 
     const isMobile = () => {
@@ -307,13 +297,14 @@ export default function Country() {
                                     width={1000}
                                     height={600}
                                     data={barData}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']); }}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
                                     <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />
-                                    <Bar dataKey="traffic" onClick={(e) => { copyToClipboard(e.keyword); }} fill="#7ac143" />
+                                    <Bar dataKey="traffic" fill="#7ac143" />
                                 </BarChart>
                             </p>
                         </div>

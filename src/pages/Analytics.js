@@ -7,7 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, Area
 import DataTable from 'react-data-table-component';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { downloadChart } from '../utils/download-chart';
+import { downloadChart, copyToClipboard } from '../utils/commons';
 
 
 export default function Analytics({ match }) {
@@ -291,6 +291,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
                             >
                                 <CartesianGrid strokeDasharray="1 1" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -315,6 +316,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -336,6 +338,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -357,6 +360,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -378,6 +382,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
+                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
