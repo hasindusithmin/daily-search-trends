@@ -8,6 +8,7 @@ import CustomizedContent from "../components/CustomContentTreemap";
 import BarModal from "../components/BarModal";
 import { Typewriter } from 'react-simple-typewriter';
 import autoComplete from "@tarekraafat/autocomplete.js";
+import { downloadChart } from "../utils/download-chart";
 
 export default function Home() {
 
@@ -288,56 +289,6 @@ export default function Home() {
         setTrends(trendsCopy);
     }
 
-    function downloadSvgAsPng(svgElement, filename) {
-        try {
-            // Convert SVG element to XML string
-            const svgXml = new XMLSerializer().serializeToString(svgElement);
-
-            // Create a canvas element
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Create an image element
-            const img = new Image();
-
-            // Set up an event listener for the image load
-            img.onload = function () {
-                // Set canvas dimensions to match the SVG element
-                canvas.width = svgElement.width.baseVal.value;
-                canvas.height = svgElement.height.baseVal.value;
-
-                // Draw the image onto the canvas
-                ctx.drawImage(img, 0, 0);
-
-                // Convert the canvas content to a data URL
-                const dataUrl = canvas.toDataURL('image/png');
-
-                // Create a temporary link element
-                const link = document.createElement('a');
-                link.href = dataUrl;
-                link.download = filename;
-
-                // Programmatically click the link to trigger the download
-                link.click();
-            };
-
-            // Set the source of the image to the SVG XML
-            img.src = 'data:image/svg+xml;base64,' + btoa(svgXml);
-        } catch (error) {
-            toast.error("Sorry, can't download chart at this moment", { autoClose: 250, hideProgressBar: true })
-        }
-    }
-
-    const downloadTreeMap = () => {
-        try {
-            const container = document.getElementById('treemap');
-            const svgElement = container.children[0].children[0]
-            downloadSvgAsPng(svgElement, 'treemap.png')
-        } catch (error) {
-            toast.error("Sorry, can't download chart at this moment", { autoClose: 250, hideProgressBar: true })
-        }
-    }
-
     return (
         <div className="w3-content">
             <ToastContainer />
@@ -369,7 +320,7 @@ export default function Home() {
             {
                 treeMapData && (
                     <div className={window && isMobile() ? 'w3-responsive' : ''}>
-                        <button onClick={downloadTreeMap} className="w3-button w3-round-large w3-blue">Download ⤵️</button>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
                         <p id="treemap">
                             <Treemap
                                 width={1000}

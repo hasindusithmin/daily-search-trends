@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import CustomizedContent from "../components/CustomContentTreemap";
 import { Typewriter } from "react-simple-typewriter";
 import { toast, ToastContainer } from 'react-toastify';
+import { downloadChart } from "../utils/download-chart";
 
 export default function Keywords() {
 
@@ -150,25 +151,29 @@ export default function Keywords() {
                 <h5 className="w3-center w3-opacity" style={{ fontWeight: 'bold' }}>🗺 Countries with the highest number of internet users</h5>
                 {
                     treeMapData &&
-                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
-                        <Treemap
-                            width={1000}
-                            height={600}
-                            data={treeMapData}
-                            dataKey="size"
-                            stroke="#fff"
-                            fill="#8884d8"
-                            content={<CustomizedContent colors={colors} />}
-                        />
-                    </div>
+                    <>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('all') }}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id="all">
+                            <Treemap
+                                width={1000}
+                                height={600}
+                                data={treeMapData}
+                                dataKey="size"
+                                stroke="#fff"
+                                fill="#8884d8"
+                                content={<CustomizedContent colors={colors} />}
+                            />
+                        </div>
+                    </>
                 }
             </div>
             {
                 treeMapDataObj.length !== 0 &&
                 Object.entries(treeMapDataObj).map(([country, data], index) => (
-                    <div className="w3-padding-32">
+                    <div className="w3-padding-32" key={index}>
                         <div className="w3-center w3-padding"><b>Daily Search Trends - {country} {flags[country]}</b></div>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(`keyword_${country}`) }}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id={`keyword_${country}`}>
                             <BarChart
                                 title={country}
                                 width={1000}
@@ -182,7 +187,7 @@ export default function Keywords() {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="keyword" />
+                                <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />

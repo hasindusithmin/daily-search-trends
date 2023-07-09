@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
 import { toast } from "react-toastify"
+import { downloadChart } from '../utils/download-chart';
 export default function BarModal({ country, color, chartData, setChartData }) {
 
     const flags = {
@@ -50,21 +51,23 @@ export default function BarModal({ country, color, chartData, setChartData }) {
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
                 <b><Typewriter words={[`Here are today's top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={10} /></b>
             </div>
-
-            <BarChart
-                width={1000}
-                height={600}
-                data={chartData}
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="keyword" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e.keyword) }} />
-            </BarChart>
+            <p id={country + '_trends'}>
+                <BarChart
+                    width={1000}
+                    height={600}
+                    data={chartData}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="traffic" fill={color} onClick={e => { copyToClipboard(e.keyword) }} />
+                </BarChart>
+            </p>
             <div className='w3-padding w3-center'>
-                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue'>View All Countries 🗺</Link>
+                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-green w3-margin-right'>All Countries 🗺</Link>
+                <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_trends') }}>⤵</button>
             </div>
         </Modal>
     )

@@ -6,6 +6,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
+import { downloadChart } from "../utils/download-chart";
 
 export default function Country() {
 
@@ -276,37 +277,47 @@ export default function Country() {
                 {/* barchart  */}
                 {
                     barData &&
-                    <div className="w3-padding-32 w3-center">
-                        <BarChart
-                            width={1000}
-                            height={600}
-                            data={barData}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="keyword" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="traffic" onClick={(e) => { copyToClipboard(e.keyword); }} fill="#7ac143" />
-                        </BarChart>
-                    </div>
+                    <>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>⤵</button>
+                        <div className="w3-center">
+                            <p id={country + '_barchart'}>
+                                <BarChart
+                                    width={1000}
+                                    height={600}
+                                    data={barData}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="traffic" onClick={(e) => { copyToClipboard(e.keyword); }} fill="#7ac143" />
+                                </BarChart>
+                            </p>
+                        </div>
+                    </>
                 }
                 {/* treemap  */}
                 {
                     treeMapData &&
-                    <div className="w3-padding-32 w3-center">
-                        <Treemap
-                            width={1000}
-                            height={600}
-                            data={treeMapData}
-                            dataKey="size"
-                            aspectRatio={4 / 3}
-                            stroke="#fff"
-                            content={<CustomizedContent colors={colors} />}
-                            onClick={treeMapHandler}
-                            style={{ cursor: 'pointer' }}
-                        />
-                    </div>
+                    <>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>⤵</button>
+                        <div className="w3-center">
+                            <p id={country + '_treemap'}>
+                                <Treemap
+                                    width={1000}
+                                    height={600}
+                                    data={treeMapData}
+                                    dataKey="size"
+                                    aspectRatio={4 / 3}
+                                    stroke="#fff"
+                                    content={<CustomizedContent colors={colors} />}
+                                    onClick={treeMapHandler}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                            </p>
+                        </div>
+                    </>
                 }
             </div>
         </div>

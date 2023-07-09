@@ -7,6 +7,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, Area
 import DataTable from 'react-data-table-component';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { downloadChart } from '../utils/download-chart';
 
 
 export default function Analytics({ match }) {
@@ -278,7 +279,8 @@ export default function Analytics({ match }) {
                     all &&
                     <div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-all')}}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
                             <BarChart
                                 width={1000}
                                 height={600}
@@ -291,7 +293,7 @@ export default function Analytics({ match }) {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="1 1" />
-                                <XAxis dataKey="question" />
+                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Legend />
@@ -301,7 +303,8 @@ export default function Analytics({ match }) {
                             </BarChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-upvotes')}}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -314,14 +317,15 @@ export default function Analytics({ match }) {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" />
+                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-comments')}}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -334,14 +338,15 @@ export default function Analytics({ match }) {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" />
+                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-shares')}}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -354,14 +359,15 @@ export default function Analytics({ match }) {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" />
+                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
                             </AreaChart>
                         </div>
                         <h3 className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</h3>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-views')}}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''}  id='analytics-views'>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -374,7 +380,7 @@ export default function Analytics({ match }) {
                                 }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" />
+                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
                                 <YAxis />
                                 <Tooltip />
                                 <Area type="monotone" dataKey="views" stroke="#E84A5F" fill="#E84A5F" />
