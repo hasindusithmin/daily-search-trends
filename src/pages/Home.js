@@ -335,49 +335,6 @@ export default function Home() {
                     />
                 </div>
             </p>
-            {
-                treeMapData1 && (
-                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
-                        <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
-                        </p>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
-                        <p id="treemap">
-                            <Treemap
-                                width={1000}
-                                height={600}
-                                data={treeMapData1}
-                                dataKey="size"
-                                aspectRatio={4 / 3}
-                                stroke="#fff"
-                                content={<CustomizedContent colors={colors} />}
-                                onClick={treeMapHandler1}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </p>
-                    </div>
-                )
-            }
-            {
-                treeMapData2 && (
-                    <div className={window && isMobile() ? 'w3-responsive' : ''}>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
-                        <p id="treemap2">
-                            <Treemap
-                                width={1000}
-                                height={600}
-                                data={treeMapData2}
-                                dataKey="size"
-                                aspectRatio={4 / 3}
-                                stroke="#fff"
-                                content={<CustomizedContent colors={colors} />}
-                                onClick={treeMapHandler2}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </p>
-                    </div>
-                )
-            }
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
@@ -411,6 +368,49 @@ export default function Home() {
                     />
                 </div>
             )}
+            {
+                treeMapData1 && (
+                    <div>
+                        <p className="w3-padding w3-center">
+                            <div className="chart-details">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
+                        </p>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
+                        <p id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
+                            <Treemap
+                                width={1000}
+                                height={600}
+                                data={treeMapData1}
+                                dataKey="size"
+                                aspectRatio={4 / 3}
+                                stroke="#fff"
+                                content={<CustomizedContent colors={colors} />}
+                                onClick={treeMapHandler1}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </p>
+                    </div>
+                )
+            }
+            {
+                treeMapData2 && (
+                    <div>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
+                        <p id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
+                            <Treemap
+                                width={1000}
+                                height={600}
+                                data={treeMapData2}
+                                dataKey="size"
+                                aspectRatio={4 / 3}
+                                stroke="#fff"
+                                content={<CustomizedContent colors={colors} />}
+                                onClick={treeMapHandler2}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </p>
+                    </div>
+                )
+            }
             {
                 country && chartData &&
                 <Modal country={country} color={color} chartData={chartData} setChartData={setChartData} />

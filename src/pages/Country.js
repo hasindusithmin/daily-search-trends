@@ -270,7 +270,7 @@ export default function Country() {
                     <>
                         <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>⤵</button>
                         <div className="w3-center">
-                            <p id={country + '_treemap'}>
+                            <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <Treemap
                                     width={1000}
                                     height={600}
@@ -292,7 +292,7 @@ export default function Country() {
                     <>
                         <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>⤵</button>
                         <div className="w3-center">
-                            <p id={country + '_barchart'}>
+                            <p id={country + '_barchart'} className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <BarChart
                                     width={1000}
                                     height={600}
