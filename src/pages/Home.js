@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
-import BarModal from "../components/BarModal";
+import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import autoComplete from "@tarekraafat/autocomplete.js";
 import { copyToClipboard, downloadChart } from "../utils/commons";
@@ -255,7 +255,9 @@ export default function Home() {
         setCountry(e.name);
         const indexOf = countryRank.indexOf(e.name)
         setColor(colors[indexOf]);
-        setChartData(trends);
+        const treeMapData = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }))
+        treeMapData.sort((a, b) => b.size - a.size);
+        setChartData(treeMapData);
     }
 
     const treeMapHandler2 = (e) => {
@@ -336,7 +338,7 @@ export default function Home() {
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
-                        <div className="w3-padding">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
+                        <div className="chart-details">Analyzing Keyword 🔠 Traffic🚦 and Public Release Dates 🕗 across Countries 🗺</div>
                     </p>
                     <p style={{ paddingBottom: 32 }}>
                         <span className="w3-right">
@@ -366,12 +368,12 @@ export default function Home() {
                     />
                 </div>
             )}
-            <p className="w3-padding w3-center">
-                <div className="w3-padding">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
-            </p>
             {
                 treeMapData1 && (
                     <div className={window && isMobile() ? 'w3-responsive' : ''}>
+                        <p className="w3-padding w3-center">
+                            <div className="chart-details">Total Traffic🚦 of Trending Keywords 🔠 Across Countries 🗺 With The Highest Number Of Internet Users 🧑🏻‍💻</div>
+                        </p>
                         <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
                         <p id="treemap">
                             <Treemap
@@ -412,7 +414,7 @@ export default function Home() {
             }
             {
                 country && chartData &&
-                <BarModal country={country} color={color} chartData={chartData} setChartData={setChartData} />
+                <Modal country={country} color={color} chartData={chartData} setChartData={setChartData} />
             }
         </div>
     );

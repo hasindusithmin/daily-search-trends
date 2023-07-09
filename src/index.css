@@ -1995,8 +1995,9 @@ a {
 }
 
 .chart-details {
-  font-weight: 1000;
+  font-weight: 580;
   font-size: 18px;
   text-align: center;
   opacity: 0.75;
+  color: #388ed1;
 }

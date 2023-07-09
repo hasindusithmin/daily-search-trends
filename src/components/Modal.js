@@ -1,9 +1,10 @@
 import Modal from 'react-modal';
 import { Link } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { Treemap } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
-import { toast } from "react-toastify"
-import { downloadChart, copyToClipboard } from '../utils/commons';
+import { downloadChart } from '../utils/commons';
+import CustomizedContent from './CustomContentTreemap';
+
 export default function BarModal({ country, color, chartData, setChartData }) {
 
     const flags = {
@@ -39,25 +40,22 @@ export default function BarModal({ country, color, chartData, setChartData }) {
             <span onClick={() => { setChartData(null) }} className="w3-button w3-display-topright w3-padding">✖️</span>
             <div className='w3-center w3-padding-32 w3-xlarge w3-opacity'><b></b></div>
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
-                <b><Typewriter words={[`Here are today's top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={10} /></b>
+                <Typewriter words={[`Here are top trending keywords in the ${country} ${flags[country]}`]} typeSpeed={20} />
             </div>
             <p id={country + '_trends'}>
-                <BarChart
+                <Treemap
                     width={1000}
                     height={600}
                     data={chartData}
-                    onClick={e => { copyToClipboard(e['activeLabel']) }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="traffic" fill={color} />
-                </BarChart>
+                    dataKey="size"
+                    aspectRatio={4 / 3}
+                    stroke="#fff"
+                    content={<CustomizedContent colors={new Array(20).fill(color)} />}
+                    style={{ cursor: 'pointer' }}
+                />
             </p>
             <div className='w3-padding w3-center'>
-                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-green w3-margin-right'>All Countries 🗺</Link>
+                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue-grey w3-margin-right'>All Countries 🗺</Link>
                 <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_trends') }}>⤵</button>
             </div>
         </Modal>

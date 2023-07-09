@@ -136,7 +136,7 @@ export default function Keywords() {
                 <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
             </div>
             <div className="w3-padding-32">
-                <h5 className="w3-center w3-opacity" style={{ fontWeight: 'bold' }}>🗺 Countries with the highest number of internet users</h5>
+                <div className="chart-details">🗺 Countries with the highest number of internet users</div>
                 {
                     treeMapData &&
                     <>
@@ -159,7 +159,7 @@ export default function Keywords() {
                 treeMapDataObj.length !== 0 &&
                 Object.entries(treeMapDataObj).map(([country, data], index) => (
                     <div className="w3-padding-32" key={index}>
-                        <div className="w3-center w3-padding"><b>Daily Search Trends - {country} {flags[country]}</b></div>
+                        <div className="chart-details">Internet traffic distribution by keywords - {country}</div>
                         <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(`keyword_${country}`) }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id={`keyword_${country}`}>
                             <BarChart

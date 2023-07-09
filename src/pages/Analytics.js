@@ -239,7 +239,7 @@ export default function Analytics({ match }) {
                     all && all.length > 30 &&
                     (
                         <div className='w3-center'>
-                            <h3 className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></h3>
+                            <div className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></div>
                             &nbsp;&nbsp;
                             <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
                         </div>
@@ -278,7 +278,7 @@ export default function Analytics({ match }) {
                 {
                     all &&
                     <div>
-                        <h3 className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
+                        <div className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</div>
                         <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-all')}}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
                             <BarChart
@@ -303,7 +303,7 @@ export default function Analytics({ match }) {
                                 <Bar dataKey="shares" stackId="a" fill="#FF851B" />
                             </BarChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</h3>
+                        <div className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</div>
                         <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-upvotes')}}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
                             <AreaChart
@@ -325,7 +325,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</h3>
+                        <div className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</div>
                         <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-comments')}}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
                             <AreaChart
@@ -347,7 +347,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</h3>
+                        <div className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</div>
                         <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-shares')}}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
                             <AreaChart
@@ -369,7 +369,7 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
                             </AreaChart>
                         </div>
-                        <h3 className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</h3>
+                        <div className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</div>
                         <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-views')}}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''}  id='analytics-views'>
                             <AreaChart
