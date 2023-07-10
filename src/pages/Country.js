@@ -256,14 +256,11 @@ export default function Country() {
     const categorizeKeywords = async () => {
         try {
             if (categorization) return
-            let prompt = 'categorize these keywords:\n';
             let keywordsStr = '';
             trends.forEach(({ keyword }) => {
                 keywordsStr += `${keyword}, `
             })
-            let allKeywords = keywordsStr.slice(0, -2);
-            prompt += allKeywords;
-            prompt += '\nPlease provide me with a categorization of these keywords without any other words.';
+            let prompt = keywordsStr.slice(0, -2);
             setProcessing(true);
             const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
                 auth: {
