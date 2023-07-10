@@ -263,7 +263,7 @@ export default function Country() {
             })
             let allKeywords = keywordsStr.slice(0, -2);
             prompt += allKeywords;
-            prompt += '\nprovide me to categorization of these keywords without anyother words';
+            prompt += '\nPlease provide me with a categorization of these keywords without any other words.';
             setProcessing(true);
             const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
                 auth: {
