@@ -260,7 +260,8 @@ export default function Country() {
             trends.forEach(({ keyword }) => {
                 keywordsStr += `${keyword}, `
             })
-            let prompt = keywordsStr.slice(0, -2);
+            let prompt = 'Explain these keywords in English\n'
+            prompt += keywordsStr.slice(0, -2);
             setProcessing(true);
             const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
                 auth: {
