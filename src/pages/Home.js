@@ -324,8 +324,8 @@ export default function Home() {
         <div className="w3-content">
             <ToastContainer />
             <div className="w3-center w3-padding-64">
-                <div className="w3-xlarge">
-                    Daily Search Trends
+                <div className="w3-xlarge w3-opacity">
+                    <b>Daily Search Trends</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
@@ -348,7 +348,7 @@ export default function Home() {
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
-                        <div className="chart-details">Analyzing Keyword Traffic and Public Release Dates across Countries <span style={{cursor:'copy'}} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                        <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries With The Highest Number Of Internet Users <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
                     </p>
                     <p style={{ paddingBottom: 32 }}>
                         <span className="w3-right">
@@ -383,7 +383,7 @@ export default function Home() {
                         <p className="w3-padding w3-center">
                             <div className="chart-details">Total Traffic of Trending Keywords Across Countries With The Highest Number Of Internet Users</div>
                         </p>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
+                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
                         <p id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
                             <Treemap
                                 width={1000}
@@ -400,10 +400,14 @@ export default function Home() {
                     </div>
                 )
             }
+            <hr className="w3-clear"/>
             {
                 treeMapData2 && (
                     <div>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
+                        <p className="w3-padding w3-center">
+                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries With The Highest Number Of Internet Users (Advanced)</div>
+                        </p>
+                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
                         <p id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                             <Treemap
                                 width={1000}

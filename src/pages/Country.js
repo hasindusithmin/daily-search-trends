@@ -282,8 +282,8 @@ export default function Country() {
         <div className="w3-content">
             <ToastContainer />
             <div className="w3-center w3-padding-64">
-                <div className="w3-xlarge">
-                    Daily Search Trends | {country} {flags[country]}
+                <div className="w3-xlarge w3-opacity">
+                    <b>Daily Search Trends | {country}</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
@@ -295,7 +295,7 @@ export default function Country() {
                     <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</button>
                     <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="categorize all keywords" onClick={categorizeKeywords}>
                         {
-                            processing ? <i className="fa fa-refresh w3-spin"></i> : '➗'
+                            processing ? <i className="fa fa-refresh w3-spin"></i> : '➗ (beta)'
                         }
                     </button>
                     {

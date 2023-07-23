@@ -96,7 +96,7 @@ export default function Analytics({ match }) {
 
         const changeState = (data) => {
             if (data.length < 5) {
-                setNotFound("Results not found");
+                setNotFound("Sorry, results not found");
                 return
             }
             const _ = data.map(({ question, upvotes, comments, shares, views, time }) => ({ question, upvotes, comments, shares, views, time }));
@@ -130,7 +130,6 @@ export default function Analytics({ match }) {
             const apiData = await getDataFromAPI();
             if (apiData.length === 0) {
                 toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
-                return
             }
             // do state changes 
             changeState(apiData);
@@ -219,18 +218,14 @@ export default function Analytics({ match }) {
             <ToastContainer />
             <div className="w3-content">
                 <div className="w3-center w3-padding-64">
-                    <div className="w3-xlarge">
-                        Daily Search Trends | {keyword}
+                    <div className="w3-xlarge w3-opacity">
+                        <b>Daily Search Trends | {keyword}</b>
                     </div>
                     <p>
                         <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                     </p>
                     <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
                 </div>
-                {
-                    keyword && <h5 className='w3-center w3-text-grey'><b>{keyword}</b></h5>
-                }
-                <hr />
                 {
                     notFound &&
                     <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
@@ -241,7 +236,7 @@ export default function Analytics({ match }) {
                         <div className='w3-center'>
                             <div className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></div>
                             &nbsp;&nbsp;
-                            <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
+                            <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer (beta)' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
                         </div>
                     )
                 }
@@ -275,11 +270,12 @@ export default function Analytics({ match }) {
                         </div>
                     )
                 }
+                <hr className='w3-clear' />
                 {
                     all &&
                     <div>
                         <div className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-all')}}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-all') }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
                             <BarChart
                                 width={1000}
@@ -291,7 +287,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
-                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
+                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
                             >
                                 <CartesianGrid strokeDasharray="1 1" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -303,8 +299,9 @@ export default function Analytics({ match }) {
                                 <Bar dataKey="shares" stackId="a" fill="#FF851B" />
                             </BarChart>
                         </div>
+                        <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-upvotes')}}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-upvotes') }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
                             <AreaChart
                                 width={1000}
@@ -316,7 +313,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
-                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
+                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -325,8 +322,9 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
                             </AreaChart>
                         </div>
+                        <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</div>
-                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-comments')}}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-comments') }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
                             <AreaChart
                                 width={1000}
@@ -338,7 +336,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
-                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
+                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -347,8 +345,9 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
                             </AreaChart>
                         </div>
+                        <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-shares')}}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-shares') }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
                             <AreaChart
                                 width={1000}
@@ -360,7 +359,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
-                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
+                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
@@ -369,9 +368,10 @@ export default function Analytics({ match }) {
                                 <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
                             </AreaChart>
                         </div>
+                        <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button className='w3-button w3-round-large' style={{backgroundColor:'#8cafbfcf', color:'#ffffff'}} onClick={()=>{downloadChart('analytics-views')}}>⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''}  id='analytics-views'>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-views') }}>⤵</button>
+                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-views'>
                             <AreaChart
                                 width={1000}
                                 height={600}
@@ -382,7 +382,7 @@ export default function Analytics({ match }) {
                                     left: 20,
                                     bottom: 5,
                                 }}
-                                onClick={(e)=>{copyToClipboard(e['activeLabel'])}}
+                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
                             >
                                 <CartesianGrid strokeDasharray="3 3" />
                                 <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />

@@ -127,8 +127,8 @@ export default function Keywords() {
         <div className="w3-content">
             <ToastContainer />
             <div className="w3-center w3-padding-64">
-                <div className="w3-xlarge">
-                    Daily Search Trends
+                <div className="w3-xlarge w3-opacity">
+                    <b>Daily Search Trends</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
@@ -140,7 +140,7 @@ export default function Keywords() {
                 {
                     treeMapData &&
                     <>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('all') }}>⤵</button>
+                        <button title="download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('all') }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id="all">
                             <Treemap
                                 width={1000}
@@ -150,7 +150,7 @@ export default function Keywords() {
                                 stroke="#fff"
                                 fill="#8884d8"
                                 content={<CustomizedContent colors={colors} />}
-                                onClick={e => {copyToClipboard(e['name'])}}
+                                onClick={e => { copyToClipboard(e['name']) }}
                             />
                         </div>
                     </>
@@ -161,7 +161,7 @@ export default function Keywords() {
                 Object.entries(treeMapDataObj).map(([country, data], index) => (
                     <div className="w3-padding-32" key={index}>
                         <div className="chart-details">Internet traffic distribution by keywords - {country}</div>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(`keyword_${country}`) }}>⤵</button>
+                        <button title="download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(`keyword_${country}`) }}>⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id={`keyword_${country}`}>
                             <BarChart
                                 title={country}
