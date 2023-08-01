@@ -6,7 +6,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
-import { downloadChart, copyToClipboard } from "../utils/commons";
+import { downloadChart, copyToClipboard, isMobile } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -47,7 +47,7 @@ export default function Country() {
         },
         {
             name: 'Keyword',
-            selector: row => row.keyword,
+            selector: row => row.title,
             sortable: true
         },
         {
@@ -162,6 +162,59 @@ export default function Country() {
         "Vietnam": "🇻🇳"
     }
 
+    const codes = {
+        'Argentina': 'AR',
+        'Australia': 'AU',
+        'Austria': 'AT',
+        'Belgium': 'BE',
+        'Brazil': 'BR',
+        'Canada': 'CA',
+        'Chile': 'CL',
+        'Colombia': 'CO',
+        'Czechia': 'CZ',
+        'Denmark': 'DK',
+        'Egypt': 'EG',
+        'Finland': 'FI',
+        'France': 'FR',
+        'Germany': 'DE',
+        'Greece': 'GR',
+        'Hong Kong': 'HK',
+        'Hungary': 'HU',
+        'India': 'IN',
+        'Indonesia': 'ID',
+        'Ireland': 'IE',
+        'Israel': 'IL',
+        'Italy': 'IT',
+        'Japan': 'JP',
+        'Kenya': 'KE',
+        'Malaysia': 'MY',
+        'Mexico': 'MX',
+        'Netherlands': 'NL',
+        'New Zealand': 'NZ',
+        'Nigeria': 'NG',
+        'Norway': 'NO',
+        'Peru': 'PE',
+        'Philippines': 'PH',
+        'Poland': 'PL',
+        'Portugal': 'PT',
+        'Romania': 'RO',
+        'Russia': 'RU',
+        'Saudi Arabia': 'SA',
+        'Singapore': 'SG',
+        'South Africa': 'ZA',
+        'South Korea': 'KR',
+        'Spain': 'ES',
+        'Sweden': 'SE',
+        'Switzerland': 'CH',
+        'Taiwan': 'TW',
+        'Thailand': 'TH',
+        'Türkiye': 'TR',
+        'Ukraine': 'UA',
+        'United Kingdom': 'GB',
+        'United States': 'US',
+        'Vietnam': 'VN'
+    }
+
     useEffect(() => {
         initialize()
     }, [])
@@ -174,14 +227,14 @@ export default function Country() {
         const changeState = (trendingsearches) => {
             trendingsearches.sort((a, b) => b.traffic - a.traffic)
             setTrends(trendingsearches);
-            setBarData(trendingsearches.map(({ keyword, traffic }) => ({ keyword, traffic })));
-            setTreeMapData(trendingsearches.map(({ keyword, traffic }) => ({ name: keyword, size: traffic })))
+            setBarData(trendingsearches.map(({ title, traffic }) => ({ title, traffic })));
+            setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
         }
 
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
-                const res = await axios.get(`https://trendsapi-1-q3464257.deta.app/${country}`);
+                const res = await axios.get(`https://claudeapi.onrender.com/trend?code=${codes[country]}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -233,18 +286,10 @@ export default function Country() {
         copyToClipboard(e.name)
     }
 
-    const isMobile = () => {
-        if (/Android|iPhone/i.test(window.navigator.userAgent)) {
-            return true
-        } else {
-            return false
-        }
-    }
-
     const copyKeywordsToClipBoard = () => {
         let keywordsStr = '';
-        trends.forEach(({ keyword }) => {
-            keywordsStr += `${keyword}, `
+        trends.forEach(({ title }) => {
+            keywordsStr += `${title}, `
         })
         let allKeywords = keywordsStr.slice(0, -2);
         copyToClipboard(allKeywords)
@@ -257,8 +302,8 @@ export default function Country() {
         try {
             if (categorization) return
             let keywordsStr = '';
-            trends.forEach(({ keyword }) => {
-                keywordsStr += `${keyword}, `
+            trends.forEach(({ title }) => {
+                keywordsStr += `${title}, `
             })
             let prompt = 'Explain these keywords in English\n'
             prompt += keywordsStr.slice(0, -2);
@@ -312,6 +357,7 @@ export default function Country() {
                             data={trends}
                             customStyles={customStyles}
                             pagination
+                            responsive
                         />
                     </div>
                 }
@@ -319,12 +365,12 @@ export default function Country() {
                 {
                     treeMapData &&
                     <>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>⤵</button>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
                         <div className="w3-center">
                             <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <Treemap
-                                    width={1000}
-                                    height={600}
+                                    width={isMobile() ? 380:1280}
+                                    height={isMobile() ? 285:760}
                                     data={treeMapData}
                                     dataKey="size"
                                     aspectRatio={4 / 3}
@@ -341,17 +387,17 @@ export default function Country() {
                 {
                     barData &&
                     <>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>⤵</button>
+                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>download ⤵</button>
                         <div className="w3-center">
                             <p id={country + '_barchart'} className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <BarChart
-                                    width={1000}
-                                    height={600}
+                                    width={isMobile() ? 380:1280}
+                                    height={isMobile() ? 285:760}
                                     data={barData}
                                     onClick={(e) => { copyToClipboard(e['activeLabel']); }}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="keyword" angle={270} orientation="top" fontSize={10} />
+                                    <XAxis dataKey="title" angle={270} orientation="top" fontSize={10} />
                                     <YAxis />
                                     <Tooltip />
                                     <Legend />

@@ -56,8 +56,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                 />
             </p>
             <div className='w3-padding w3-center'>
-                <Link to="/keywords" style={{ textDecoration: "none" }} className='w3-button w3-round w3-blue-grey w3-margin-right'>All Countries 🗺</Link>
-                <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_trends') }}>⤵</button>
+                <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_trends') }}>Download ⤵</button>
             </div>
         </Modal>
     )

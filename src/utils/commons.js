@@ -110,3 +110,21 @@ export function copyToClipboard(text) {
   document.body.removeChild(textarea);
   toast.success(`Copied to the clipboard`, { hideProgressBar: true, autoClose: 250, position: 'top-left' })
 }
+
+
+export function isMobile() {
+  const toMatch = [
+      /Android/i,
+      /webOS/i,
+      /iPhone/i,
+      /iPad/i,
+      /iPod/i,
+      /BlackBerry/i,
+      /Windows Phone/i
+  ];
+
+  
+  return toMatch.some((toMatchItem) => {
+      return window.navigator.userAgent.match(toMatchItem);
+  });
+}

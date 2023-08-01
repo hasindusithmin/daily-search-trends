@@ -7,10 +7,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, Area
 import DataTable from 'react-data-table-component';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { downloadChart, copyToClipboard } from '../utils/commons';
+import { downloadChart, copyToClipboard, isMobile } from '../utils/commons';
 
 
-export default function Analytics({ match }) {
+export default function Analytics({ }) {
 
     function truncateText(text) {
         if (text.length <= 20) {
@@ -205,13 +205,6 @@ export default function Analytics({ match }) {
         }
     }
 
-    const isMobile = () => {
-        if (/Android|iPhone/i.test(window.navigator.userAgent)) {
-            return true
-        } else {
-            return false
-        }
-    }
 
     return (
         <>
@@ -266,6 +259,7 @@ export default function Analytics({ match }) {
                                 data={all}
                                 customStyles={customStyles}
                                 pagination
+                                responsive
                             />
                         </div>
                     )
@@ -275,11 +269,11 @@ export default function Analytics({ match }) {
                     all &&
                     <div>
                         <div className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-all') }}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-all') }}>download ⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
                             <BarChart
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 680 : 1280}
+                                height={isMobile() ? 380 : 760}
                                 data={all}
                                 margin={{
                                     top: 20,
@@ -301,11 +295,11 @@ export default function Analytics({ match }) {
                         </div>
                         <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-upvotes') }}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-upvotes') }}>download ⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
                             <AreaChart
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 680 : 1280}
+                                height={isMobile() ? 380 : 760}
                                 data={upvotesRank}
                                 margin={{
                                     top: 5,
@@ -324,11 +318,11 @@ export default function Analytics({ match }) {
                         </div>
                         <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-comments') }}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-comments') }}>download ⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
                             <AreaChart
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 680 : 1280}
+                                height={isMobile() ? 380 : 760}
                                 data={commentsRank}
                                 margin={{
                                     top: 5,
@@ -347,11 +341,11 @@ export default function Analytics({ match }) {
                         </div>
                         <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-shares') }}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-shares') }}>download ⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
                             <AreaChart
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 680 : 1280}
+                                height={isMobile() ? 380 : 760}
                                 data={sharesRank}
                                 margin={{
                                     top: 5,
@@ -370,11 +364,11 @@ export default function Analytics({ match }) {
                         </div>
                         <hr className='w3-clear' />
                         <div className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-views') }}>⤵</button>
+                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-views') }}>download ⤵</button>
                         <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-views'>
                             <AreaChart
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 680 : 1280}
+                                height={isMobile() ? 380 : 760}
                                 data={viewsRank}
                                 margin={{
                                     top: 5,

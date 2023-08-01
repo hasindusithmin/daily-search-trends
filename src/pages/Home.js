@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
 import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
+import Select from "react-select";
 import autoComplete from "@tarekraafat/autocomplete.js";
 import { copyToClipboard, downloadChart } from "../utils/commons";
 
@@ -24,7 +25,7 @@ export default function Home() {
         },
         {
             name: 'Keyword',
-            selector: row => row.keyword,
+            selector: row => row.title,
             sortable: true
         },
         {
@@ -45,7 +46,7 @@ export default function Home() {
             sortable: true
         },
         {
-            cell: row => <Link to={`/analytics/${row.keyword}`} className="w3-button w3-light-gray w3-round-large" title="People also ask" >PAS</Link>,
+            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="People also ask" >PAS</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -53,135 +54,6 @@ export default function Home() {
             }
         }
     ];
-
-    const [trends, setTrends] = useState(null);
-    const [trendsCopy, setTrendsCopy] = useState([]);
-    const [treeMapData1, setTreeMapData1] = useState(null);
-    const [treeMapData2, setTreeMapData2] = useState(null);
-    const [rawData, setRawData] = useState([]);
-    const [countryRank, setCountryRank] = useState([]);
-    const [color, setColor] = useState('');
-
-    function formatNumberAbbreviation(number) {
-        const suffixes = ['', 'K', 'M', 'B', 'T'];
-        const suffixNum = Math.floor(('' + number).length / 3);
-        let shortNumber = parseFloat((suffixNum !== 0 ? (number / Math.pow(1000, suffixNum)) : number).toPrecision(2));
-        if (shortNumber % 1 !== 0) {
-            shortNumber = shortNumber.toFixed(1);
-        }
-        return shortNumber + suffixes[suffixNum];
-    }
-
-    function formatToBrowserTimezone(datetimeString) {
-        const options = {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric"
-        };
-
-        return new Date(datetimeString).toLocaleString(undefined, options);
-    }
-
-    const colors = [
-        "#004400",  // dark green
-        "#006600",  // pakistan green
-        "#008000",  // office green
-        "#228B22",  // forest green
-        "#32CD32",  // lime green
-        "#3CB371",  // medium sea green
-        "#66CDAA",  // medium aquamarine
-        "#98FB98",  // pale green
-        "#ADFF2F",  // green yellow
-        "#ccffcc"   // honeydew 
-    ];
-
-    useEffect(() => {
-        initialize();
-    }, []);
-
-    const initialize = () => {
-        const changeState = (trendingsearches) => {
-            setRawData(trendingsearches);
-            const data = []
-            const treeMapDataArr1 = []
-            const treeMapDataArr2 = []
-            for (const { country, trends, flag } of trendingsearches) {
-                const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
-                treeMapDataArr1.push({ name: country, size: totalTraffic })
-                for (const trend of trends) {
-                    data.push({ ...trend, country: `${country} ${flag}` })
-                }
-            }
-            treeMapDataArr1.sort((a, b) => b.size - a.size);
-            setTreeMapData1(treeMapDataArr1)
-            for (const Country of trendingsearches) {
-                const obj = {};
-                const { country, trends, flag } = Country;
-                obj['name'] = country;
-                const data = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }));
-                data.sort((a, b) => b.size - a.size);
-                obj['children'] = data
-                obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
-                treeMapDataArr2.push(obj);
-            }
-            treeMapDataArr2.sort((a, b) => b.traffic - a.traffic);
-            setTreeMapData2(treeMapDataArr2);
-            setCountryRank(treeMapDataArr1.map(({ name }) => name));
-            setTrends(data.sort((a, b) => b.traffic - a.traffic));
-            setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
-        }
-
-        const getDataFromAPI = async () => {
-            const toastID = toast.loading("Processing, Please Wait...")
-            try {
-                const res = await axios.get('https://trendsapi-1-q3464257.deta.app');
-                toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                return res.data
-            } catch (error) {
-                toast.update(toastID, { render: error.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                return []
-            }
-        }
-
-        const fetchRenderSave = async () => {
-            // get data from API 
-            const apiData = await getDataFromAPI();
-            if (apiData.length === 0) {
-                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
-                return
-            }
-            // do state changes 
-            changeState(apiData);
-            // save data in local storage 
-            const store_data = {
-                "created": Date.now(),
-                "resource": JSON.stringify(apiData)
-            }
-            localStorage.setItem('treasure', JSON.stringify(store_data))
-        }
-
-        const treasure = localStorage.getItem('treasure');
-        if (!treasure) {
-            // If there is no data in the local storage
-            console.log('there is no data in the local storage');
-            fetchRenderSave();
-            return
-        }
-        const { created, resource } = JSON.parse(treasure);
-        const now = Date.now();
-        const is_data_old = (now - created) > (15 * 60 * 1000)
-        if (is_data_old) {
-            // If the data is more than 15 minutes old
-            console.log('data is more than 15 minutes old');
-            fetchRenderSave();
-            return
-        }
-        // do state changes 
-        changeState(JSON.parse(resource));
-    }
 
     const customStyles = {
         headCells: {
@@ -215,27 +87,192 @@ export default function Home() {
         },
     };
 
-    setTimeout(() => {
-        const autoCompleteJS = new autoComplete({
-            placeHolder: "Search for Countries...",
-            data: {
-                src: ['Australia', 'Argentina', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Czechia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Malaysia', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Türkiye', 'Ukraine', 'United Kingdom', 'United States', 'Vietnam'],
-                cache: true,
-            },
-            resultItem: {
-                highlight: true
-            },
-            events: {
-                input: {
-                    selection: (event) => {
-                        const selection = event.detail.selection.value;
-                        autoCompleteJS.input.value = selection;
-                        navigate(`/country/${selection}`)
-                    }
+    const selectOptions = [
+        { "label": "Argentina", "value": "AR" },
+        { "label": "Australia", "value": "AU" },
+        { "label": "Austria", "value": "AT" },
+        { "label": "Belgium", "value": "BE" },
+        { "label": "Brazil", "value": "BR" },
+        { "label": "Canada", "value": "CA" },
+        { "label": "Chile", "value": "CL" },
+        { "label": "Colombia", "value": "CO" },
+        { "label": "Czechia", "value": "CZ" },
+        { "label": "Denmark", "value": "DK" },
+        { "label": "Egypt", "value": "EG" },
+        { "label": "Finland", "value": "FI" },
+        { "label": "France", "value": "FR" },
+        { "label": "Germany", "value": "DE" },
+        { "label": "Greece", "value": "GR" },
+        { "label": "Hong Kong", "value": "HK" },
+        { "label": "Hungary", "value": "HU" },
+        { "label": "India", "value": "IN" },
+        { "label": "Indonesia", "value": "ID" },
+        { "label": "Ireland", "value": "IE" },
+        { "label": "Israel", "value": "IL" },
+        { "label": "Italy", "value": "IT" },
+        { "label": "Japan", "value": "JP" },
+        { "label": "Kenya", "value": "KE" },
+        { "label": "Malaysia", "value": "MY" },
+        { "label": "Mexico", "value": "MX" },
+        { "label": "Netherlands", "value": "NL" },
+        { "label": "New Zealand", "value": "NZ" },
+        { "label": "Nigeria", "value": "NG" },
+        { "label": "Norway", "value": "NO" },
+        { "label": "Peru", "value": "PE" },
+        { "label": "Philippines", "value": "PH" },
+        { "label": "Poland", "value": "PL" },
+        { "label": "Portugal", "value": "PT" },
+        { "label": "Romania", "value": "RO" },
+        { "label": "Russia", "value": "RU" },
+        { "label": "Saudi Arabia", "value": "SA" },
+        { "label": "Singapore", "value": "SG" },
+        { "label": "South Africa", "value": "ZA" },
+        { "label": "South Korea", "value": "KR" },
+        { "label": "Spain", "value": "ES" },
+        { "label": "Sweden", "value": "SE" },
+        { "label": "Switzerland", "value": "CH" },
+        { "label": "Taiwan", "value": "TW" },
+        { "label": "Thailand", "value": "TH" },
+        { "label": "Türkiye", "value": "TR" },
+        { "label": "Ukraine", "value": "UA" },
+        { "label": "United Kingdom", "value": "GB" },
+        { "label": "United States", "value": "US" },
+        { "label": "Vietnam", "value": "VN" }
+    ]
+
+    const colors = [
+        "#004400",  // dark green
+        "#006600",  // pakistan green
+        "#008000",  // office green
+        "#228B22",  // forest green
+        "#32CD32",  // lime green
+        "#3CB371",  // medium sea green
+        "#66CDAA",  // medium aquamarine
+        "#98FB98",  // pale green
+        "#ADFF2F",  // green yellow
+        "#ccffcc"   // honeydew 
+    ];
+
+    const [trends, setTrends] = useState(null);
+    const [trendsCopy, setTrendsCopy] = useState([]);
+    const [treeMapData1, setTreeMapData1] = useState(null);
+    const [treeMapData2, setTreeMapData2] = useState(null);
+    const [rawData, setRawData] = useState([]);
+    const [countryRank, setCountryRank] = useState([]);
+    const [color, setColor] = useState('');
+    const [isListChange, setIsListChange] = useState(false);
+    const [countryList, setCountryList] = useState(["IN", "US", "ID", "BR", "RU"])
+
+    function formatNumberAbbreviation(number) {
+        const suffixes = ['', 'K', 'M', 'B', 'T'];
+        const suffixNum = Math.floor(('' + number).length / 3);
+        let shortNumber = parseFloat((suffixNum !== 0 ? (number / Math.pow(1000, suffixNum)) : number).toPrecision(2));
+        if (shortNumber % 1 !== 0) {
+            shortNumber = shortNumber.toFixed(1);
+        }
+        return shortNumber + suffixes[suffixNum];
+    }
+
+    function formatToBrowserTimezone(datetimeString) {
+        const options = {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric"
+        };
+
+        return new Date(datetimeString).toLocaleString(undefined, options);
+    }
+
+    useEffect(() => {
+        initialize();
+    }, []);
+
+    const initialize = () => {
+        const changeState = (trendingsearches) => {
+            setRawData(trendingsearches);
+            const data = []
+            const treeMapDataArr1 = []
+            const treeMapDataArr2 = []
+            for (const { country, trends, flag } of trendingsearches) {
+                const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
+                treeMapDataArr1.push({ name: country, size: totalTraffic })
+                for (const trend of trends) {
+                    data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
-        });
-    }, 1000)
+            treeMapDataArr1.sort((a, b) => b.size - a.size);
+            setTreeMapData1(treeMapDataArr1)
+            for (const Country of trendingsearches) {
+                const obj = {};
+                const { country, trends, flag } = Country;
+                obj['name'] = country;
+                const data = trends.map(({ title, traffic }) => ({ name: title, size: traffic }));
+                data.sort((a, b) => b.size - a.size);
+                obj['children'] = data
+                obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
+                treeMapDataArr2.push(obj);
+            }
+            treeMapDataArr2.sort((a, b) => b.traffic - a.traffic);
+            setTreeMapData2(treeMapDataArr2);
+            setCountryRank(treeMapDataArr1.map(({ name }) => name));
+            setTrends(data.sort((a, b) => b.traffic - a.traffic));
+            setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
+        }
+
+        const getDataFromAPI = async () => {
+            const toastID = toast.loading("Processing, Please Wait...")
+            try {
+                const res = await axios.post('https://claudeapi.onrender.com/trends', {
+                    codes: countryList
+                });
+                toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return res.data
+            } catch (error) {
+                toast.update(toastID, { render: error.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                return []
+            }
+        }
+
+        const fetchRenderSave = async () => {
+            // get data from API 
+            const apiData = await getDataFromAPI();
+            if (apiData.length === 0) {
+                toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
+                return
+            }
+            // do state changes 
+            changeState(apiData);
+            // save data in local storage 
+            const store_data = {
+                "created": Date.now(),
+                "resource": JSON.stringify(apiData)
+            }
+            localStorage.setItem('treasure', JSON.stringify(store_data))
+        }
+
+        const treasure = localStorage.getItem('treasure');
+        if (!treasure || isListChange) {
+            // If there is no data in the local storage or requests new list
+            console.log('there is no data in the local storage');
+            fetchRenderSave();
+            setIsListChange(false)
+            return
+        }
+        const { created, resource } = JSON.parse(treasure);
+        const now = Date.now();
+        const is_data_old = (now - created) > (15 * 60 * 1000)
+        if (is_data_old) {
+            // If the data is more than 15 minutes old
+            console.log('data is more than 15 minutes old');
+            fetchRenderSave();
+            return
+        }
+        // do state changes 
+        changeState(JSON.parse(resource));
+    }
 
     const [country, setCountry] = useState(null);
     const [chartData, setChartData] = useState(null);
@@ -255,7 +292,7 @@ export default function Home() {
         setCountry(e.name);
         const indexOf = countryRank.indexOf(e.name)
         setColor(colors[indexOf]);
-        const treeMapData = trends.map(({ keyword, traffic }) => ({ name: keyword, size: traffic }))
+        const treeMapData = trends.map(({ title, traffic }) => ({ name: title, size: traffic }))
         treeMapData.sort((a, b) => b.size - a.size);
         setChartData(treeMapData);
     }
@@ -312,12 +349,43 @@ export default function Home() {
 
     const copyKeywordsToClipBoard = () => {
         let keywordsStr = '';
-        trends.forEach(({ keyword }) => {
-            keywordsStr += `${keyword}, `
+        trends.forEach(({ title }) => {
+            keywordsStr += `${title}, `
         })
         let allKeywords = keywordsStr.slice(0, -2);
         copyToClipboard(allKeywords)
     }
+
+    const fetchNewList = () => {
+        const reqList = selectedCountries.map(({ value }) => value)
+        setCountryList(reqList);
+        setIsListChange(true);
+        initialize()
+    }
+
+    setTimeout(() => {
+        const autoCompleteJS = new autoComplete({
+            placeHolder: "Search for Countries...",
+            data: {
+                src: ['Australia', 'Argentina', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Czechia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Malaysia', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Türkiye', 'Ukraine', 'United Kingdom', 'United States', 'Vietnam'],
+                cache: true,
+            },
+            resultItem: {
+                highlight: true
+            },
+            events: {
+                input: {
+                    selection: (event) => {
+                        const selection = event.detail.selection.value;
+                        autoCompleteJS.input.value = selection;
+                        navigate(`/country/${selection}`)
+                    }
+                }
+            }
+        });
+    }, 1000)
+
+    const [selectedCountries, setSelectedCountries] = useState([{ "label": "India", "value": "IN" }, { "label": "United States", "value": "US" }, { "label": "Indonesia", "value": "ID" }, { "label": "Brazil", "value": "BR" }, { "label": "Russia", "value": "RU" }]);
 
     return (
         <div className="w3-content">
@@ -344,11 +412,32 @@ export default function Home() {
                     />
                 </div>
             </p>
+
+
             {trends && (
                 <div className="w3-padding-32 w3-center">
                     <p className="w3-padding w3-center">
-                        <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries With The Highest Number Of Internet Users <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                        <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
                     </p>
+                    <div className="w3-center">
+                        <Select
+                            options={selectOptions}
+                            isMulti
+                            isSearchable={true}
+                            placeholder="Select Countries..."
+                            onChange={(o) => setSelectedCountries(o)}
+                            isOptionDisabled={() => selectedCountries.length >= 5}
+                            defaultValue={[
+                                selectOptions[17],
+                                selectOptions[48],
+                                selectOptions[18],
+                                selectOptions[4],
+                                selectOptions[35]
+                            ]}
+                        />
+                        <br />
+                        <button className="w3-button w3-border w3-border-blue w3-round-large" style={{ fontWeight: 750 }} onClick={fetchNewList}>Get Search Trends</button>
+                    </div>
                     <p style={{ paddingBottom: 32 }}>
                         <span className="w3-right">
                             <input
@@ -365,7 +454,7 @@ export default function Home() {
                                 style={{ padding: '10px' }}
                                 onClick={resetFilter}
                                 title="Clear"
-                            >✖️</button>
+                            >✖</button>
                         </span>
                     </p>
                     <DataTable
@@ -373,6 +462,7 @@ export default function Home() {
                         data={trends}
                         customStyles={customStyles}
                         pagination
+                        responsive
                     />
                 </div>
             )}
@@ -380,13 +470,13 @@ export default function Home() {
                 treeMapData1 && (
                     <div>
                         <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries With The Highest Number Of Internet Users</div>
+                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries</div>
                         </p>
-                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>⤵</button>
+                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
                         <p id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
                             <Treemap
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 380:1280}
+                                height={isMobile() ? 285:760}
                                 data={treeMapData1}
                                 dataKey="size"
                                 aspectRatio={4 / 3}
@@ -399,24 +489,25 @@ export default function Home() {
                     </div>
                 )
             }
-            <hr className="w3-clear"/>
+            <br/>
             {
                 treeMapData2 && (
                     <div>
                         <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries With The Highest Number Of Internet Users (Advanced)</div>
+                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Advanced)</div>
                         </p>
-                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>⤵</button>
+                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
                         <p id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                             <Treemap
-                                width={1000}
-                                height={600}
+                                width={isMobile() ? 380:1280}
+                                height={isMobile() ? 285:760}
                                 data={treeMapData2}
                                 dataKey="size"
                                 aspectRatio={4 / 3}
                                 stroke="#fff"
                                 content={<CustomizedContent colors={colors} />}
                                 onClick={treeMapHandler2}
+                                className="w3-image"
                                 style={{ cursor: 'pointer' }}
                             />
                         </p>
