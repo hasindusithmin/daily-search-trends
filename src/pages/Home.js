@@ -100,7 +100,6 @@ export default function Home() {
 
     useEffect(() => {
         initialize();
-        axios.get('https://claudeapi.onrender.com')
     }, []);
 
     const initialize = () => {

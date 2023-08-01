@@ -263,7 +263,7 @@ export default function Country() {
             let prompt = 'Explain these keywords in English\n'
             prompt += keywordsStr.slice(0, -2);
             setProcessing(true);
-            const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
+            const res = await axios.post('https://claudeapi.onrender.com?engine=Llama', { prompt }, {
                 auth: {
                     username: process.env.REACT_APP_UNAME,
                     password: process.env.REACT_APP_PWORD
@@ -292,10 +292,10 @@ export default function Country() {
             </div>
             <div >
                 <div className={window && isMobile() ? 'w3-padding' : ''}>
-                    <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</button>
-                    <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="categorize all keywords" onClick={categorizeKeywords}>
+                    <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋 Copy</button>
+                    <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="Click to do keyword research using AI" onClick={categorizeKeywords}>
                         {
-                            processing ? <i className="fa fa-refresh w3-spin"></i> : '➗ (beta)'
+                            processing ? <i className="fa fa-refresh w3-spin"></i> : <span className="w3-small">Learn about keywords (beta)</span>
                         }
                     </button>
                     {
