@@ -435,10 +435,10 @@ export default function Home() {
 
             {
                 pieChartDataLevel01 && pieChartDataLevel02 && (
-                    <div className="">
+                    <div className="w3-hide-small">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Advanced)</div>
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Pie Chart)</div>
                             </div>
                             <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
                             <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
