@@ -2,14 +2,14 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link, useNavigate } from "react-router-dom";
-import { Treemap } from 'recharts';
+import { Treemap, PieChart, Pie, Tooltip } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
 import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
-import autoComplete from "@tarekraafat/autocomplete.js";
-import { copyToClipboard, downloadChart } from "../utils/commons";
+import CountriesSearch from "../components/CountriesSearch";
+import { copyToClipboard, downloadChart, isMobile } from "../utils/commons";
 
 export default function Home() {
 
@@ -156,12 +156,13 @@ export default function Home() {
     const [trends, setTrends] = useState(null);
     const [trendsCopy, setTrendsCopy] = useState([]);
     const [treeMapData1, setTreeMapData1] = useState(null);
-    const [treeMapData2, setTreeMapData2] = useState(null);
+    const [pieChartDataLevel01, setPieChartDataLevel01] = useState(null);
+    const [pieChartDataLevel02, setPieChartDataLevel02] = useState(null);
     const [rawData, setRawData] = useState([]);
     const [countryRank, setCountryRank] = useState([]);
     const [color, setColor] = useState('');
     const [isListChange, setIsListChange] = useState(false);
-    const [countryList, setCountryList] = useState(["IN", "US", "ID", "BR", "RU"])
+    const [selectedCountries, setSelectedCountries] = useState([{ "label": "India", "value": "IN" }, { "label": "United States", "value": "US" }, { "label": "Indonesia", "value": "ID" }, { "label": "Brazil", "value": "BR" }, { "label": "Russia", "value": "RU" }]);
 
     function formatNumberAbbreviation(number) {
         const suffixes = ['', 'K', 'M', 'B', 'T'];
@@ -193,40 +194,31 @@ export default function Home() {
     const initialize = () => {
         const changeState = (trendingsearches) => {
             setRawData(trendingsearches);
-            const data = []
-            const treeMapDataArr1 = []
-            const treeMapDataArr2 = []
+            const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [];
             for (const { country, trends, flag } of trendingsearches) {
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
+                level01Data.push({ name: country, value: totalTraffic })
                 treeMapDataArr1.push({ name: country, size: totalTraffic })
                 for (const trend of trends) {
+                    level02Data.push({ name: trend.title, value: trend.traffic })
                     data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
             treeMapDataArr1.sort((a, b) => b.size - a.size);
+            setPieChartDataLevel01(level01Data)
+            setPieChartDataLevel02(level02Data)
             setTreeMapData1(treeMapDataArr1)
-            for (const Country of trendingsearches) {
-                const obj = {};
-                const { country, trends, flag } = Country;
-                obj['name'] = country;
-                const data = trends.map(({ title, traffic }) => ({ name: title, size: traffic }));
-                data.sort((a, b) => b.size - a.size);
-                obj['children'] = data
-                obj['traffic'] = data.reduce((sum, item) => sum + item.size, 0)
-                treeMapDataArr2.push(obj);
-            }
-            treeMapDataArr2.sort((a, b) => b.traffic - a.traffic);
-            setTreeMapData2(treeMapDataArr2);
             setCountryRank(treeMapDataArr1.map(({ name }) => name));
             setTrends(data.sort((a, b) => b.traffic - a.traffic));
             setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
+
         }
 
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
                 const res = await axios.post('https://claudeapi.onrender.com/trends', {
-                    codes: countryList
+                    codes: selectedCountries.map(({ value }) => value)
                 });
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
@@ -248,20 +240,24 @@ export default function Home() {
             // save data in local storage 
             const store_data = {
                 "created": Date.now(),
-                "resource": JSON.stringify(apiData)
+                "resource": JSON.stringify(apiData),
+                "countries": JSON.stringify(selectedCountries)
             }
-            localStorage.setItem('treasure', JSON.stringify(store_data))
+            sessionStorage.setItem('treasure', JSON.stringify(store_data))
         }
 
-        const treasure = localStorage.getItem('treasure');
+        const treasure = sessionStorage.getItem('treasure');
         if (!treasure || isListChange) {
             // If there is no data in the local storage or requests new list
             console.log('there is no data in the local storage');
+            if (isListChange) {
+                sessionStorage.removeItem('treasure')
+            }
             fetchRenderSave();
             setIsListChange(false)
             return
         }
-        const { created, resource } = JSON.parse(treasure);
+        const { created, resource, countries } = JSON.parse(treasure);
         const now = Date.now();
         const is_data_old = (now - created) > (15 * 60 * 1000)
         if (is_data_old) {
@@ -272,6 +268,7 @@ export default function Home() {
         }
         // do state changes 
         changeState(JSON.parse(resource));
+        setSelectedCountries(JSON.parse(countries));
     }
 
     const [country, setCountry] = useState(null);
@@ -295,19 +292,6 @@ export default function Home() {
         const treeMapData = trends.map(({ title, traffic }) => ({ name: title, size: traffic }))
         treeMapData.sort((a, b) => b.size - a.size);
         setChartData(treeMapData);
-    }
-
-    const treeMapHandler2 = (e) => {
-        copyToClipboard(e.name)
-        toast.info(`${e.name} ${formatNumberAbbreviation(e.size)}+`, { autoClose: 500, position: 'bottom-center', hideProgressBar: true })
-    }
-
-    const isMobile = () => {
-        if (/Android|iPhone/i.test(window.navigator.userAgent)) {
-            return true
-        } else {
-            return false
-        }
     }
 
     const [filterText, setFilterText] = useState('');
@@ -357,160 +341,114 @@ export default function Home() {
     }
 
     const fetchNewList = () => {
-        const reqList = selectedCountries.map(({ value }) => value)
-        setCountryList(reqList);
         setIsListChange(true);
         initialize()
     }
 
-    setTimeout(() => {
-        const autoCompleteJS = new autoComplete({
-            placeHolder: "Search for Countries...",
-            data: {
-                src: ['Australia', 'Argentina', 'Austria', 'Belgium', 'Brazil', 'Canada', 'Chile', 'Colombia', 'Czechia', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'Hong Kong', 'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kenya', 'Malaysia', 'Mexico', 'Netherlands', 'New Zealand', 'Nigeria', 'Norway', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'South Africa', 'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Türkiye', 'Ukraine', 'United Kingdom', 'United States', 'Vietnam'],
-                cache: true,
-            },
-            resultItem: {
-                highlight: true
-            },
-            events: {
-                input: {
-                    selection: (event) => {
-                        const selection = event.detail.selection.value;
-                        autoCompleteJS.input.value = selection;
-                        navigate(`/country/${selection}`)
-                    }
-                }
-            }
-        });
-    }, 1000)
-
-    const [selectedCountries, setSelectedCountries] = useState([{ "label": "India", "value": "IN" }, { "label": "United States", "value": "US" }, { "label": "Indonesia", "value": "ID" }, { "label": "Brazil", "value": "BR" }, { "label": "Russia", "value": "RU" }]);
-
     return (
-        <div className="w3-content">
+        <div className="">
             <ToastContainer />
-            <div className="w3-center w3-padding-64">
+            <div className="w3-center w3-padding-64 w3-text-blue">
                 <div className="w3-xlarge w3-opacity">
                     <b>Daily Search Trends</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
+                <CountriesSearch />
             </div>
-
-            <p className="w3-center">
-                <div className="autoComplete_wrapper">
-                    <input
-                        id="autoComplete"
-                        type="search"
-                        dir="ltr"
-                        spellCheck="false"
-                        autoCorrect="off"
-                        autoComplete="off"
-                        autoCapitalize="off"
-                    />
-                </div>
-            </p>
-
-
             {trends && (
-                <div className="w3-padding-32 w3-center">
-                    <p className="w3-padding w3-center">
-                        <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
-                    </p>
-                    <div className="w3-center">
-                        <Select
-                            options={selectOptions}
-                            isMulti
-                            isSearchable={true}
-                            placeholder="Select Countries..."
-                            onChange={(o) => setSelectedCountries(o)}
-                            isOptionDisabled={() => selectedCountries.length >= 5}
-                            defaultValue={[
-                                selectOptions[17],
-                                selectOptions[48],
-                                selectOptions[18],
-                                selectOptions[4],
-                                selectOptions[35]
-                            ]}
-                        />
-                        <br />
-                        <button className="w3-button w3-border w3-border-blue w3-round-large" style={{ fontWeight: 750 }} onClick={fetchNewList}>Get Search Trends</button>
-                    </div>
-                    <p style={{ paddingBottom: 32 }}>
-                        <span className="w3-right">
-                            <input
-                                type="text"
-                                size="25"
-                                value={filterText}
-                                className="w3-border"
-                                placeholder="Search keyword..."
-                                style={{ padding: '10px 5px' }}
-                                onInput={filterKeywords}
+                <div className="">
+                    <div className="w3-content w3-padding-64">
+                        <div className="w3-center w3-padding-32">
+                            <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                        </div>
+                        <div className="w3-center">
+                            <Select
+                                options={selectOptions}
+                                isMulti
+                                isSearchable={true}
+                                placeholder="Select Countries..."
+                                onChange={(o) => setSelectedCountries(o)}
+                                isOptionDisabled={() => selectedCountries.length >= 5}
+                                defaultValue={selectedCountries}
                             />
-                            <button
-                                className="w3-button w3-border w3-blue"
-                                style={{ padding: '10px' }}
-                                onClick={resetFilter}
-                                title="Clear"
-                            >✖</button>
-                        </span>
-                    </p>
-                    <DataTable
-                        columns={columns}
-                        data={trends}
-                        customStyles={customStyles}
-                        pagination
-                        responsive
-                    />
+                            <br />
+                            <button className="w3-button w3-border w3-border-blue w3-round-large" style={{ fontWeight: 750 }} onClick={fetchNewList}>Get Search Trends</button>
+                        </div>
+                        <p style={{ paddingBottom: 32 }}>
+                            <span className="w3-right">
+                                <input
+                                    type="text"
+                                    size="25"
+                                    value={filterText}
+                                    className="w3-border"
+                                    placeholder="Search keyword..."
+                                    style={{ padding: '10px 5px' }}
+                                    onInput={filterKeywords}
+                                />
+                                <button
+                                    className="w3-button w3-border w3-blue"
+                                    style={{ padding: '10px' }}
+                                    onClick={resetFilter}
+                                    title="Clear"
+                                >✖</button>
+                            </span>
+                        </p>
+                        <DataTable
+                            columns={columns}
+                            data={trends}
+                            customStyles={customStyles}
+                            pagination
+                            responsive
+                        />
+                    </div>
                 </div>
             )}
             {
                 treeMapData1 && (
-                    <div>
-                        <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries</div>
-                        </p>
-                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
-                        <p id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
-                            <Treemap
-                                width={isMobile() ? 380:1280}
-                                height={isMobile() ? 285:760}
-                                data={treeMapData1}
-                                dataKey="size"
-                                aspectRatio={4 / 3}
-                                stroke="#fff"
-                                content={<CustomizedContent colors={colors} />}
-                                onClick={treeMapHandler1}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </p>
+                    <div className="">
+                        <div className="w3-content w3-padding-64">
+                            <div className="w3-center">
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries</div>
+                            </div>
+                            <p>
+                                <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
+                            </p>
+                            <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
+                                <Treemap
+                                    width={isMobile() ? 380 : 1280}
+                                    height={isMobile() ? 285 : 760}
+                                    data={treeMapData1}
+                                    dataKey="size"
+                                    aspectRatio={4 / 3}
+                                    stroke="#fff"
+                                    content={<CustomizedContent colors={colors} />}
+                                    onClick={treeMapHandler1}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                            </div>
+                        </div>
                     </div>
                 )
             }
-            <br/>
+
             {
-                treeMapData2 && (
-                    <div>
-                        <p className="w3-padding w3-center">
-                            <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Advanced)</div>
-                        </p>
-                        <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
-                        <p id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
-                            <Treemap
-                                width={isMobile() ? 380:1280}
-                                height={isMobile() ? 285:760}
-                                data={treeMapData2}
-                                dataKey="size"
-                                aspectRatio={4 / 3}
-                                stroke="#fff"
-                                content={<CustomizedContent colors={colors} />}
-                                onClick={treeMapHandler2}
-                                className="w3-image"
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </p>
+                pieChartDataLevel01 && pieChartDataLevel02 && (
+                    <div className="">
+                        <div className="w3-content w3-padding-64">
+                            <div className="w3-center">
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Advanced)</div>
+                            </div>
+                            <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
+                            <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
+                                <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#8884d8" />
+                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#82ca9d" label />
+                                    <Tooltip />
+                                </PieChart>
+                            </div>
+                        </div>
                     </div>
                 )
             }

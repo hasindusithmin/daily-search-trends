@@ -1995,10 +1995,18 @@ a {
 }
 
 .chart-details {
-  font-weight: 580;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 18px;
   text-align: center;
   opacity: 0.75;
-  color: #7f38d1;
+  color: #7a888f;
   padding-bottom: 10px;
 }
+
+.bgimg {
+  background-repeat: repeat;
+  background-size: letter;
+  background-image: url(https://user-images.githubusercontent.com/78546078/258491904-41893bc7-2432-486d-ace4-32e206cd2f89.jpg);
+  min-height: 90%;
+}
+

@@ -8,6 +8,7 @@ import DataTable from 'react-data-table-component';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { downloadChart, copyToClipboard, isMobile } from '../utils/commons';
+import CountriesSearch from '../components/CountriesSearch';
 
 
 export default function Analytics({ }) {
@@ -138,10 +139,10 @@ export default function Analytics({ }) {
                 "created": Date.now(),
                 "resource": JSON.stringify(apiData)
             }
-            localStorage.setItem(keyword, JSON.stringify(store_data))
+            sessionStorage.setItem(keyword, JSON.stringify(store_data))
         }
 
-        const treasure = localStorage.getItem(keyword);
+        const treasure = sessionStorage.getItem(keyword);
         if (!treasure) {
             // If there is no data in the local storage
             console.log('there is no data in the local storage');
@@ -209,7 +210,7 @@ export default function Analytics({ }) {
     return (
         <>
             <ToastContainer />
-            <div className="w3-content">
+            <div >
                 <div className="w3-center w3-padding-64">
                     <div className="w3-xlarge w3-opacity">
                         <b>Daily Search Trends | {keyword}</b>
@@ -217,178 +218,180 @@ export default function Analytics({ }) {
                     <p>
                         <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                     </p>
+                    <CountriesSearch />
                     <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
                 </div>
-                {
-                    notFound &&
-                    <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
-                }
-                {
-                    all && all.length > 30 &&
-                    (
-                        <div className='w3-center'>
-                            <div className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></div>
-                            &nbsp;&nbsp;
-                            <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer (beta)' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
-                        </div>
-                    )
-                }
-                {
-                    overview && (
-                        <div className='w3-padding-32'>
-                            <div className='w3-card w3-padding w3-round-large w3-text-blue-grey w3-white' style={{ fontWeight: "bold" }}>
-                                <ReactMarkdown children={overview} remarkPlugins={[remarkGfm]} />
+                <div className="w3-content w3-padding-64">
+                    {
+                        notFound &&
+                        <p className="w3-center w3-text-red w3-xlarge">{notFound}</p>
+                    }
+                    {
+                        all && all.length > 30 &&
+                        (
+                            <div className='w3-center'>
+                                <div className="chart-details"><span>Click to 📚 view the complete overview of the data by identifying 📈 trends and 🌀 patterns 👉</span></div>
+                                &nbsp;&nbsp;
+                                <button disabled={analyzing} className='w3-button w3-round-large w3-blue' onClick={analyseData}>{!analyzing ? 'AI analyzer (beta)' : <span>analyzing <i className="fa fa-spinner w3-spin" aria-hidden="true"></i></span>}</button>
                             </div>
-                        </div>
-                    )
-                }
-                {
-                    overviewErr && (
-                        <div className='w3-padding-32'>
-                            <div className='w3-card w3-padding w3-round-large w3-text-red' style={{ fontWeight: "bold" }}>
-                                <Typewriter words={[overviewErr]} typeSpeed={25} cursor cursorBlinking={true} />
+                        )
+                    }
+                    {
+                        overview && (
+                            <div className='w3-padding-32'>
+                                <div className='w3-card w3-padding w3-round-large w3-text-blue-grey w3-white' style={{ fontWeight: "bold" }}>
+                                    <ReactMarkdown children={overview} remarkPlugins={[remarkGfm]} />
+                                </div>
                             </div>
+                        )
+                    }
+                    {
+                        overviewErr && (
+                            <div className='w3-padding-32'>
+                                <div className='w3-card w3-padding w3-round-large w3-text-red' style={{ fontWeight: "bold" }}>
+                                    <Typewriter words={[overviewErr]} typeSpeed={25} cursor cursorBlinking={true} />
+                                </div>
+                            </div>
+                        )
+                    }
+                    {
+                        all && (
+                            <div className="w3-padding-32 w3-center">
+                                <DataTable
+                                    columns={columns}
+                                    data={all}
+                                    customStyles={customStyles}
+                                    pagination
+                                    responsive
+                                />
+                            </div>
+                        )
+                    }
+                    <hr className='w3-clear' />
+                    {
+                        all &&
+                        <div>
+                            <div className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</div>
+                            <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-all') }}>download ⤵</button>
+                            <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
+                                <BarChart
+                                    width={isMobile() ? 680 : 1280}
+                                    height={isMobile() ? 380 : 760}
+                                    data={all}
+                                    margin={{
+                                        top: 20,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']) }}
+                                >
+                                    <CartesianGrid strokeDasharray="1 1" />
+                                    <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="upvotes" stackId="a" fill="#8BC34A" />
+                                    <Bar dataKey="comments" stackId="a" fill="#4682B4" />
+                                    <Bar dataKey="shares" stackId="a" fill="#FF851B" />
+                                </BarChart>
+                            </div>
+                            <hr className='w3-clear' />
+                            <div className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</div>
+                            <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-upvotes') }}>download ⤵</button>
+                            <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
+                                <AreaChart
+                                    width={isMobile() ? 680 : 1280}
+                                    height={isMobile() ? 380 : 760}
+                                    data={upvotesRank}
+                                    margin={{
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']) }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
+                                </AreaChart>
+                            </div>
+                            <hr className='w3-clear' />
+                            <div className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</div>
+                            <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-comments') }}>download ⤵</button>
+                            <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
+                                <AreaChart
+                                    width={isMobile() ? 680 : 1280}
+                                    height={isMobile() ? 380 : 760}
+                                    data={commentsRank}
+                                    margin={{
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']) }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
+                                </AreaChart>
+                            </div>
+                            <hr className='w3-clear' />
+                            <div className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</div>
+                            <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-shares') }}>download ⤵</button>
+                            <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
+                                <AreaChart
+                                    width={isMobile() ? 680 : 1280}
+                                    height={isMobile() ? 380 : 760}
+                                    data={sharesRank}
+                                    margin={{
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']) }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
+                                </AreaChart>
+                            </div>
+                            <hr className='w3-clear' />
+                            <div className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</div>
+                            <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-views') }}>download ⤵</button>
+                            <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-views'>
+                                <AreaChart
+                                    width={isMobile() ? 680 : 1280}
+                                    height={isMobile() ? 380 : 760}
+                                    data={viewsRank}
+                                    margin={{
+                                        top: 5,
+                                        right: 30,
+                                        left: 20,
+                                        bottom: 5,
+                                    }}
+                                    onClick={(e) => { copyToClipboard(e['activeLabel']) }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Area type="monotone" dataKey="views" stroke="#E84A5F" fill="#E84A5F" />
+                                </AreaChart>
+                            </div>
+                            <hr />
                         </div>
-                    )
-                }
-                {
-                    all && (
-                        <div className="w3-padding-32 w3-center">
-                            <DataTable
-                                columns={columns}
-                                data={all}
-                                customStyles={customStyles}
-                                pagination
-                                responsive
-                            />
-                        </div>
-                    )
-                }
-                <hr className='w3-clear' />
-                {
-                    all &&
-                    <div>
-                        <div className="chart-details">The chart shows the number of upvotes 🗳️, comments 💬, and shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-all') }}>download ⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-all'>
-                            <BarChart
-                                width={isMobile() ? 680 : 1280}
-                                height={isMobile() ? 380 : 760}
-                                data={all}
-                                margin={{
-                                    top: 20,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}
-                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
-                            >
-                                <CartesianGrid strokeDasharray="1 1" />
-                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="upvotes" stackId="a" fill="#8BC34A" />
-                                <Bar dataKey="comments" stackId="a" fill="#4682B4" />
-                                <Bar dataKey="shares" stackId="a" fill="#FF851B" />
-                            </BarChart>
-                        </div>
-                        <hr className='w3-clear' />
-                        <div className="chart-details">The chart shows the number of upvotes 🗳️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-upvotes') }}>download ⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-upvotes'>
-                            <AreaChart
-                                width={isMobile() ? 680 : 1280}
-                                height={isMobile() ? 380 : 760}
-                                data={upvotesRank}
-                                margin={{
-                                    top: 5,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}
-                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
-                                <YAxis />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="upvotes" stroke="#8BC34A" fill="#8BC34A" />
-                            </AreaChart>
-                        </div>
-                        <hr className='w3-clear' />
-                        <div className="chart-details">The chart shows the number of comments 💬 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-comments') }}>download ⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-comments'>
-                            <AreaChart
-                                width={isMobile() ? 680 : 1280}
-                                height={isMobile() ? 380 : 760}
-                                data={commentsRank}
-                                margin={{
-                                    top: 5,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}
-                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
-                                <YAxis />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="comments" stroke="#4682B4" fill="#4682B4" />
-                            </AreaChart>
-                        </div>
-                        <hr className='w3-clear' />
-                        <div className="chart-details">The chart shows the number of shares 📢 for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-shares') }}>download ⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-shares'>
-                            <AreaChart
-                                width={isMobile() ? 680 : 1280}
-                                height={isMobile() ? 380 : 760}
-                                data={sharesRank}
-                                margin={{
-                                    top: 5,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}
-                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
-                                <YAxis />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="shares" stroke="#FF851B" fill="#FF851B" />
-                            </AreaChart>
-                        </div>
-                        <hr className='w3-clear' />
-                        <div className="chart-details">The chart shows the number of views 👁️‍🗨️ for a set of questions about <code>{keyword}</code>.</div>
-                        <button title='download' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('analytics-views') }}>download ⤵</button>
-                        <div className={window && isMobile() ? 'w3-responsive' : ''} id='analytics-views'>
-                            <AreaChart
-                                width={isMobile() ? 680 : 1280}
-                                height={isMobile() ? 380 : 760}
-                                data={viewsRank}
-                                margin={{
-                                    top: 5,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}
-                                onClick={(e) => { copyToClipboard(e['activeLabel']) }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="question" angle={270} orientation="top" fontSize={10} />
-                                <YAxis />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="views" stroke="#E84A5F" fill="#E84A5F" />
-                            </AreaChart>
-                        </div>
-                        <hr />
-                    </div>
-
-                }
+                    }
+                </div>
             </div>
         </>
     )

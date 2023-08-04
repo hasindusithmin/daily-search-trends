@@ -9,6 +9,7 @@ import CustomizedContent from "../components/CustomContentTreemap";
 import { downloadChart, copyToClipboard, isMobile } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import CountriesSearch from "../components/CountriesSearch";
 
 export default function Country() {
 
@@ -109,59 +110,6 @@ export default function Country() {
         "#ccffcc"   // honeydew 
     ];
 
-    const flags = {
-        "Australia": "🇦🇺",
-        "Argentina": "🇦🇷",
-        "Austria": "🇦🇹",
-        "Belgium": "🇧🇪",
-        "Brazil": "🇧🇷",
-        "Canada": "🇨🇦",
-        "Chile": "🇨🇱",
-        "Colombia": "🇨🇴",
-        "Czechia": "🇨🇿",
-        "Denmark": "🇩🇰",
-        "Egypt": "🇪🇬",
-        "Finland": "🇫🇮",
-        "France": "🇫🇷",
-        "Germany": "🇩🇪",
-        "Greece": "🇬🇷",
-        "Hong Kong": "🇭🇰",
-        "Hungary": "🇭🇺",
-        "India": "🇮🇳",
-        "Indonesia": "🇮🇩",
-        "Ireland": "🇮🇪",
-        "Israel": "🇮🇱",
-        "Italy": "🇮🇹",
-        "Japan": "🇯🇵",
-        "Kenya": "🇰🇪",
-        "Malaysia": "🇲🇾",
-        "Mexico": "🇲🇽",
-        "Netherlands": "🇳🇱",
-        "New Zealand": "🇳🇿",
-        "Nigeria": "🇳🇬",
-        "Norway": "🇳🇴",
-        "Peru": "🇵🇪",
-        "Philippines": "🇵🇭",
-        "Poland": "🇵🇱",
-        "Portugal": "🇵🇹",
-        "Romania": "🇷🇴",
-        "Russia": "🇷🇺",
-        "Saudi Arabia": "🇸🇦",
-        "Singapore": "🇸🇬",
-        "South Africa": "🇿🇦",
-        "South Korea": "🇰🇷",
-        "Spain": "🇪🇸",
-        "Sweden": "🇸🇪",
-        "Switzerland": "🇨🇭",
-        "Taiwan": "🇹🇼",
-        "Thailand": "🇹🇭",
-        "Türkiye": "🇹🇷",
-        "Ukraine": "🇺🇦",
-        "United Kingdom": "🇬🇧",
-        "United States": "🇺🇸",
-        "Vietnam": "🇻🇳"
-    }
-
     const codes = {
         'Argentina': 'AR',
         'Australia': 'AU',
@@ -217,7 +165,7 @@ export default function Country() {
 
     useEffect(() => {
         initialize()
-    }, [])
+    }, [country])
 
     const [trends, setTrends] = useState(null);
     const [barData, setBarData] = useState(null);
@@ -257,10 +205,10 @@ export default function Country() {
                 "created": Date.now(),
                 "resource": JSON.stringify(apiData)
             }
-            localStorage.setItem(country, JSON.stringify(store_data))
+            sessionStorage.setItem(country, JSON.stringify(store_data))
         }
 
-        const cache = localStorage.getItem(country);
+        const cache = sessionStorage.getItem(country);
         if (!cache) {
             // If there is no data in the local storage
             console.log('there is no data in the local storage');
@@ -324,7 +272,7 @@ export default function Country() {
     }
 
     return (
-        <div className="w3-content">
+        <div className="">
             <ToastContainer />
             <div className="w3-center w3-padding-64">
                 <div className="w3-xlarge w3-opacity">
@@ -333,80 +281,83 @@ export default function Country() {
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
+                <CountriesSearch />
                 <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
             </div>
-            <div >
-                <div className={window && isMobile() ? 'w3-padding' : ''}>
-                    <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋 Copy</button>
-                    <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="Click to do keyword research using AI" onClick={categorizeKeywords}>
+            <div>
+                <div className="w3-content w3-padding-64" >
+                    <div className={window && isMobile() ? 'w3-padding' : ''}>
+                        <button className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋 Copy</button>
+                        <button disabled={processing || categorization || categorizationErr} className='w3-button w3-round-large w3-margin-right' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff', cursor: 'pointer' }} title="Click to do keyword research using AI" onClick={categorizeKeywords}>
+                            {
+                                processing ? <i className="fa fa-refresh w3-spin"></i> : <span className="w3-small">Learn about keywords (beta)</span>
+                            }
+                        </button>
                         {
-                            processing ? <i className="fa fa-refresh w3-spin"></i> : <span className="w3-small">Learn about keywords (beta)</span>
+                            categorization &&
+                            <ReactMarkdown children={categorization} remarkPlugins={[remarkGfm]} className="w3-panel w3-border w3-round-large w3-white w3-leftbar w3-hover-sand" />
                         }
-                    </button>
+                    </div>
+                    {/* datatable  */}
                     {
-                        categorization &&
-                        <ReactMarkdown children={categorization} remarkPlugins={[remarkGfm]} className="w3-panel w3-border w3-round-large w3-white w3-leftbar w3-hover-sand" />
+                        trends &&
+                        <div className={window && isMobile() ? 'w3-responsive' : 'w3-padding-32 w3-center'}>
+                            <DataTable
+                                columns={columns}
+                                data={trends}
+                                customStyles={customStyles}
+                                pagination
+                                responsive
+                            />
+                        </div>
+                    }
+                    {/* treemap  */}
+                    {
+                        treeMapData &&
+                        <>
+                            <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
+                            <div className="w3-center">
+                                <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
+                                    <Treemap
+                                        width={isMobile() ? 380 : 1280}
+                                        height={isMobile() ? 285 : 760}
+                                        data={treeMapData}
+                                        dataKey="size"
+                                        aspectRatio={4 / 3}
+                                        stroke="#fff"
+                                        content={<CustomizedContent colors={colors} />}
+                                        onClick={treeMapHandler}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                </p>
+                            </div>
+                        </>
+                    }
+                    {/* barchart  */}
+                    {
+                        barData &&
+                        <>
+                            <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>download ⤵</button>
+                            <div className="w3-center">
+                                <p id={country + '_barchart'} className={window && isMobile() ? 'w3-responsive' : ''}>
+                                    <BarChart
+                                        width={isMobile() ? 380 : 1280}
+                                        height={isMobile() ? 285 : 760}
+                                        data={barData}
+                                        onClick={(e) => { copyToClipboard(e['activeLabel']); }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey="title" angle={270} orientation="top" fontSize={10} />
+                                        <YAxis />
+                                        <Tooltip />
+                                        <Legend />
+                                        <Bar dataKey="traffic" fill="#7ac143" />
+                                    </BarChart>
+                                </p>
+                            </div>
+                        </>
                     }
                 </div>
-                {/* datatable  */}
-                {
-                    trends &&
-                    <div className={window && isMobile() ? 'w3-responsive' : 'w3-padding-32 w3-center'}>
-                        <DataTable
-                            columns={columns}
-                            data={trends}
-                            customStyles={customStyles}
-                            pagination
-                            responsive
-                        />
-                    </div>
-                }
-                {/* treemap  */}
-                {
-                    treeMapData &&
-                    <>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
-                        <div className="w3-center">
-                            <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
-                                <Treemap
-                                    width={isMobile() ? 380:1280}
-                                    height={isMobile() ? 285:760}
-                                    data={treeMapData}
-                                    dataKey="size"
-                                    aspectRatio={4 / 3}
-                                    stroke="#fff"
-                                    content={<CustomizedContent colors={colors} />}
-                                    onClick={treeMapHandler}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            </p>
-                        </div>
-                    </>
-                }
-                {/* barchart  */}
-                {
-                    barData &&
-                    <>
-                        <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>download ⤵</button>
-                        <div className="w3-center">
-                            <p id={country + '_barchart'} className={window && isMobile() ? 'w3-responsive' : ''}>
-                                <BarChart
-                                    width={isMobile() ? 380:1280}
-                                    height={isMobile() ? 285:760}
-                                    data={barData}
-                                    onClick={(e) => { copyToClipboard(e['activeLabel']); }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="title" angle={270} orientation="top" fontSize={10} />
-                                    <YAxis />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="traffic" fill="#7ac143" />
-                                </BarChart>
-                            </p>
-                        </div>
-                    </>
-                }
             </div>
         </div>
     )
