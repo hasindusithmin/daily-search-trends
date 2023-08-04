@@ -211,7 +211,7 @@ export default function Analytics({ }) {
         <>
             <ToastContainer />
             <div >
-                <div className="w3-center w3-padding-64">
+                <div className="w3-center w3-padding-32">
                     <div className="w3-xlarge w3-opacity">
                         <b>Daily Search Trends | {keyword}</b>
                     </div>

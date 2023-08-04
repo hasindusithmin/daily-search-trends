@@ -17,7 +17,7 @@ export default function Home() {
 
     const columns = [
         {
-            cell: row => <img src={row.picture} alt={row.title} width="30px" className="w3-circle" />,
+            cell: row => <img src={row.picture} width="30px" className="w3-circle" />,
             width: '30px',
             style: {
                 padding: '10px'
@@ -241,7 +241,6 @@ export default function Home() {
             const store_data = {
                 "created": Date.now(),
                 "resource": JSON.stringify(apiData),
-                "countries": JSON.stringify(selectedCountries)
             }
             sessionStorage.setItem('treasure', JSON.stringify(store_data))
         }
@@ -257,7 +256,7 @@ export default function Home() {
             setIsListChange(false)
             return
         }
-        const { created, resource, countries } = JSON.parse(treasure);
+        const { created, resource } = JSON.parse(treasure);
         const now = Date.now();
         const is_data_old = (now - created) > (15 * 60 * 1000)
         if (is_data_old) {
@@ -268,7 +267,6 @@ export default function Home() {
         }
         // do state changes 
         changeState(JSON.parse(resource));
-        setSelectedCountries(JSON.parse(countries));
     }
 
     const [country, setCountry] = useState(null);
@@ -348,7 +346,7 @@ export default function Home() {
     return (
         <div className="">
             <ToastContainer />
-            <div className="w3-center w3-padding-64 w3-text-blue">
+            <div className="w3-center w3-padding-32">
                 <div className="w3-xlarge w3-opacity">
                     <b>Daily Search Trends</b>
                 </div>
@@ -370,8 +368,6 @@ export default function Home() {
                                 isSearchable={true}
                                 placeholder="Select Countries..."
                                 onChange={(o) => setSelectedCountries(o)}
-                                isOptionDisabled={() => selectedCountries.length >= 5}
-                                defaultValue={selectedCountries}
                             />
                             <br />
                             <button className="w3-button w3-border w3-border-blue w3-round-large" style={{ fontWeight: 750 }} onClick={fetchNewList}>Get Search Trends</button>
@@ -406,6 +402,27 @@ export default function Home() {
                 </div>
             )}
             {
+                pieChartDataLevel01 && pieChartDataLevel02 && (
+                    <div className="w3-hide-small">
+                        <div className="w3-content w3-padding-64">
+                            <div className="w3-center">
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Pie Chart)</div>
+                            </div>
+                            <p>
+                            <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
+                            </p>
+                            <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
+                                <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#8884d8" />
+                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#82ca9d" label />
+                                    <Tooltip />
+                                </PieChart>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+            {
                 treeMapData1 && (
                     <div className="">
                         <div className="w3-content w3-padding-64">
@@ -427,26 +444,6 @@ export default function Home() {
                                     onClick={treeMapHandler1}
                                     style={{ cursor: 'pointer' }}
                                 />
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-
-            {
-                pieChartDataLevel01 && pieChartDataLevel02 && (
-                    <div className="w3-hide-small">
-                        <div className="w3-content w3-padding-64">
-                            <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Pie Chart)</div>
-                            </div>
-                            <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
-                            <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
-                                <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
-                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#8884d8" />
-                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#82ca9d" label />
-                                    <Tooltip />
-                                </PieChart>
                             </div>
                         </div>
                     </div>
