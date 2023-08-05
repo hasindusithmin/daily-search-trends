@@ -65,7 +65,8 @@ export default function Country() {
         },
         {
             cell: row => <Link target="_blank" to={'https://www.google.com/search?q='+row.title.replaceAll(' ','+')} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
-            width: '100px',
+            allowOverflow: true,
+            button: true,
             style: {
                 padding: '10px'
             }

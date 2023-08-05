@@ -44,7 +44,15 @@ export default function Home() {
             sortable: true
         },
         {
-            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="People also ask" >PAS</Link>,
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q='+row.title.replaceAll(' ','+')} className="w3-button w3-light-gray w3-round-large" title="Google" ><i className="fa fa-google" aria-hidden="true"></i></Link>,
+            allowOverflow: true,
+            button: true,
+            style: {
+                padding: '10px'
+            }
+        },
+        {
+            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="Quora" ><i className="fa fa-quora" aria-hidden="true"></i></Link>,
             allowOverflow: true,
             button: true,
             style: {
