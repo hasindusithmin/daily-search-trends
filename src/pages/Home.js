@@ -44,7 +44,7 @@ export default function Home() {
             sortable: true
         },
         {
-            cell: row => <Link target="_blank" to={'https://www.google.com/search?q='+row.title.replaceAll(' ','+')} className="w3-button w3-light-gray w3-round-large" title="Google" ><i className="fa fa-google" aria-hidden="true"></i></Link>,
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + row.title.replaceAll(' ', '+')} className="w3-button w3-light-gray w3-round-large" title="Google" ><i style={{ color: '#fbbc05' }} className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -52,13 +52,13 @@ export default function Home() {
             }
         },
         {
-            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="Quora" ><i className="fa fa-quora" aria-hidden="true"></i></Link>,
+            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="Quora" ><i style={{ color: '#a82400' }} className="fa fa-quora" aria-hidden="true"></i>uora</Link>,
             allowOverflow: true,
             button: true,
             style: {
                 padding: '10px'
             }
-        }
+        },
     ];
 
     const customStyles = {
@@ -408,7 +408,7 @@ export default function Home() {
                                 <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Pie Chart)</div>
                             </div>
                             <p>
-                            <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
+                                <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
                             </p>
                             <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
