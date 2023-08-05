@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Treemap, PieChart, Pie, Tooltip } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../components/CustomContentTreemap";
@@ -12,8 +12,6 @@ import CountriesSearch from "../components/CountriesSearch";
 import { copyToClipboard, downloadChart, isMobile } from "../utils/commons";
 
 export default function Home() {
-
-    const navigate = useNavigate()
 
     const columns = [
         {
@@ -273,13 +271,6 @@ export default function Home() {
     const [chartData, setChartData] = useState(null);
 
     const treeMapHandler1 = (e) => {
-        if (isMobile()) {
-            toast.warn("Modal View Unavailable on Mobile", { autoClose: 1000, hideProgressBar: true });
-            setTimeout(() => {
-                navigate('/keywords')
-            }, 1500)
-            return
-        }
         const data = rawData.filter(({ country }) => country === e.name)
         if (data.length === 0) return
         const trends = data[0]['trends']
@@ -413,8 +404,8 @@ export default function Home() {
                             </p>
                             <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
-                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#8884d8" />
-                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#82ca9d" label />
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#0088FE" />
+                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#00C49F" label />
                                     <Tooltip />
                                 </PieChart>
                             </div>
@@ -427,7 +418,7 @@ export default function Home() {
                     <div className="">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries</div>
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Treemap)</div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
