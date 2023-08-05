@@ -23,23 +23,33 @@ export default function Home() {
         },
         {
             name: 'Keyword',
-            selector: row => row.title,
+            width: '150px',
+            selector: row => <div title={row.title}>{row.title}</div>,
+            sortable: true
+        },
+        {
+            name: 'Description',
+            width: '300px',
+            selector: row => row.description,
             sortable: true
         },
         {
             name: 'Traffic',
+            width: '150px',
             selector: row => row.traffic,
             format: row => formatNumberAbbreviation(row.traffic) + '+',
             sortable: true
         },
         {
             name: 'Public Date',
+            width: '200px',
             selector: row => row.pubDate,
             format: row => formatToBrowserTimezone(row.pubDate),
             sortable: true
         },
         {
             name: 'Country',
+            width: '200px',
             selector: row => row.country,
             sortable: true
         },
@@ -60,38 +70,6 @@ export default function Home() {
             }
         },
     ];
-
-    const customStyles = {
-        headCells: {
-            style: {
-                backgroundColor: '#f2f2f2',
-                fontWeight: 'bold',
-                paddingLeft: '12px',
-                paddingRight: '12px',
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '12px',
-                paddingRight: '12px',
-                fontSize: '14px',
-            },
-        },
-        rows: {
-            style: {
-                borderBottomStyle: 'solid',
-                borderBottomWidth: '1px',
-                borderBottomColor: '#f2f2f2',
-                minHeight: '56px',
-            },
-            selectedHighlightStyle: {
-                backgroundColor: '#e6e6e6',
-            },
-            highlightOnHoverStyle: {
-                backgroundColor: '#f5f5f5',
-            },
-        },
-    };
 
     const selectOptions = [
         { "label": "Argentina", "value": "AR" },
@@ -393,7 +371,6 @@ export default function Home() {
                         <DataTable
                             columns={columns}
                             data={trends}
-                            customStyles={customStyles}
                             pagination
                             responsive
                         />
