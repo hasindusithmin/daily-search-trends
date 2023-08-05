@@ -11,26 +11,23 @@ import { downloadChart, copyToClipboard, isMobile } from '../utils/commons';
 import CountriesSearch from '../components/CountriesSearch';
 
 
-export default function Analytics({ }) {
-
-    function truncateText(text) {
-        if (text.length <= 20) {
-            return text;
-        } else {
-            return text.slice(0, 25) + '...';
-        }
-    }
+export default function Analytics() {
 
     const columns = [
         {
+            cell: row => <Link to={row.profileUrl} target='_blank'><img src={row.profilImage} width="35px" className="w3-circle" title={row.profileName} /></Link>,
+            width: '50px',
+        },
+        {
             name: 'Question',
-            cell: row => <div title={row.question}>{truncateText(row.question)}</div>,
+            cell: row => <div title={row.question} className='w3-justify'>{row.question}</div>,
+            width: '500px',
             sortable: true
         },
         {
             name: 'Upvotes',
             selector: row => row.upvotes,
-            sortable: true
+            sortable: true,
         },
         {
             name: 'Comments',
@@ -46,40 +43,16 @@ export default function Analytics({ }) {
             name: 'Views',
             selector: row => row.views,
             sortable: true
+        },
+        {
+            cell: row => <Link to={row.link} target='_blank' style={{ textDecoration: 'none', fontWeight: 400, color:'#0099e5' }}>Read More...</Link>,
+            width: '150px',
+            style: {
+                padding: '10px'
+            }
         }
-    ];
 
-    const customStyles = {
-        headCells: {
-            style: {
-                backgroundColor: '#f2f2f2',
-                fontWeight: 'bold',
-                paddingLeft: '12px',
-                paddingRight: '12px',
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '12px',
-                paddingRight: '12px',
-                fontSize: '14px',
-            },
-        },
-        rows: {
-            style: {
-                borderBottomStyle: 'solid',
-                borderBottomWidth: '1px',
-                borderBottomColor: '#f2f2f2',
-                minHeight: '56px',
-            },
-            selectedHighlightStyle: {
-                backgroundColor: '#e6e6e6',
-            },
-            highlightOnHoverStyle: {
-                backgroundColor: '#f5f5f5',
-            },
-        },
-    };
+    ];
 
     let { keyword } = useParams();
     const [all, setAll] = useState(null)
@@ -100,11 +73,11 @@ export default function Analytics({ }) {
                 setNotFound("Sorry, results not found");
                 return
             }
-            const _ = data.map(({ question, upvotes, comments, shares, views, time }) => ({ question, upvotes, comments, shares, views, time }));
-            const __ = data.map(({ question, upvotes }) => ({ question, upvotes }))
-            const ___ = data.map(({ question, comments }) => ({ question, comments }))
-            const ____ = data.map(({ question, shares }) => ({ question, shares }))
-            const _____ = data.map(({ question, views }) => ({ question, views }))
+            const _ = data.map(({ text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }) => ({ question: text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }));
+            const __ = data.map(({ text, upvotes }) => ({ question: text, upvotes }))
+            const ___ = data.map(({ text, comments }) => ({ question: text, comments }))
+            const ____ = data.map(({ text, shares }) => ({ question: text, shares }))
+            const _____ = data.map(({ text, views }) => ({ question: text, views }))
             setAll(_)
             setUpvotesRank(__)
             setCommentsRank(___)
@@ -117,7 +90,7 @@ export default function Analytics({ }) {
             try {
                 setOverview('')
                 setOverviewErr('')
-                const res = await axios.get(`https://alsoask-1-r9997761.deta.app/v2?keyword=${encodeURIComponent(keyword)}`);
+                const res = await axios.get(`https://claudeapi.onrender.com/quora/${keyword}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -260,7 +233,6 @@ export default function Analytics({ }) {
                                 <DataTable
                                     columns={columns}
                                     data={all}
-                                    customStyles={customStyles}
                                     pagination
                                     responsive
                                 />
