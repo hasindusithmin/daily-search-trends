@@ -10,6 +10,7 @@ import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
 import { copyToClipboard, downloadChart, isMobile } from "../utils/commons";
+import PieChartModal from "../components/PieChartModal";
 
 export default function Home() {
 
@@ -184,7 +185,7 @@ export default function Home() {
                 level01Data.push({ name: country, value: totalTraffic })
                 treeMapDataArr1.push({ name: country, size: totalTraffic })
                 for (const trend of trends) {
-                    level02Data.push({ name: trend.title, value: trend.traffic })
+                    level02Data.push({ name: trend.title, value: trend.traffic, country  })
                     data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
@@ -320,6 +321,14 @@ export default function Home() {
         initialize()
     }
 
+    const [pieChartData, setPieChartData] = useState(null);
+
+    const pieChartHandler = e => {
+        setCountry(e.name);
+        const data = pieChartDataLevel02.filter(({country})=>country === e.name)
+        setPieChartData(data)
+    }
+
     return (
         <div className="">
             <ToastContainer />
@@ -389,7 +398,7 @@ export default function Home() {
                             </p>
                             <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
-                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#0088FE" />
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#0088FE" onClick={pieChartHandler} />
                                     <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#00C49F" label />
                                     <Tooltip />
                                 </PieChart>
@@ -428,6 +437,10 @@ export default function Home() {
             {
                 country && chartData &&
                 <Modal country={country} color={color} chartData={chartData} setChartData={setChartData} />
+            }
+            {
+                country && pieChartData &&
+                <PieChartModal country={country} pieChartData={pieChartData} setPieChartData={setPieChartData} />
             }
         </div>
     );
