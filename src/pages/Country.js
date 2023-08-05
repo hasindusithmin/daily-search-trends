@@ -48,23 +48,32 @@ export default function Country() {
         },
         {
             name: 'Keyword',
+            width: '200px',
             selector: row => row.title,
             sortable: true
         },
         {
+            name: 'Description',
+            width: '500px',
+            selector: row => row.description,
+            sortable: true
+        },
+        {
             name: 'Traffic',
+            width: '150px',
             selector: row => row.traffic,
             format: row => formatNumberAbbreviation(row.traffic) + '+',
             sortable: true
         },
         {
             name: 'Public Date',
+            width: '250px',
             selector: row => row.pubDate,
             format: row => formatToBrowserTimezone(row.pubDate),
             sortable: true
         },
         {
-            cell: row => <Link target="_blank" to={'https://www.google.com/search?q='+row.title.replaceAll(' ','+')} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + row.title.replaceAll(' ', '+')} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -72,38 +81,6 @@ export default function Country() {
             }
         }
     ];
-
-    const customStyles = {
-        headCells: {
-            style: {
-                backgroundColor: '#f2f2f2',
-                fontWeight: 'bold',
-                paddingLeft: '12px',
-                paddingRight: '12px',
-            },
-        },
-        cells: {
-            style: {
-                paddingLeft: '12px',
-                paddingRight: '12px',
-                fontSize: '14px',
-            },
-        },
-        rows: {
-            style: {
-                borderBottomStyle: 'solid',
-                borderBottomWidth: '1px',
-                borderBottomColor: '#f2f2f2',
-                minHeight: '56px',
-            },
-            selectedHighlightStyle: {
-                backgroundColor: '#e6e6e6',
-            },
-            highlightOnHoverStyle: {
-                backgroundColor: '#f5f5f5',
-            },
-        },
-    };
 
     const colors = [
         "#004400",  // dark green
@@ -313,7 +290,6 @@ export default function Country() {
                             <DataTable
                                 columns={columns}
                                 data={trends}
-                                customStyles={customStyles}
                                 pagination
                                 responsive
                             />

@@ -45,7 +45,7 @@ export default function Analytics() {
             sortable: true
         },
         {
-            cell: row => <Link to={row.link} target='_blank' style={{ textDecoration: 'none', fontWeight: 400, color:'#0099e5' }}>Read More...</Link>,
+            cell: row => <Link to={row.link} target='_blank' style={{ textDecoration: 'none', fontWeight: 600}}>Read More...</Link>,
             width: '150px',
             style: {
                 padding: '10px'
