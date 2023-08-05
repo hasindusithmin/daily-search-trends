@@ -40,7 +40,7 @@ export default function Country() {
 
     const columns = [
         {
-            cell: row => <img src={row.picture} alt={row.title} width="30px" className="w3-circle" />,
+            cell: row => <img src={row.picture} width="30px" className="w3-circle" />,
             width: '30px',
             style: {
                 padding: '10px'
@@ -62,6 +62,13 @@ export default function Country() {
             selector: row => row.pubDate,
             format: row => formatToBrowserTimezone(row.pubDate),
             sortable: true
+        },
+        {
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q='+row.title.replaceAll(' ','+')} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
+            width: '100px',
+            style: {
+                padding: '10px'
+            }
         }
     ];
 
