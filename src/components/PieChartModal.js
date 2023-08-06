@@ -1,7 +1,7 @@
 import Modal from 'react-modal';
 import { PieChart, Pie, Tooltip } from 'recharts';
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart } from '../utils/commons';
+import { downloadChart, isMobile } from '../utils/commons';
 
 
 export default function PieChartModal({ country, pieChartData, setPieChartData }) {
@@ -24,20 +24,20 @@ export default function PieChartModal({ country, pieChartData, setPieChartData }
             ariaHideApp={false}
         >
             <div className='w3-center'>
-                <span onClick={() => { setPieChartData(null) }} className="w3-btn w3-red w3-round w3-padding">close</span>
+                <span onClick={() => { setPieChartData(null) }} className="w3-btn w3-red w3-round-large w3-padding">close</span>
             </div>
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
                 <Typewriter words={[`Here are top trending keywords in the ${country}`]} typeSpeed={20} />
             </div>
             <p id={country + '_trends'}>
-                <PieChart width={700} height={500}>
+                <PieChart width={isMobile() ? window.innerWidth : 700} height={isMobile() ? window.innerWidth / 1.2 : 500}>
                     <Pie
                         dataKey="value"
                         isAnimationActive={true}
                         data={pieChartData}
                         cx="50%"
                         cy="50%"
-                        outerRadius={200}
+                        outerRadius={isMobile() ? window.innerWidth / 3 : 200}
                         fill="#2196F3"
                         label
                     />

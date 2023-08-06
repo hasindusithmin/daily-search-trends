@@ -113,18 +113,9 @@ export function copyToClipboard(text) {
 
 
 export function isMobile() {
-  const toMatch = [
-      /Android/i,
-      /webOS/i,
-      /iPhone/i,
-      /iPad/i,
-      /iPod/i,
-      /BlackBerry/i,
-      /Windows Phone/i
-  ];
+  return window.innerWidth < 601;
+}
 
-  
-  return toMatch.some((toMatchItem) => {
-      return window.navigator.userAgent.match(toMatchItem);
-  });
+export function isLarge() {
+  return window.innerWidth > 1280;
 }

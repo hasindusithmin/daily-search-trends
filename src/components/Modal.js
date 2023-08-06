@@ -26,7 +26,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
             ariaHideApp={false}
         >
             <div className='w3-center'>
-                <span onClick={() => { setChartData(null) }} className="w3-btn w3-red w3-round w3-padding">close</span>
+                <span onClick={() => { setChartData(null) }} className="w3-btn w3-red w3-round-large w3-padding">close</span>
             </div>
             <div className='w3-center w3-padding-32 w3-large w3-opacity'>
                 <Typewriter words={[`Here are top trending keywords in the ${country}`]} typeSpeed={20} />

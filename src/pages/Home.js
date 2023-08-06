@@ -9,7 +9,7 @@ import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
-import { copyToClipboard, downloadChart, isMobile } from "../utils/commons";
+import { copyToClipboard, downloadChart, isLarge, isMobile } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -364,6 +364,18 @@ Embrace the power of daily search trends and unlock your potential for success. 
 
 **Stay in the know. Stay trendy.** 🧭📲📈
 `
+    const RADIAN = Math.PI / 180;
+    const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+        return (
+            <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+                {`∘${name}`}
+            </text>
+        );
+    };
 
     return (
         <div className="">
@@ -378,7 +390,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 <CountriesSearch />
             </div>
             <div className="w3-content" style={{ fontWeight: 400 }}>
-                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-border w3-border-blue w3-leftbar w3-round-xlarge" />
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-border w3-border-blue-grey w3-leftbar w3-topbar w3-round-xlarge" />
             </div>
             {trends && (
                 <div className="">
@@ -426,19 +438,19 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 </div>
             )}
             {
-                pieChartDataLevel01 && pieChartDataLevel02 && (
-                    <div className="w3-hide-small">
+                pieChartDataLevel01 && pieChartDataLevel02 && window && (
+                    <div className="">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
                                 <div className="chart-details">Total Traffic of Trending Keywords Across Countries - PieChart</div>
                             </div>
                             <p>
-                                <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
+                                <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('piechart') }}>download ⤵</button>
                             </p>
-                            <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
-                                <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
-                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#2196F3" onClick={pieChartHandler} />
-                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#00C49F" label />
+                            <div id="piechart" className="w3-center">
+                                <PieChart width={isLarge() ? 1280 : window.innerWidth} height={isMobile() ? window.innerWidth * 1.2 : isLarge() ? 640 : window.innerWidth * 1}>
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 270 : window.innerWidth / 3} fill="#2196F3" onClick={pieChartHandler} label={renderCustomizedLabel} />
+                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 300 : window.innerWidth / 2.5} innerRadius={isLarge() ? 280 : window.innerWidth / 2.5 - 20} fill="#00C49F" label />
                                     <Tooltip />
                                 </PieChart>
                             </div>
@@ -447,7 +459,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 )
             }
             {
-                treeMapData1 && (
+                treeMapData1 && window && (
                     <div className="">
                         <div className="w3-content w3-padding-32">
                             <div className="w3-center">
@@ -458,8 +470,8 @@ Embrace the power of daily search trends and unlock your potential for success. 
                             </p>
                             <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <Treemap
-                                    width={isMobile() ? 380 : 1280}
-                                    height={isMobile() ? 285 : 760}
+                                    width={isLarge() ? 1280 : window.innerWidth}
+                                    height={isLarge() ? 640 : window.innerWidth / 2}
                                     data={treeMapData1}
                                     dataKey="size"
                                     aspectRatio={4 / 3}
