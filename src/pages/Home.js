@@ -370,7 +370,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
             <ToastContainer />
             <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
                 <div className="w3-xlarge w3-opacity">
-                    <b>DAILY SEARCH TRENDS</b>
+                    <b>TRENDY WORLD</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
