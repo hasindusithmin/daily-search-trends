@@ -259,9 +259,9 @@ export default function Country() {
     return (
         <div className="">
             <ToastContainer />
-            <div className="w3-center w3-padding-32">
+            <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
                 <div className="w3-xlarge w3-opacity">
-                    <b>Daily Search Trends | {country}</b>
+                    <b>DAILY SEARCH TRENDS | {country}</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />

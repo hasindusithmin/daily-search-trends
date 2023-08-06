@@ -38,7 +38,7 @@ export default function PieChartModal({ country, pieChartData, setPieChartData }
                         cx="50%"
                         cy="50%"
                         outerRadius={200}
-                        fill="#0088FE"
+                        fill="#2196F3"
                         label
                     />
                     <Tooltip />

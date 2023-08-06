@@ -11,6 +11,8 @@ import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
 import { copyToClipboard, downloadChart, isMobile } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export default function Home() {
 
@@ -185,7 +187,7 @@ export default function Home() {
                 level01Data.push({ name: country, value: totalTraffic })
                 treeMapDataArr1.push({ name: country, size: totalTraffic })
                 for (const trend of trends) {
-                    level02Data.push({ name: trend.title, value: trend.traffic, country  })
+                    level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
@@ -278,7 +280,7 @@ export default function Home() {
         if (e.nativeEvent.inputType === 'insertText') {
             setFilterText(inputValue);
             const filteredData = trends.filter(
-                trend => trend.keyword && trend.keyword.toLowerCase().includes(inputValue)
+                trend => trend.title && trend.title.toLowerCase().includes(inputValue)
             );
             setTrends(filteredData);
         } else {
@@ -296,7 +298,7 @@ export default function Home() {
             }
 
             const filteredData = trendsCopy.filter(
-                trend => trend.keyword.toLowerCase().includes(inputValue)
+                trend => trend.title.toLowerCase().includes(inputValue)
             );
             setTrends(filteredData);
         }
@@ -325,25 +327,62 @@ export default function Home() {
 
     const pieChartHandler = e => {
         setCountry(e.name);
-        const data = pieChartDataLevel02.filter(({country})=>country === e.name)
+        const data = pieChartDataLevel02.filter(({ country }) => country === e.name)
         setPieChartData(data)
     }
+
+    const content = `
+**Welcome To Our Trendy World** 🌟
+
+Stay Ahead with Daily Search Trends 📈
+
+Are you ready to unlock the power of daily search trends? At Trendy World, we offer you a gateway to stay at the forefront of what's buzzing and trending in the online world. Whether you're a content creator, marketer, or just a curious mind, our platform provides valuable insights that can drive your success. 💪💼🌐
+
+**Why Embrace Daily Search Trends?**
+
+In today's fast-paced digital landscape, staying relevant is key. By harnessing the power of daily search trends, you can:
+
+**1. Boost Your Content:** Discover popular keywords and phrases that resonate with your audience. Tailor your content to their interests and watch your engagement soar. 📝✨
+
+**2. Seize Timely Opportunities:** Capitalize on trending topics to create timely and compelling content that captivates your audience. 🚀⏰📢
+
+**3. Understand User Intent:** Get inside the minds of your audience by analyzing their search behavior. Understand what they are looking for and deliver solutions that truly matter. 🧠🔍💡
+
+**4. Stay Ahead of Competitors:** Keep a keen eye on your competition. Track their strategies and adapt your own to maintain a competitive edge. 👀📊🏆
+
+**5. Embrace Seasonal Trends:** Plan ahead and align your marketing campaigns with seasonal trends, tapping into heightened interest during specific periods. 🗓️🎉🎁
+
+**6. Be Informed:** Be the first to know about breaking news and current events with real-time updates on what's trending globally. 🌐📰🔔
+
+**How Trendy World Works**
+
+Our intuitive platform provides you with instant access to the most relevant and up-to-date search trends. Simply browse through our user-friendly interface and explore the trending topics that matter most to you. 🖥️🔍🚀
+
+**Start Your Trend Journey Today**
+
+Embrace the power of daily search trends and unlock your potential for success. Join us at Trendy World and make every day a step towards a brighter, trendier future. 🚀🌟
+
+**Stay in the know. Stay trendy.** 🧭📲📈
+`
 
     return (
         <div className="">
             <ToastContainer />
-            <div className="w3-center w3-padding-32">
+            <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
                 <div className="w3-xlarge w3-opacity">
-                    <b>Daily Search Trends</b>
+                    <b>DAILY SEARCH TRENDS</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
                 <CountriesSearch />
             </div>
+            <div className="w3-content" style={{ fontWeight: 400 }}>
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-border w3-border-blue w3-leftbar w3-round-xlarge" />
+            </div>
             {trends && (
                 <div className="">
-                    <div className="w3-content w3-padding-64">
+                    <div className="w3-content w3-padding-32">
                         <div className="w3-center w3-padding-32">
                             <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
                         </div>
@@ -391,14 +430,14 @@ export default function Home() {
                     <div className="w3-hide-small">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Pie Chart)</div>
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries - PieChart</div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap2') }}>download ⤵</button>
                             </p>
                             <div id="treemap2" className={window && isMobile() ? 'w3-responsive' : ''}>
                                 <PieChart width={isMobile() ? 380 : 1280} height={isMobile() ? 285 : 760}>
-                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#0088FE" onClick={pieChartHandler} />
+                                    <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={250} fill="#2196F3" onClick={pieChartHandler} />
                                     <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={300} innerRadius={280} fill="#00C49F" label />
                                     <Tooltip />
                                 </PieChart>
@@ -410,9 +449,9 @@ export default function Home() {
             {
                 treeMapData1 && (
                     <div className="">
-                        <div className="w3-content w3-padding-64">
+                        <div className="w3-content w3-padding-32">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries (Treemap)</div>
+                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries - Treemap</div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
