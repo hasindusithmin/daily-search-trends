@@ -56,6 +56,7 @@ export default function Analytics() {
 
     let { keyword } = useParams();
     const [all, setAll] = useState(null)
+    const [allInOne, setAllInOne] = useState(null)
     const [upvotesRank, setUpvotesRank] = useState(null)
     const [commentsRank, setCommentsRank] = useState(null)
     const [sharesRank, setSharesRank] = useState(null)
@@ -66,6 +67,13 @@ export default function Analytics() {
         if (keyword) initialize()
     }, [])
 
+    const truncateText = (text, maxLength = 30, suffix = '...') => {
+        if (text.length <= maxLength) {
+          return text;
+        }
+        return text.slice(0, maxLength - suffix.length) + suffix;
+      };
+
     const initialize = async () => {
 
         const changeState = (data) => {
@@ -73,12 +81,14 @@ export default function Analytics() {
                 setNotFound("Sorry, results not found");
                 return
             }
-            const _ = data.map(({ text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }) => ({ question: text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }));
-            const __ = data.map(({ text, upvotes }) => ({ question: text, upvotes }))
-            const ___ = data.map(({ text, comments }) => ({ question: text, comments }))
-            const ____ = data.map(({ text, shares }) => ({ question: text, shares }))
-            const _____ = data.map(({ text, views }) => ({ question: text, views }))
-            setAll(_)
+            const al = data.map(({ text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }) => ({ question: text, upvotes, comments, shares, views, profilImage, profileUrl, profileName, link }));
+            const _ = data.map(({ text, upvotes, comments, shares, views }) => ({ question: truncateText(text), upvotes, comments, shares, views }));
+            const __ = data.map(({ text, upvotes }) => ({ question: truncateText(text), upvotes }))
+            const ___ = data.map(({ text, comments }) => ({ question: truncateText(text), comments }))
+            const ____ = data.map(({ text, shares }) => ({ question: truncateText(text), shares }))
+            const _____ = data.map(({ text, views }) => ({ question: truncateText(text), views }))
+            setAll(al)
+            setAllInOne(_)
             setUpvotesRank(__)
             setCommentsRank(___)
             setSharesRank(____)
@@ -249,7 +259,7 @@ export default function Analytics() {
                                 <BarChart
                                     width={isMobile() ? 680 : 1280}
                                     height={isMobile() ? 380 : 760}
-                                    data={all}
+                                    data={allInOne}
                                     margin={{
                                         top: 20,
                                         right: 30,
