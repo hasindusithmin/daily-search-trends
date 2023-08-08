@@ -15,6 +15,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { scaleLinear } from "d3-scale";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+import HomeTagCloudM from "../modals/HomeTagCloudM";
+import { TagCloud } from 'react-tagcloud'
 
 export default function Home() {
 
@@ -202,6 +204,7 @@ export default function Home() {
     const [pieChartDataLevel02, setPieChartDataLevel02] = useState(null);
     const [geoMapData, setGeoMapData] = useState(null);
     const [maxTraffic, setMaxTraffic] = useState(0);
+    const [tagCloudData, setTagCloudData] = useState(null);
     const [rawData, setRawData] = useState([]);
     const [countryRank, setCountryRank] = useState([]);
     const [color, setColor] = useState('');
@@ -238,7 +241,7 @@ export default function Home() {
     const initialize = () => {
         const changeState = (trendingsearches) => {
             setRawData(trendingsearches);
-            const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [], geoData = [];
+            const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [], geoData = [], tagCloud = [];
             for (const { country, trends, flag } of trendingsearches) {
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
                 level01Data.push({ name: country, value: totalTraffic })
@@ -247,6 +250,7 @@ export default function Home() {
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
+                    tagCloud.push({ value: `${flag}${trend.title}`, count: trend.traffic })
                 }
             }
             setMaxTraffic(geoData.reduce((max, item) => {
@@ -257,6 +261,7 @@ export default function Home() {
             setPieChartDataLevel02(level02Data)
             setTreeMapData1(treeMapDataArr1)
             setGeoMapData(geoData)
+            setTagCloudData(tagCloud)
             setCountryRank(treeMapDataArr1.map(({ name }) => name));
             setTrends(data.sort((a, b) => b.traffic - a.traffic));
             setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
@@ -443,6 +448,16 @@ Embrace the power of daily search trends and unlock your potential for success. 
         [maxTraffic]
     );
 
+    const [showTC, setShowTC] = useState(null);
+    const openModal = (country) => {
+        try {
+            const filteredData = rawData.filter(object => object.country === country)[0]
+            setShowTC(filteredData)
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+
     return (
         <div className="">
             <ToastContainer />
@@ -456,11 +471,25 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 <CountriesSearch />
             </div>
             <div className="w3-content" style={{ fontWeight: 400 }}>
-                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-border w3-border-blue-grey w3-leftbar w3-topbar w3-round-xlarge" />
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
             </div>
+            <p className="w3-content w3-center" style={{padding: '15px 0px'}}>
+                <Select
+                    options={selectOptions}
+                    isMulti
+                    isSearchable={true}
+                    placeholder="Select Countries..."
+                    onChange={(o) => setSelectedCountries(o)}
+                />
+                <br />
+                <button className="w3-button w3-border w3-round-xlarge" style={{ fontWeight: 750 }} onClick={fetchNewList}>🔍</button>
+            </p>
             {
                 geoMapData && (
-                    <div className="w3-content w3-padding">
+                    <div className="w3-content" style={{ paddingTop: 15 }}>
+                        <div className="w3-center">
+                            <div className="chart-details">Explore Locations and Discover Insights Worldwide</div>
+                        </div>
                         <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
                             <Geographies geography={"/geo.json"}>
                                 {({ geographies }) =>
@@ -471,7 +500,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                             </Geographies>
                             {geoMapData.map(({ country, totalTraffic, lnglat }) => {
                                 return (
-                                    <Marker key={country} coordinates={lnglat}>
+                                    <Marker key={country} coordinates={lnglat} onClick={() => openModal(country)}>
                                         <circle fill="#F53" stroke="#FFF" r={popScale(totalTraffic)} />
                                         <text
                                             textAnchor="middle"
@@ -487,63 +516,71 @@ Embrace the power of daily search trends and unlock your potential for success. 
                     </div>
                 )
             }
-            {trends && (
-                <div className="">
-                    <div className="w3-content w3-padding-32">
+            {
+                tagCloudData && (
+                    <div className="w3-content w3-padding-32" >
                         <div className="w3-center w3-padding-32">
-                            <div className="chart-details">Analyzing Keyword, Traffic And Public Release Dates Across Countries <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                            <div className="chart-details">Discover What's Hot and Relevant Now</div>
                         </div>
-                        <div className="w3-center">
-                            <Select
-                                options={selectOptions}
-                                isMulti
-                                isSearchable={true}
-                                placeholder="Select Countries..."
-                                onChange={(o) => setSelectedCountries(o)}
+                        <p style={{ lineHeight: 1.8 }} className="w3-justify">
+                            <TagCloud
+                                minSize={isMobile() ? 5 : 15}
+                                maxSize={isMobile() ? 12 : 36}
+                                tags={tagCloudData}
+                                className="w3-"
                             />
-                            <br />
-                            <button className="w3-button w3-border w3-border-blue w3-round-large" style={{ fontWeight: 750 }} onClick={fetchNewList}>Get Search Trends</button>
-                        </div>
-                        <p style={{ paddingBottom: 32 }}>
-                            <span className="w3-right">
-                                <input
-                                    type="text"
-                                    size="25"
-                                    value={filterText}
-                                    className="w3-border"
-                                    placeholder="Search keyword..."
-                                    style={{ padding: '10px 5px' }}
-                                    onInput={filterKeywords}
-                                />
-                                <button
-                                    className="w3-button w3-border w3-blue"
-                                    style={{ padding: '10px' }}
-                                    onClick={resetFilter}
-                                    title="Clear"
-                                >✖</button>
-                            </span>
                         </p>
-                        <DataTable
-                            columns={columns}
-                            data={trends}
-                            pagination
-                            responsive
-                        />
                     </div>
-                </div>
-            )}
+                )
+            }
+            {
+                trends && (
+                    <div className="">
+                        <div className="w3-content w3-padding-32">
+                            <div className="w3-center w3-padding-32">
+                                <div className="chart-details">Organized Information at a Glance <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                            </div>
+                            <p style={{ paddingBottom: 32 }}>
+                                <span className="w3-right">
+                                    <input
+                                        type="text"
+                                        size="25"
+                                        value={filterText}
+                                        className="w3-border"
+                                        placeholder="Search keyword..."
+                                        style={{ padding: '10px 5px' }}
+                                        onInput={filterKeywords}
+                                    />
+                                    <button
+                                        className="w3-button w3-border w3-blue"
+                                        style={{ padding: '10px' }}
+                                        onClick={resetFilter}
+                                        title="Clear"
+                                    >✖</button>
+                                </span>
+                            </p>
+                            <DataTable
+                                columns={columns}
+                                data={trends}
+                                pagination
+                                responsive
+                            />
+                        </div>
+                    </div>
+                )
+            }
             {
                 pieChartDataLevel01 && pieChartDataLevel02 && window && (
                     <div className="">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries - PieChart</div>
+                                <div className="chart-details">A Delicious Slice of Information</div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('piechart') }}>download ⤵</button>
                             </p>
                             <div id="piechart" className="w3-center">
-                                <PieChart width={isLarge() ? 1280 : window.innerWidth} height={isMobile() ? window.innerWidth * 1.2 : isLarge() ? 640 : window.innerWidth * 1}>
+                                <PieChart width={isLarge() ? 1280 : window.innerWidth} height={isMobile() ? window.innerWidth * 1.2 : isLarge() ? 740 : window.innerWidth * 1}>
                                     <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 270 : window.innerWidth / 3} fill="#2196F3" onClick={pieChartHandler} label={renderCustomizedLabel} />
                                     <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 300 : window.innerWidth / 2.5} innerRadius={isLarge() ? 280 : window.innerWidth / 2.5 - 20} fill="#00C49F" label />
                                     <Tooltip />
@@ -558,7 +595,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                     <div className="">
                         <div className="w3-content w3-padding-32">
                             <div className="w3-center">
-                                <div className="chart-details">Total Traffic of Trending Keywords Across Countries - Treemap</div>
+                                <div className="chart-details">Exploring Hierarchical Data in a Compact View</div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
@@ -587,6 +624,11 @@ Embrace the power of daily search trends and unlock your potential for success. 
             {
                 country && pieChartData &&
                 <PieChartModal country={country} pieChartData={pieChartData} setPieChartData={setPieChartData} />
+            }
+            {
+                showTC && (
+                    <HomeTagCloudM showTC={showTC} setShowTC={setShowTC} />
+                )
             }
         </div>
     );
