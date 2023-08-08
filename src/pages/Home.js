@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
 import { Treemap, PieChart, Pie, Tooltip } from 'recharts';
@@ -13,6 +13,8 @@ import { copyToClipboard, downloadChart, isLarge, isMobile } from "../utils/comm
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { scaleLinear } from "d3-scale";
+import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 
 export default function Home() {
 
@@ -140,11 +142,66 @@ export default function Home() {
         "#ccffcc"   // honeydew 
     ];
 
+    const coordinates = {
+        Argentina: [-63.616672, -38.416097],
+        Australia: [133.775136, -25.274398],
+        Austria: [14.550072, 47.516231],
+        Belgium: [4.469936, 50.503887],
+        Brazil: [-51.92528, -14.235004],
+        Canada: [-106.346771, 56.130366],
+        Chile: [-71.542969, -35.675147],
+        Colombia: [-74.297333, 4.570868],
+        Czechia: [15.472962, 49.817492],
+        Denmark: [9.501785, 56.26392],
+        Egypt: [30.802498, 26.820553],
+        Finland: [25.748151, 61.92411],
+        France: [2.213749, 46.227638],
+        Germany: [10.451526, 51.165691],
+        Greece: [21.824312, 39.074208],
+        'Hong Kong': [114.109497, 22.396428],
+        Hungary: [19.503304, 47.162494],
+        India: [78.96288, 20.593684],
+        Indonesia: [113.921327, -0.789275],
+        Ireland: [-8.24389, 53.41291],
+        Israel: [34.851612, 31.046051],
+        Italy: [12.56738, 41.87194],
+        Japan: [138.252924, 36.204824],
+        Kenya: [37.906193, -0.023559],
+        Malaysia: [101.975766, 4.210484],
+        Mexico: [-102.552784, 23.634501],
+        Netherlands: [5.291266, 52.132633],
+        'New Zealand': [174.885971, -40.900557],
+        Nigeria: [8.675277, 9.081999],
+        Norway: [8.468946, 60.472024],
+        Peru: [-75.015152, -9.189967],
+        Philippines: [121.774017, 12.879721],
+        Poland: [19.145136, 51.919438],
+        Portugal: [-8.224454, 39.399872],
+        Romania: [24.96676, 45.943161],
+        Russia: [105.318756, 61.52401],
+        'Saudi Arabia': [45.079162, 23.885942],
+        Singapore: [103.819836, 1.352083],
+        'South Africa': [22.937506, -30.559482],
+        'South Korea': [127.766922, 35.907757],
+        Spain: [-3.74922, 40.463667],
+        Sweden: [18.643501, 60.128161],
+        Switzerland: [8.227512, 46.818188],
+        Taiwan: [120.960515, 23.69781],
+        Thailand: [100.992541, 15.870032],
+        'Türkiye': [35.243322, 38.963745],
+        Ukraine: [31.16558, 48.379433],
+        'United Kingdom': [-3.435973, 55.378051],
+        'United States': [-95.712891, 37.09024],
+        Vietnam: [108.277199, 14.058324]
+    }
+
     const [trends, setTrends] = useState(null);
     const [trendsCopy, setTrendsCopy] = useState([]);
     const [treeMapData1, setTreeMapData1] = useState(null);
     const [pieChartDataLevel01, setPieChartDataLevel01] = useState(null);
     const [pieChartDataLevel02, setPieChartDataLevel02] = useState(null);
+    const [geoMapData, setGeoMapData] = useState(null);
+    const [maxTraffic, setMaxTraffic] = useState(0);
     const [rawData, setRawData] = useState([]);
     const [countryRank, setCountryRank] = useState([]);
     const [color, setColor] = useState('');
@@ -181,24 +238,28 @@ export default function Home() {
     const initialize = () => {
         const changeState = (trendingsearches) => {
             setRawData(trendingsearches);
-            const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [];
+            const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [], geoData = [];
             for (const { country, trends, flag } of trendingsearches) {
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
                 level01Data.push({ name: country, value: totalTraffic })
                 treeMapDataArr1.push({ name: country, size: totalTraffic })
+                geoData.push({ country, totalTraffic, lnglat: coordinates[country] })
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
                 }
             }
+            setMaxTraffic(geoData.reduce((max, item) => {
+                return item.totalTraffic > max ? item.totalTraffic : max;
+            }, 0))
             treeMapDataArr1.sort((a, b) => b.size - a.size);
             setPieChartDataLevel01(level01Data)
             setPieChartDataLevel02(level02Data)
             setTreeMapData1(treeMapDataArr1)
+            setGeoMapData(geoData)
             setCountryRank(treeMapDataArr1.map(({ name }) => name));
             setTrends(data.sort((a, b) => b.traffic - a.traffic));
             setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
-
         }
 
         const getDataFromAPI = async () => {
@@ -377,6 +438,11 @@ Embrace the power of daily search trends and unlock your potential for success. 
         );
     };
 
+    const popScale = useMemo(
+        () => scaleLinear().domain([0, maxTraffic]).range([0, 24]),
+        [maxTraffic]
+    );
+
     return (
         <div className="">
             <ToastContainer />
@@ -392,6 +458,35 @@ Embrace the power of daily search trends and unlock your potential for success. 
             <div className="w3-content" style={{ fontWeight: 400 }}>
                 <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-border w3-border-blue-grey w3-leftbar w3-topbar w3-round-xlarge" />
             </div>
+            {
+                geoMapData && (
+                    <div className="w3-content w3-padding">
+                        <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
+                            <Geographies geography={"/geo.json"}>
+                                {({ geographies }) =>
+                                    geographies.map((geo) => (
+                                        <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
+                                    ))
+                                }
+                            </Geographies>
+                            {geoMapData.map(({ country, totalTraffic, lnglat }) => {
+                                return (
+                                    <Marker key={country} coordinates={lnglat}>
+                                        <circle fill="#F53" stroke="#FFF" r={popScale(totalTraffic)} />
+                                        <text
+                                            textAnchor="middle"
+                                            y={5}
+                                            style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 9 }}
+                                        >
+                                            {country} <tspan fontSize="6px" dy="-0.5em" fontWeight="bold">{formatNumberAbbreviation(totalTraffic)}+</tspan>
+                                        </text>
+                                    </Marker>
+                                );
+                            })}
+                        </ComposableMap>
+                    </div>
+                )
+            }
             {trends && (
                 <div className="">
                     <div className="w3-content w3-padding-32">

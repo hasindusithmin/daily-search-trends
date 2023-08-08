@@ -2050,3 +2050,17 @@ a {
   padding: 10px;
 }
 
+.tag-cloud-tag {
+  padding: 15px;
+  cursor: cell;
+  position: relative;
+}
+
+.tag-cloud:active:after {
+  content:attr(title);
+  padding:5px;
+  border:1px solid #ccc;
+  top:5px;
+  right:10%;
+  background: #bada55;
+}
