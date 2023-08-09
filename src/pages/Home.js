@@ -494,7 +494,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                             <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
                         </p>
                         <div id="geoChart" className="w3-center">
-                            <div>
+                            <div className="w3-border w3-round-xlarge" style={{backgroundColor:'#607d8bc4'}}>
                                 <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
                                     <Geographies geography={"/geo.json"}>
                                         {({ geographies }) =>
@@ -510,9 +510,9 @@ Embrace the power of daily search trends and unlock your potential for success. 
                                                 <text
                                                     textAnchor="middle"
                                                     y={5}
-                                                    style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 9 }}
+                                                    style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 9, fontWeight: 550 }}
                                                 >
-                                                    {country} <tspan fontSize="6px" dy="-0.5em" fontWeight="bold">{formatNumberAbbreviation(totalTraffic)}+</tspan>
+                                                    {country} <tspan fontSize="6px" dy="-0.5em" fontWeight={750}>{formatNumberAbbreviation(totalTraffic)}+</tspan>
                                                 </text>
                                             </Marker>
                                         );
@@ -535,6 +535,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                                 maxSize={isMobile() ? 12 : 36}
                                 tags={tagCloudData}
                                 className=""
+                                onClick={tag => copyToClipboard(tag.value)}
                             />
                         </p>
                     </div>
