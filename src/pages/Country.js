@@ -259,6 +259,14 @@ export default function Country() {
         }
     }
 
+    const customRenderer = (tag, size, color) => {
+        return (
+            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', padding: '1px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
+                {tag.value}<sup style={{ fontWeight: 500, color: '#111' }}>{formatNumberAbbreviation(tag.count)}+</sup>
+            </span>
+        )
+    }
+
     return (
         <div className="">
             <ToastContainer />
@@ -295,7 +303,9 @@ export default function Country() {
                                         minSize={isMobile() ? 5 : 15}
                                         maxSize={isMobile() ? 12 : 36}
                                         tags={tagCloudData}
+                                        renderer={customRenderer}
                                         className=""
+                                        onClick={({ value }) => { copyToClipboard(value) }}
                                     />
                                 </p>
                             </div>
@@ -312,28 +322,6 @@ export default function Country() {
                                 responsive
                             />
                         </div>
-                    }
-                    {/* treemap  */}
-                    {
-                        treeMapData &&
-                        <>
-                            <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
-                            <div className="w3-center">
-                                <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
-                                    <Treemap
-                                        width={isMobile() ? 380 : 1280}
-                                        height={isMobile() ? 285 : 760}
-                                        data={treeMapData}
-                                        dataKey="size"
-                                        aspectRatio={4 / 3}
-                                        stroke="#fff"
-                                        content={<CustomizedContent colors={colors} />}
-                                        onClick={treeMapHandler}
-                                        style={{ cursor: 'pointer' }}
-                                    />
-                                </p>
-                            </div>
-                        </>
                     }
                     {/* barchart  */}
                     {
@@ -355,6 +343,28 @@ export default function Country() {
                                         <Legend />
                                         <Bar dataKey="traffic" fill="#7ac143" />
                                     </BarChart>
+                                </p>
+                            </div>
+                        </>
+                    }
+                    {/* treemap  */}
+                    {
+                        treeMapData &&
+                        <>
+                            <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
+                            <div className="w3-center">
+                                <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
+                                    <Treemap
+                                        width={isMobile() ? 380 : 1280}
+                                        height={isMobile() ? 285 : 760}
+                                        data={treeMapData}
+                                        dataKey="size"
+                                        aspectRatio={4 / 3}
+                                        stroke="#fff"
+                                        content={<CustomizedContent colors={colors} />}
+                                        onClick={treeMapHandler}
+                                        style={{ cursor: 'pointer' }}
+                                    />
                                 </p>
                             </div>
                         </>

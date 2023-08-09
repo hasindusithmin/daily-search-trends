@@ -9,13 +9,13 @@ import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
-import { copyToClipboard, downloadChart, isLarge, isMobile } from "../utils/commons";
+import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { scaleLinear } from "d3-scale";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
-import HomeTagCloudM from "../modals/HomeTagCloudM";
+import HomeTagCloudM from "../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
 
 export default function Home() {
@@ -211,16 +211,6 @@ export default function Home() {
     const [isListChange, setIsListChange] = useState(false);
     const [selectedCountries, setSelectedCountries] = useState([{ "label": "India", "value": "IN" }, { "label": "United States", "value": "US" }, { "label": "Indonesia", "value": "ID" }, { "label": "Brazil", "value": "BR" }, { "label": "Russia", "value": "RU" }]);
 
-    function formatNumberAbbreviation(number) {
-        const suffixes = ['', 'K', 'M', 'B', 'T'];
-        const suffixNum = Math.floor(('' + number).length / 3);
-        let shortNumber = parseFloat((suffixNum !== 0 ? (number / Math.pow(1000, suffixNum)) : number).toPrecision(2));
-        if (shortNumber % 1 !== 0) {
-            shortNumber = shortNumber.toFixed(1);
-        }
-        return shortNumber + suffixes[suffixNum];
-    }
-
     function formatToBrowserTimezone(datetimeString) {
         const options = {
             year: "numeric",
@@ -250,7 +240,7 @@ export default function Home() {
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
-                    tagCloud.push({ value: `${flag}${trend.title}`, count: trend.traffic })
+                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag })
                 }
             }
             setMaxTraffic(geoData.reduce((max, item) => {
@@ -458,6 +448,14 @@ Embrace the power of daily search trends and unlock your potential for success. 
         }
     }
 
+    const customRenderer = (tag, size, color) => {
+        return (
+            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
+                <sub style={{fontSize: 12}}>{tag.flag}</sub>{tag.value}<sup style={{color:'#333'}}>{formatNumberAbbreviation(tag.count)}+</sup>
+            </span>
+        )
+    }
+
     return (
         <div className="">
             <ToastContainer />
@@ -494,7 +492,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                             <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
                         </p>
                         <div id="geoChart" className="w3-center">
-                            <div className="w3-border w3-round-xlarge" style={{backgroundColor:'#607d8bc4'}}>
+                            <div className="w3-border w3-round-xlarge" style={{ backgroundColor: '#607d8bc4' }}>
                                 <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
                                     <Geographies geography={"/geo.json"}>
                                         {({ geographies }) =>
@@ -531,11 +529,12 @@ Embrace the power of daily search trends and unlock your potential for success. 
                         </div>
                         <p style={{ lineHeight: 1.8 }} className="w3-justify">
                             <TagCloud
-                                minSize={isMobile() ? 5 : 15}
-                                maxSize={isMobile() ? 12 : 36}
+                                minSize={isMobile() ? 7 : 15}
+                                maxSize={isMobile() ? 15 : 36}
                                 tags={tagCloudData}
-                                className=""
+                                className="w3-tag w3-transparent"
                                 onClick={tag => copyToClipboard(tag.value)}
+                                renderer={customRenderer}
                             />
                         </p>
                     </div>
@@ -590,7 +589,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                             <div id="piechart" className="w3-center">
                                 <PieChart width={isLarge() ? 1280 : window.innerWidth} height={isMobile() ? window.innerWidth * 1.2 : isLarge() ? 740 : window.innerWidth * 1}>
                                     <Pie data={pieChartDataLevel01} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 270 : window.innerWidth / 3} fill="#2196F3" onClick={pieChartHandler} label={renderCustomizedLabel} />
-                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 300 : window.innerWidth / 2.5} innerRadius={isLarge() ? 280 : window.innerWidth / 2.5 - 20} fill="#00C49F" label />
+                                    <Pie data={pieChartDataLevel02} dataKey="value" cx="50%" cy="50%" outerRadius={isLarge() ? 300 : window.innerWidth / 2.5} innerRadius={isLarge() ? 280 : window.innerWidth / 2.5 - 20} fill="#00C49F" />
                                     <Tooltip />
                                 </PieChart>
                             </div>
