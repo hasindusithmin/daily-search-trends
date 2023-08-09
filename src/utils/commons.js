@@ -1,6 +1,6 @@
 import { toast } from "react-toastify"
 
-function downloadSvgAsPng(svgElement, filename) {
+export function downloadSvgAsPng(svgElement, filename) {
   try {
     // Convert SVG element to XML string
     const svgXml = new XMLSerializer().serializeToString(svgElement);

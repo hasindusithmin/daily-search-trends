@@ -473,7 +473,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
             <div className="w3-content" style={{ fontWeight: 400 }}>
                 <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
             </div>
-            <p className="w3-content w3-center" style={{padding: '15px 0px'}}>
+            <p className="w3-content w3-center" style={{ padding: '15px 0px' }}>
                 <Select
                     options={selectOptions}
                     isMulti
@@ -490,29 +490,36 @@ Embrace the power of daily search trends and unlock your potential for success. 
                         <div className="w3-center">
                             <div className="chart-details">Explore Locations and Discover Insights Worldwide</div>
                         </div>
-                        <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
-                            <Geographies geography={"/geo.json"}>
-                                {({ geographies }) =>
-                                    geographies.map((geo) => (
-                                        <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
-                                    ))
-                                }
-                            </Geographies>
-                            {geoMapData.map(({ country, totalTraffic, lnglat }) => {
-                                return (
-                                    <Marker key={country} coordinates={lnglat} onClick={() => openModal(country)}>
-                                        <circle fill="#F53" stroke="#FFF" r={popScale(totalTraffic)} />
-                                        <text
-                                            textAnchor="middle"
-                                            y={5}
-                                            style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 9 }}
-                                        >
-                                            {country} <tspan fontSize="6px" dy="-0.5em" fontWeight="bold">{formatNumberAbbreviation(totalTraffic)}+</tspan>
-                                        </text>
-                                    </Marker>
-                                );
-                            })}
-                        </ComposableMap>
+                        <p>
+                            <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
+                        </p>
+                        <div id="geoChart" className="w3-center">
+                            <div>
+                                <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
+                                    <Geographies geography={"/geo.json"}>
+                                        {({ geographies }) =>
+                                            geographies.map((geo) => (
+                                                <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
+                                            ))
+                                        }
+                                    </Geographies>
+                                    {geoMapData.map(({ country, totalTraffic, lnglat }) => {
+                                        return (
+                                            <Marker key={country} coordinates={lnglat} onClick={() => openModal(country)}>
+                                                <circle fill="#F53" stroke="#FFF" r={popScale(totalTraffic)} />
+                                                <text
+                                                    textAnchor="middle"
+                                                    y={5}
+                                                    style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 9 }}
+                                                >
+                                                    {country} <tspan fontSize="6px" dy="-0.5em" fontWeight="bold">{formatNumberAbbreviation(totalTraffic)}+</tspan>
+                                                </text>
+                                            </Marker>
+                                        );
+                                    })}
+                                </ComposableMap>
+                            </div>
+                        </div>
                     </div>
                 )
             }
@@ -527,7 +534,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                                 minSize={isMobile() ? 5 : 15}
                                 maxSize={isMobile() ? 12 : 36}
                                 tags={tagCloudData}
-                                className="w3-"
+                                className=""
                             />
                         </p>
                     </div>

@@ -10,6 +10,7 @@ import { downloadChart, copyToClipboard, isMobile } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CountriesSearch from "../components/CountriesSearch";
+import { TagCloud } from 'react-tagcloud'
 
 export default function Country() {
 
@@ -155,6 +156,7 @@ export default function Country() {
     const [trends, setTrends] = useState(null);
     const [barData, setBarData] = useState(null);
     const [treeMapData, setTreeMapData] = useState(null);
+    const [tagCloudData, setTagCloudData] = useState(null);
 
     const initialize = () => {
         const changeState = (trendingsearches) => {
@@ -162,6 +164,7 @@ export default function Country() {
             setTrends(trendingsearches);
             setBarData(trendingsearches.map(({ title, traffic }) => ({ title, traffic })));
             setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
+            setTagCloudData(trendingsearches.map(({ title, traffic }) => ({ value: title, count: traffic })))
         }
 
         const getDataFromAPI = async () => {
@@ -283,6 +286,21 @@ export default function Country() {
                             <ReactMarkdown children={categorization} remarkPlugins={[remarkGfm]} className="w3-panel w3-border w3-round-large w3-white w3-leftbar w3-hover-sand" />
                         }
                     </div>
+                    {/* tagcloud */}
+                    {
+                        tagCloudData && (
+                            <div className="w3-content w3-padding-32" >
+                                <p style={{ lineHeight: 1.8 }} className="w3-justify">
+                                    <TagCloud
+                                        minSize={isMobile() ? 5 : 15}
+                                        maxSize={isMobile() ? 12 : 36}
+                                        tags={tagCloudData}
+                                        className=""
+                                    />
+                                </p>
+                            </div>
+                        )
+                    }
                     {/* datatable  */}
                     {
                         trends &&
