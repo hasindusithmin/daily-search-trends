@@ -6,7 +6,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
-import { downloadChart, copyToClipboard, isMobile } from "../utils/commons";
+import { downloadChart, copyToClipboard, isMobile, openNewsModal } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CountriesSearch from "../components/CountriesSearch";
@@ -164,7 +164,7 @@ export default function Country() {
             setTrends(trendingsearches);
             setBarData(trendingsearches.map(({ title, traffic }) => ({ title, traffic })));
             setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
-            setTagCloudData(trendingsearches.map(({ title, traffic }) => ({ value: title, count: traffic })))
+            setTagCloudData(trendingsearches.map(({ title, traffic, picture, news }) => ({ value: title, count: traffic, picture: picture, news })))
         }
 
         const getDataFromAPI = async () => {
@@ -305,7 +305,7 @@ export default function Country() {
                                         tags={tagCloudData}
                                         renderer={customRenderer}
                                         className=""
-                                        onClick={({ value }) => { copyToClipboard(value) }}
+                                        onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
                                     />
                                 </p>
                             </div>
