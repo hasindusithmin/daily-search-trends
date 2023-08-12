@@ -118,7 +118,7 @@ export function isMobile() {
 }
 
 export function isLarge() {
-  return window.innerWidth > 1280;
+  return window.innerWidth >= 1280;
 }
 
 export const codes = {
