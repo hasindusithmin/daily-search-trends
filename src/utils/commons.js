@@ -209,7 +209,7 @@ export function openNewsModal(title, news, picture) {
     imageWidth: 100,
     imageHeight: 100,
     imageAlt: title,
-    title: `<b>${title}</b><sup style="font-size:11">Related news</sup>`,
+    title: `<b>${title}</b>`,
     html: generateNewsHTML(news),
     showCloseButton: true,
     confirmButtonText: 'Copy',
