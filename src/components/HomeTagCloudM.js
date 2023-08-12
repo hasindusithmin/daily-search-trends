@@ -1,5 +1,5 @@
 import Rodal from 'rodal';
-import { isMobile, codes, copyToClipboard, formatNumberAbbreviation } from '../utils/commons';
+import { isMobile, codes, formatNumberAbbreviation, openNewsModal } from '../utils/commons';
 import { TagCloud } from 'react-tagcloud'
 
 export default function HomeTagCloudM({ showTC, setShowTC }) {
@@ -30,9 +30,9 @@ export default function HomeTagCloudM({ showTC, setShowTC }) {
                     className='w3-padding'
                     minSize={12}
                     maxSize={35}
-                    tags={trends.map(({ title, traffic }) => ({ value: title, count: traffic }))}
+                    tags={trends.map(({ title, traffic, news, picture }) => ({ value: title, count: traffic, news, picture }))}
                     renderer={customRenderer}
-                    onClick={({ value }) => { copyToClipboard(value) }}
+                    onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
                 />
             </div>
         </Rodal >

@@ -9,7 +9,7 @@ import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
-import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation } from "../utils/commons";
+import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation, openNewsModal } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -240,7 +240,7 @@ export default function Home() {
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
-                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag })
+                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag, picture:trend.picture, news:trend.news })
                 }
             }
             setMaxTraffic(geoData.reduce((max, item) => {
@@ -451,7 +451,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
     const customRenderer = (tag, size, color) => {
         return (
             <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
-                <sub style={{fontSize: 12}}>{tag.flag}</sub>{tag.value}<sup style={{color:'#333'}}>{formatNumberAbbreviation(tag.count)}+</sup>
+                <sub style={{ fontSize: 12 }}>{tag.flag}</sub>{tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
     }
@@ -533,7 +533,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                                 maxSize={isMobile() ? 15 : 36}
                                 tags={tagCloudData}
                                 className="w3-tag w3-transparent"
-                                onClick={tag => copyToClipboard(tag.value)}
+                                onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
                                 renderer={customRenderer}
                             />
                         </p>

@@ -1,4 +1,5 @@
 import { toast } from "react-toastify"
+import Swal from "sweetalert2";
 
 export function downloadSvgAsPng(svgElement, filename) {
   try {
@@ -179,7 +180,43 @@ export function formatNumberAbbreviation(number) {
   const suffixNum = Math.floor(('' + number).length / 3);
   let shortNumber = parseFloat((suffixNum !== 0 ? (number / Math.pow(1000, suffixNum)) : number).toPrecision(2));
   if (shortNumber % 1 !== 0) {
-      shortNumber = shortNumber.toFixed(1);
+    shortNumber = shortNumber.toFixed(1);
   }
   return shortNumber + suffixes[suffixNum];
+}
+
+function generateNewsHTML(newsItems) {
+  let html = '<p>';
+
+  newsItems.forEach(item => {
+    html += `    <div>\n`;
+    html += `        <h5><a href="${item['ht:news_item_url']}" target="_blank">${item['ht:news_item_title']}</a></h5>\n`;
+    html += `        <p>${item['ht:news_item_snippet']}</p>\n`;
+    html += `        <p>Source: <em>${item['ht:news_item_source']}</em></p>\n`;
+    html += `    </div>\n`;
+    html += `    <hr>\n`;
+  });
+
+  html += '</p>';
+
+  return html;
+}
+
+export function openNewsModal(title, news, picture) {
+  news = Array.isArray(news) ? news : [news]
+  Swal.fire({
+    imageUrl: picture,
+    imageWidth: 100,
+    imageHeight: 100,
+    imageAlt: title,
+    title: `<b>${title}</b><sup style="font-size:11">Related news</sup>`,
+    html: generateNewsHTML(news),
+    showCloseButton: true,
+    confirmButtonText: 'Copy',
+  })
+    .then((result) => {
+      if (result.isConfirmed) {
+        copyToClipboard(title)
+      }
+    })
 }
