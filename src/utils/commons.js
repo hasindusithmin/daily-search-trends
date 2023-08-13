@@ -174,6 +174,144 @@ export const codes = {
   'Vietnam': 'VN'
 }
 
+export const iso = {
+  'AR': 'Argentina',
+  'AU': 'Australia',
+  'AT': 'Austria',
+  'BE': 'Belgium',
+  'BR': 'Brazil',
+  'CA': 'Canada',
+  'CL': 'Chile',
+  'CO': 'Colombia',
+  'CZ': 'Czechia',
+  'DK': 'Denmark',
+  'EG': 'Egypt',
+  'FI': 'Finland',
+  'FR': 'France',
+  'DE': 'Germany',
+  'GR': 'Greece',
+  'HK': 'Hong Kong',
+  'HU': 'Hungary',
+  'IN': 'India',
+  'ID': 'Indonesia',
+  'IE': 'Ireland',
+  'IL': 'Israel',
+  'IT': 'Italy',
+  'JP': 'Japan',
+  'KE': 'Kenya',
+  'MY': 'Malaysia',
+  'MX': 'Mexico',
+  'NL': 'Netherlands',
+  'NZ': 'New Zealand',
+  'NG': 'Nigeria',
+  'NO': 'Norway',
+  'PE': 'Peru',
+  'PH': 'Philippines',
+  'PL': 'Poland',
+  'PT': 'Portugal',
+  'RO': 'Romania',
+  'RU': 'Russia',
+  'SA': 'Saudi Arabia',
+  'SG': 'Singapore',
+  'ZA': 'South Africa',
+  'KR': 'South Korea',
+  'ES': 'Spain',
+  'SE': 'Sweden',
+  'CH': 'Switzerland',
+  'TW': 'Taiwan',
+  'TH': 'Thailand',
+  'TR': 'Türkiye',
+  'UA': 'Ukraine',
+  'GB': 'United Kingdom',
+  'US': 'United States',
+  'VN': 'Vietnam'
+}
+
+export const flags = {
+  'AR': '🇦🇷',
+  'AU': '🇦🇺',
+  'AT': '🇦🇹',
+  'BE': '🇧🇪',
+  'BR': '🇧🇷',
+  'CA': '🇨🇦',
+  'CL': '🇨🇱',
+  'CO': '🇨🇴',
+  'CZ': '🇨🇿',
+  'DK': '🇩🇰',
+  'EG': '🇪🇬',
+  'FI': '🇫🇮',
+  'FR': '🇫🇷',
+  'DE': '🇩🇪',
+  'GR': '🇬🇷',
+  'HK': '🇭🇰',
+  'HU': '🇭🇺',
+  'IN': '🇮🇳',
+  'ID': '🇮🇩',
+  'IE': '🇮🇪',
+  'IL': '🇮🇱',
+  'IT': '🇮🇹',
+  'JP': '🇯🇵',
+  'KE': '🇰🇪',
+  'MY': '🇲🇾',
+  'MX': '🇲🇽',
+  'NL': '🇳🇱',
+  'NZ': '🇳🇿',
+  'NG': '🇳🇬',
+  'NO': '🇳🇴',
+  'PE': '🇵🇪',
+  'PH': '🇵🇭',
+  'PL': '🇵🇱',
+  'PT': '🇵🇹',
+  'RO': '🇷🇴',
+  'RU': '🇷🇺',
+  'SA': '🇸🇦',
+  'SG': '🇸🇬',
+  'ZA': '🇿🇦',
+  'KR': '🇰🇷',
+  'ES': '🇪🇸',
+  'SE': '🇸🇪',
+  'CH': '🇨🇭',
+  'TW': '🇹🇼',
+  'TH': '🇹🇭',
+  'TR': '🇹🇷',
+  'UA': '🇺🇦',
+  'GB': '🇬🇧',
+  'US': '🇺🇸',
+  'VN': '🇻🇳'
+}
+
+export const content = `
+**Welcome To The Trendy World** - _Stay Ahead with Daily Search Trends_ 😉
+
+Are you ready to unlock the power of daily search trends? At Trendy World, we offer you a gateway to stay at the forefront of what's buzzing and trending in the online world. Whether you're a content creator, marketer, or just a curious mind, our platform provides valuable insights that can drive your success. 💪💼🌐
+
+**Why Embrace Daily Search Trends?**
+
+In today's fast-paced digital landscape, staying relevant is key. By harnessing the power of daily search trends, you can:
+
+**1. Boost Your Content:** Discover popular keywords and phrases that resonate with your audience. Tailor your content to their interests and watch your engagement soar. 📝✨
+
+**2. Seize Timely Opportunities:** Capitalize on trending topics to create timely and compelling content that captivates your audience. 🚀⏰📢
+
+**3. Understand User Intent:** Get inside the minds of your audience by analyzing their search behavior. Understand what they are looking for and deliver solutions that truly matter. 🧠🔍💡
+
+**4. Stay Ahead of Competitors:** Keep a keen eye on your competition. Track their strategies and adapt your own to maintain a competitive edge. 👀📊🏆
+
+**5. Embrace Seasonal Trends:** Plan ahead and align your marketing campaigns with seasonal trends, tapping into heightened interest during specific periods. 🗓️🎉🎁
+
+**6. Be Informed:** Be the first to know about breaking news and current events with real-time updates on what's trending globally. 🌐📰🔔
+
+**How Trendy World Works**
+
+Our intuitive platform provides you with instant access to the most relevant and up-to-date search trends. Simply browse through our user-friendly interface and explore the trending topics that matter most to you. 🖥️🔍🚀
+
+**Start Your Trend Journey Today**
+
+Embrace the power of daily search trends and unlock your potential for success. Join us at Trendy World and make every day a step towards a brighter, trendier future. 🚀🌟
+
+**Stay in the know. Stay trendy.** 🧭📲📈
+`
+
 
 export function formatNumberAbbreviation(number) {
   const suffixes = ['', 'K', 'M', 'B', 'T'];
@@ -185,12 +323,12 @@ export function formatNumberAbbreviation(number) {
   return shortNumber + suffixes[suffixNum];
 }
 
-function generateNewsHTML(newsItems) {
+function generateNewsHTML(news) {
   let html = '<p>';
 
-  newsItems.forEach(item => {
+  news.forEach(item => {
     html += `    <div>\n`;
-    html += `        <h5><a href="${item['ht:news_item_url']}" target="_blank">${item['ht:news_item_title']}</a></h5>\n`;
+    html += `        <h5><a href="${item['ht:news_item_url']}" target="_blank" >${item['ht:news_item_title']}</a></h5>\n`;
     html += `        <p>${item['ht:news_item_snippet']}</p>\n`;
     html += `        <p>Source: <em>${item['ht:news_item_source']}</em></p>\n`;
     html += `    </div>\n`;
@@ -202,14 +340,14 @@ function generateNewsHTML(newsItems) {
   return html;
 }
 
-export function openNewsModal(title, news, picture) {
+export function openNewsModal(title, count, news, picture) {
   news = Array.isArray(news) ? news : [news]
   Swal.fire({
     imageUrl: picture,
     imageWidth: 100,
     imageHeight: 100,
     imageAlt: title,
-    title: `<b>${title}</b>`,
+    title: `<b>${title}</b><sup style="font-size:15px;">${formatNumberAbbreviation(count)}+</sup>`,
     html: generateNewsHTML(news),
     showCloseButton: true,
     confirmButtonText: 'Copy',
@@ -219,4 +357,21 @@ export function openNewsModal(title, news, picture) {
         copyToClipboard(title)
       }
     })
+}
+
+export function arraysHaveSameElements(array1, array2) {
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  const sortedArray1 = array1.slice().sort();
+  const sortedArray2 = array2.slice().sort();
+
+  for (let i = 0; i < sortedArray1.length; i++) {
+    if (sortedArray1[i] !== sortedArray2[i]) {
+      return false;
+    }
+  }
+
+  return true;
 }

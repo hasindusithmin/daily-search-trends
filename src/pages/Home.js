@@ -9,7 +9,7 @@ import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
-import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation, openNewsModal } from "../utils/commons";
+import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation, openNewsModal, content, arraysHaveSameElements } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -17,6 +17,7 @@ import { scaleLinear } from "d3-scale";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
+import CountryLable from "../components/CountryLabel";
 
 export default function Home() {
 
@@ -208,8 +209,7 @@ export default function Home() {
     const [rawData, setRawData] = useState([]);
     const [countryRank, setCountryRank] = useState([]);
     const [color, setColor] = useState('');
-    const [isListChange, setIsListChange] = useState(false);
-    const [selectedCountries, setSelectedCountries] = useState([{ "label": "India", "value": "IN" }, { "label": "United States", "value": "US" }, { "label": "Indonesia", "value": "ID" }, { "label": "Brazil", "value": "BR" }, { "label": "Russia", "value": "RU" }]);
+    const [selectedCountries, setSelectedCountries] = useState([]);
 
     function formatToBrowserTimezone(datetimeString) {
         const options = {
@@ -228,8 +228,11 @@ export default function Home() {
         initialize();
     }, []);
 
-    const initialize = () => {
+    const initialize = (reRender = false) => {
         const changeState = (trendingsearches) => {
+            setTimeout(() => {
+                document.title = `Trendy w... ${selectedCountries.join(',')}`
+            }, 250)
             setRawData(trendingsearches);
             const data = [], treeMapDataArr1 = [], level01Data = [], level02Data = [], geoData = [], tagCloud = [];
             for (const { country, trends, flag } of trendingsearches) {
@@ -239,8 +242,8 @@ export default function Home() {
                 geoData.push({ country, totalTraffic, lnglat: coordinates[country] })
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
-                    data.push({ ...trend, country: `${country} ${flag}` })
-                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag, picture: trend.picture, news: trend.news })
+                    data.push({ ...trend, country })
+                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag, picture: trend.picture, news: trend.news, country: country })
                 }
             }
             setMaxTraffic(geoData.reduce((max, item) => {
@@ -251,17 +254,20 @@ export default function Home() {
             setPieChartDataLevel02(level02Data)
             setTreeMapData1(treeMapDataArr1)
             setGeoMapData(geoData)
-            setTagCloudData(tagCloud)
             setCountryRank(treeMapDataArr1.map(({ name }) => name));
             setTrends(data.sort((a, b) => b.traffic - a.traffic));
             setTrendsCopy(data.sort((a, b) => b.traffic - a.traffic));
+            setTagCloudData(null)
+            setTimeout(() => {
+                setTagCloudData(tagCloud);
+            }, 100)
         }
 
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
                 const res = await axios.post('https://claudeapi.onrender.com/trends', {
-                    codes: selectedCountries.map(({ value }) => value)
+                    codes: selectedCountries.length > 0 ? selectedCountries : ["IN", "US", "ID", "BR", "RU"]
                 });
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
@@ -278,28 +284,39 @@ export default function Home() {
                 toast.info("Please try again in a few minutes", { autoClose: 1500, hideProgressBar: true });
                 return
             }
+            const sC = selectedCountries.length > 0 ? selectedCountries : ["IN", "US", "ID", "BR", "RU"];
+            setSelectedCountries(sC);
             // do state changes 
             changeState(apiData);
             // save data in local storage 
             const store_data = {
                 "created": Date.now(),
                 "resource": JSON.stringify(apiData),
+                "countries": JSON.stringify(sC)
             }
             sessionStorage.setItem('treasure', JSON.stringify(store_data))
         }
 
         const treasure = sessionStorage.getItem('treasure');
-        if (!treasure || isListChange) {
+        if (!treasure) {
             // If there is no data in the local storage or requests new list
             console.log('there is no data in the local storage');
-            if (isListChange) {
-                sessionStorage.removeItem('treasure')
-            }
-            fetchRenderSave();
-            setIsListChange(false)
+            fetchRenderSave()
             return
         }
-        const { created, resource } = JSON.parse(treasure);
+        if (reRender) {
+            if (selectedCountries.length === 0) return
+            const { countries } = JSON.parse(treasure);
+            const prevSelectedCountries = JSON.parse(countries) || []
+            if (arraysHaveSameElements(selectedCountries, prevSelectedCountries)) {
+                toast.info("Content Already Shown", { autoClose: 500, hideProgressBar: true, position: 'top-center' });
+                return
+            }
+            sessionStorage.removeItem('treasure')
+            fetchRenderSave()
+            return
+        }
+        const { created, resource, countries } = JSON.parse(treasure);
         const now = Date.now();
         const is_data_old = (now - created) > (15 * 60 * 1000)
         if (is_data_old) {
@@ -308,6 +325,7 @@ export default function Home() {
             fetchRenderSave();
             return
         }
+        setSelectedCountries(JSON.parse(countries))
         // do state changes 
         changeState(JSON.parse(resource));
     }
@@ -375,8 +393,7 @@ export default function Home() {
     }
 
     const fetchNewList = () => {
-        setIsListChange(true);
-        initialize()
+        initialize(true);
     }
 
     const [pieChartData, setPieChartData] = useState(null);
@@ -387,39 +404,6 @@ export default function Home() {
         setPieChartData(data.map(({ name, value }) => ({ y: value, label: name, abbr: formatNumberAbbreviation(value) })));
     }
 
-    const content = `
-**Welcome To Our Trendy World** 🌟
-
-Stay Ahead with Daily Search Trends 📈
-
-Are you ready to unlock the power of daily search trends? At Trendy World, we offer you a gateway to stay at the forefront of what's buzzing and trending in the online world. Whether you're a content creator, marketer, or just a curious mind, our platform provides valuable insights that can drive your success. 💪💼🌐
-
-**Why Embrace Daily Search Trends?**
-
-In today's fast-paced digital landscape, staying relevant is key. By harnessing the power of daily search trends, you can:
-
-**1. Boost Your Content:** Discover popular keywords and phrases that resonate with your audience. Tailor your content to their interests and watch your engagement soar. 📝✨
-
-**2. Seize Timely Opportunities:** Capitalize on trending topics to create timely and compelling content that captivates your audience. 🚀⏰📢
-
-**3. Understand User Intent:** Get inside the minds of your audience by analyzing their search behavior. Understand what they are looking for and deliver solutions that truly matter. 🧠🔍💡
-
-**4. Stay Ahead of Competitors:** Keep a keen eye on your competition. Track their strategies and adapt your own to maintain a competitive edge. 👀📊🏆
-
-**5. Embrace Seasonal Trends:** Plan ahead and align your marketing campaigns with seasonal trends, tapping into heightened interest during specific periods. 🗓️🎉🎁
-
-**6. Be Informed:** Be the first to know about breaking news and current events with real-time updates on what's trending globally. 🌐📰🔔
-
-**How Trendy World Works**
-
-Our intuitive platform provides you with instant access to the most relevant and up-to-date search trends. Simply browse through our user-friendly interface and explore the trending topics that matter most to you. 🖥️🔍🚀
-
-**Start Your Trend Journey Today**
-
-Embrace the power of daily search trends and unlock your potential for success. Join us at Trendy World and make every day a step towards a brighter, trendier future. 🚀🌟
-
-**Stay in the know. Stay trendy.** 🧭📲📈
-`
     const RADIAN = Math.PI / 180;
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
         const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -450,8 +434,8 @@ Embrace the power of daily search trends and unlock your potential for success. 
 
     const customRenderer = (tag, size, color) => {
         return (
-            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
-                <sub style={{ fontSize: 12 }}>{tag.flag}</sub>{tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup>
+            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent tooltip'>
+                {tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup><span className="tooltiptext">{tag.flag}{tag.country}</span>
             </span>
         )
     }
@@ -460,8 +444,8 @@ Embrace the power of daily search trends and unlock your potential for success. 
         <div className="">
             <ToastContainer />
             <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
-                <div className="w3-xlarge w3-opacity">
-                    <b>TRENDY WORLD</b>
+                <div className="w3-xlarge">
+                    <b className="w3-opacity">TRENDY WORLD</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
@@ -477,7 +461,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                     isMulti
                     isSearchable={true}
                     placeholder="Select Countries..."
-                    onChange={(o) => setSelectedCountries(o)}
+                    onChange={(opt) => setSelectedCountries(opt.map(({ value }) => value))}
                 />
                 <br />
                 <button className="w3-button w3-border w3-round-xlarge" style={{ fontWeight: 750 }} onClick={fetchNewList}>🔍</button>
@@ -486,7 +470,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 geoMapData && (
                     <div className="w3-content" style={{ paddingTop: 15 }}>
                         <div className="w3-center">
-                            <div className="chart-details">Explore Locations and Discover Insights Worldwide</div>
+                            <div className="chart-details">Explore Locations and Discover Insights Worldwide.<sup style={{ fontSize: 14 }}><CountryLable selectedCountries={selectedCountries} /></sup></div>
                         </div>
                         <p>
                             <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
@@ -524,8 +508,8 @@ Embrace the power of daily search trends and unlock your potential for success. 
             {
                 tagCloudData && (
                     <div className="w3-content w3-padding-32" >
-                        <div className="w3-center w3-padding-32">
-                            <div className="chart-details">Discover What's Hot and Relevant Now</div>
+                        <div className="w3-center w3-padding">
+                            <div className="chart-details">Discover What's Hot and Relevant Now.<sup style={{ fontSize: 14 }}><CountryLable selectedCountries={selectedCountries} /></sup></div>
                         </div>
                         <p style={{ lineHeight: 1.8 }} className="w3-justify">
                             <TagCloud
@@ -533,7 +517,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                                 maxSize={isMobile() ? 15 : 36}
                                 tags={tagCloudData}
                                 className="w3-tag w3-transparent"
-                                onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
+                                onClick={({ value, count, news, picture }) => { openNewsModal(value, count, news, picture); }}
                                 renderer={customRenderer}
                             />
                         </p>
@@ -544,8 +528,8 @@ Embrace the power of daily search trends and unlock your potential for success. 
                 trends && (
                     <div className="">
                         <div className="w3-content w3-padding-32">
-                            <div className="w3-center w3-padding-32">
-                                <div className="chart-details">Organized Information at a Glance <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span></div>
+                            <div className="w3-center w3-padding">
+                                <div className="chart-details">Organized Information at a Glance <span style={{ cursor: 'copy' }} title="copy all keywords" onClick={copyKeywordsToClipBoard}>📋</span><sup style={{ fontSize: 14 }}><CountryLable selectedCountries={selectedCountries} /></sup></div>
                             </div>
                             <p style={{ paddingBottom: 32 }}>
                                 <span className="w3-right">
@@ -581,7 +565,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                     <div className="">
                         <div className="w3-content w3-padding-64">
                             <div className="w3-center">
-                                <div className="chart-details">A Delicious Slice of Information</div>
+                                <div className="chart-details">A Delicious Slice of Information.<sup style={{ fontSize: 14 }}><CountryLable selectedCountries={selectedCountries} /></sup></div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('piechart') }}>download ⤵</button>
@@ -602,7 +586,7 @@ Embrace the power of daily search trends and unlock your potential for success. 
                     <div className="">
                         <div className="w3-content w3-padding-32">
                             <div className="w3-center">
-                                <div className="chart-details">Exploring Hierarchical Data in a Compact View</div>
+                                <div className="chart-details">Exploring Hierarchical Data in a Compact View.<sup style={{ fontSize: 14 }}><CountryLable selectedCountries={selectedCountries} /></sup></div>
                             </div>
                             <p>
                                 <button title="Download" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>

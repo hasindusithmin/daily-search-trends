@@ -161,10 +161,16 @@ export default function Country() {
     const initialize = () => {
         const changeState = (trendingsearches) => {
             trendingsearches.sort((a, b) => b.traffic - a.traffic)
+            setTimeout(()=>{
+                document.title = `Trendy w... ${country}`
+            },250)
             setTrends(trendingsearches);
             setBarData(trendingsearches.map(({ title, traffic }) => ({ title, traffic })));
             setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
-            setTagCloudData(trendingsearches.map(({ title, traffic, picture, news }) => ({ value: title, count: traffic, picture: picture, news })))
+            setTagCloudData(null)
+            setTimeout(() => {
+                setTagCloudData(trendingsearches.map(({ title, traffic, picture, news }) => ({ value: title, count: traffic, picture: picture, news })))
+            }, 100)
         }
 
         const getDataFromAPI = async () => {
@@ -305,7 +311,7 @@ export default function Country() {
                                         tags={tagCloudData}
                                         renderer={customRenderer}
                                         className=""
-                                        onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
+                                        onClick={({ value, count, news, picture }) => { openNewsModal(value, count, news, picture); }}
                                     />
                                 </p>
                             </div>

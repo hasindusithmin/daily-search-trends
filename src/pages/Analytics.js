@@ -77,6 +77,9 @@ export default function Analytics() {
     const initialize = async () => {
 
         const changeState = (data) => {
+            setTimeout(()=>{
+                document.title = `Trendy w... ${keyword}`
+            },250)
             if (data.length < 5) {
                 setNotFound("Sorry, results not found");
                 return

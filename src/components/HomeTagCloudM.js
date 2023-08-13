@@ -32,7 +32,7 @@ export default function HomeTagCloudM({ showTC, setShowTC }) {
                     maxSize={35}
                     tags={trends.map(({ title, traffic, news, picture }) => ({ value: title, count: traffic, news, picture }))}
                     renderer={customRenderer}
-                    onClick={({ value, news, picture }) => { openNewsModal(value, news, picture); }}
+                    onClick={({ value, count, news, picture }) => { openNewsModal(value, count, news, picture); }}
                 />
             </div>
         </Rodal >
