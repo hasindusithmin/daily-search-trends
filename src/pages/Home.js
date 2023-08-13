@@ -240,7 +240,7 @@ export default function Home() {
                 for (const trend of trends) {
                     level02Data.push({ name: trend.title, value: trend.traffic, country })
                     data.push({ ...trend, country: `${country} ${flag}` })
-                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag, picture:trend.picture, news:trend.news })
+                    tagCloud.push({ value: trend.title, count: trend.traffic, flag: flag, picture: trend.picture, news: trend.news })
                 }
             }
             setMaxTraffic(geoData.reduce((max, item) => {
@@ -384,7 +384,7 @@ export default function Home() {
     const pieChartHandler = e => {
         setCountry(e.name);
         const data = pieChartDataLevel02.filter(({ country }) => country === e.name)
-        setPieChartData(data)
+        setPieChartData(data.map(({ name, value }) => ({ y: value, label: name, abbr: formatNumberAbbreviation(value) })));
     }
 
     const content = `
