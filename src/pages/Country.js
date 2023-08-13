@@ -11,10 +11,13 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CountriesSearch from "../components/CountriesSearch";
 import { TagCloud } from 'react-tagcloud'
+import CanvasJSReact from '@canvasjs/react-charts';
 
 export default function Country() {
 
     let { country } = useParams();
+
+    let CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
     function formatToBrowserTimezone(datetimeString) {
         const options = {
@@ -161,11 +164,35 @@ export default function Country() {
     const initialize = () => {
         const changeState = (trendingsearches) => {
             trendingsearches.sort((a, b) => b.traffic - a.traffic)
-            setTimeout(()=>{
+            setTimeout(() => {
                 document.title = `Trendy w... ${country}`
-            },250)
+            }, 250)
             setTrends(trendingsearches);
-            setBarData(trendingsearches.map(({ title, traffic }) => ({ title, traffic })));
+            setBarData({
+                animationEnabled: true,
+                zoomEnabled: true,
+                theme: "light",
+                exportFileName: `${country}_daily_search_trends`,
+                exportEnabled: true,
+                title: {
+                    text: `Exploring Today's Top Searches in ${country}`,
+                    fontSize: 18
+                },
+                axisX: {
+                    title: "keywords",
+                    reversed: true,
+                },
+                axisY: {
+                    title: "traffic",
+                    includeZero: true,
+                },
+                data: [{
+                    type: "bar",
+                    indexLabel: "{y}",
+                    indexLabelFontColor: "white",
+                    dataPoints: trendingsearches.map(({ title, traffic }) => ({ label: title, y: traffic }))
+                }]
+            });
             setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
             setTagCloudData(null)
             setTimeout(() => {
@@ -332,31 +359,14 @@ export default function Country() {
                     {/* barchart  */}
                     {
                         barData &&
-                        <>
-                            <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_barchart') }}>download ⤵</button>
-                            <div className="w3-center">
-                                <p id={country + '_barchart'} className={window && isMobile() ? 'w3-responsive' : ''}>
-                                    <BarChart
-                                        width={isMobile() ? 380 : 1280}
-                                        height={isMobile() ? 285 : 760}
-                                        data={barData}
-                                        onClick={(e) => { copyToClipboard(e['activeLabel']); }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="title" angle={270} orientation="top" fontSize={10} />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Bar dataKey="traffic" fill="#7ac143" />
-                                    </BarChart>
-                                </p>
-                            </div>
-                        </>
+                        <div className="w3-center" >
+                            <CanvasJSChart options={barData} />
+                        </div>
                     }
                     {/* treemap  */}
                     {
                         treeMapData &&
-                        <>
+                        <div style={{ paddingTop: 10 }}>
                             <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '_treemap') }}>download ⤵</button>
                             <div className="w3-center">
                                 <p id={country + '_treemap'} className={window && isMobile() ? 'w3-responsive' : ''}>
@@ -373,7 +383,7 @@ export default function Country() {
                                     />
                                 </p>
                             </div>
-                        </>
+                        </div>
                     }
                 </div>
             </div>

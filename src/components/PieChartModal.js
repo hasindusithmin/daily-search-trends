@@ -12,10 +12,12 @@ export default function PieChartModal({ country, pieChartData, setPieChartData }
         setChartOpts({
             theme: "light",
             animationEnabled: true,
+            zoomEnabled: true,
             exportFileName: `${country}_daily_search_trends`,
             exportEnabled: true,
             title: {
-                text: `${country} Trending Searches`
+                text: `${country} Trending Searches`,
+                fontSize: 18
             },
             data: [{
                 type: "pie",
