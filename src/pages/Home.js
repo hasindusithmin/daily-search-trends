@@ -266,7 +266,7 @@ export default function Home() {
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
-                const res = await axios.post('https://claudeapi.onrender.com/trends', {
+                const res = await axios.post('https://claudeapi-1-t7350571.deta.app/trends', {
                     codes: selectedCountries.length > 0 ? selectedCountries : ["IN", "US", "ID", "BR", "RU"]
                 });
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })

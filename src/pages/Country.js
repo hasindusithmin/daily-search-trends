@@ -203,7 +203,7 @@ export default function Country() {
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
-                const res = await axios.get(`https://claudeapi.onrender.com/trend?code=${codes[country]}`);
+                const res = await axios.get(`https://claudeapi-1-t7350571.deta.app/trend?code=${codes[country]}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -277,7 +277,7 @@ export default function Country() {
             let prompt = 'Explain these keywords in English\n'
             prompt += keywordsStr.slice(0, -2);
             setProcessing(true);
-            const res = await axios.post('https://claudeapi.onrender.com?engine=Llama', { prompt }, {
+            const res = await axios.post('https://claudeapi-1-t7350571.deta.app?engine=Llama', { prompt }, {
                 auth: {
                     username: process.env.REACT_APP_UNAME,
                     password: process.env.REACT_APP_PWORD

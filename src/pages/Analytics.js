@@ -103,7 +103,7 @@ export default function Analytics() {
             try {
                 setOverview('')
                 setOverviewErr('')
-                const res = await axios.get(`https://claudeapi.onrender.com/quora/${keyword}`);
+                const res = await axios.get(`https://claudeapi-1-t7350571.deta.app/quora/${keyword}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -178,7 +178,7 @@ export default function Analytics() {
         setOverviewErr('')
         setAnalyzing(true)
         try {
-            const res = await axios.post('https://claudeapi.onrender.com', { prompt }, {
+            const res = await axios.post('https://claudeapi-1-t7350571.deta.app', { prompt }, {
                 auth: {
                     username: process.env.REACT_APP_UNAME,
                     password: process.env.REACT_APP_PWORD
