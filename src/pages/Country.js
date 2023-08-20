@@ -309,11 +309,11 @@ export default function Country() {
             imageWidth: 100,
             imageHeight: 100,
             imageAlt: title,
-            title: `<b>${title}</b><sup style="font-size:15px;">${formatNumberAbbreviation(count)}+</sup>`,
+            title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Latest News</sup>`,
             html: generateNewsHTMLV1(news),
             showCloseButton: true,
             showDenyButton: true,
-            confirmButtonText: 'Google News',
+            confirmButtonText: 'Hot News',
             denyButtonText: 'Copy keyword'
         })
             .then((result) => {
@@ -323,7 +323,7 @@ export default function Country() {
                         .then(res => {
                             toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                             Swal.fire({
-                                title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Google News</sup>`,
+                                title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Hot News</sup>`,
                                 html: generateNewsHTMLV2(res.data),
                                 showConfirmButton: false,
                                 showCloseButton: true
