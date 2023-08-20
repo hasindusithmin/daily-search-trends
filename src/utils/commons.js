@@ -1,5 +1,4 @@
 import { toast } from "react-toastify"
-import Swal from "sweetalert2";
 
 export function downloadSvgAsPng(svgElement, filename) {
   try {
@@ -323,7 +322,7 @@ export function formatNumberAbbreviation(number) {
   return shortNumber + suffixes[suffixNum];
 }
 
-function generateNewsHTML(news) {
+export function generateNewsHTMLV1(news) {
   let html = '<p>';
 
   news.forEach(item => {
@@ -340,23 +339,20 @@ function generateNewsHTML(news) {
   return html;
 }
 
-export function openNewsModal(title, count, news, picture) {
-  news = Array.isArray(news) ? news : [news]
-  Swal.fire({
-    imageUrl: picture,
-    imageWidth: 100,
-    imageHeight: 100,
-    imageAlt: title,
-    title: `<b>${title}</b><sup style="font-size:15px;">${formatNumberAbbreviation(count)}+</sup>`,
-    html: generateNewsHTML(news),
-    showCloseButton: true,
-    confirmButtonText: 'Copy',
-  })
-    .then((result) => {
-      if (result.isConfirmed) {
-        copyToClipboard(title)
-      }
-    })
+export function generateNewsHTMLV2(news) {
+  let html = '<p>';
+
+  news.forEach(item => {
+    html += `    <div>\n`;
+    html += `        <h5><a href="${item['link']}" target="_blank" >${item['title']}</a></h5>\n`;
+    html += `        <p>💡${item['source']} | ⏰${item['time']} </p>\n`;
+    html += `    </div>\n`;
+    html += `    <hr>\n`;
+  });
+
+  html += '</p>';
+
+  return html;
 }
 
 export function arraysHaveSameElements(array1, array2) {

@@ -4,14 +4,16 @@ import { Typewriter } from "react-simple-typewriter";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import DataTable from "react-data-table-component";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Treemap } from 'recharts';
+import { Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
-import { downloadChart, copyToClipboard, isMobile, openNewsModal } from "../utils/commons";
+import { downloadChart, copyToClipboard, isMobile, generateNewsHTMLV1, generateNewsHTMLV2, flags } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CountriesSearch from "../components/CountriesSearch";
 import { TagCloud } from 'react-tagcloud'
 import CanvasJSReact from '@canvasjs/react-charts';
+import Swal from "sweetalert2";
+
 
 export default function Country() {
 
@@ -298,6 +300,43 @@ export default function Country() {
                 {tag.value}<sup style={{ fontWeight: 500, color: '#111' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
+    }
+
+    const openNewsModal = (title, count, news, picture) => {
+        news = Array.isArray(news) ? news : [news]
+        Swal.fire({
+            imageUrl: picture,
+            imageWidth: 100,
+            imageHeight: 100,
+            imageAlt: title,
+            title: `<b>${title}</b><sup style="font-size:15px;">${formatNumberAbbreviation(count)}+</sup>`,
+            html: generateNewsHTMLV1(news),
+            showCloseButton: true,
+            showDenyButton: true,
+            confirmButtonText: 'Google News',
+            denyButtonText: 'Copy keyword'
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    const toastID = toast.loading("Processing, Please Wait...")
+                    axios.get(`https://claudeapi-1-t7350571.deta.app/gnews/${title}`)
+                        .then(res => {
+                            toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                            Swal.fire({
+                                title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Google News</sup>`,
+                                html: generateNewsHTMLV2(res.data),
+                                showConfirmButton: false,
+                                showCloseButton: true
+                            })
+                        })
+                        .catch(err => {
+                            toast.update(toastID, { render: err.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+                        })
+                }
+                else if (result.isDenied) {
+                    copyToClipboard(title)
+                }
+            })
     }
 
     return (
