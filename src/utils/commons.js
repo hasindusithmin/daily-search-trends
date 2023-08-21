@@ -1,44 +1,9 @@
 import { toast } from "react-toastify"
+import Swal from "sweetalert2";
+import axios from "axios";
 
-export function downloadSvgAsPng(svgElement, filename) {
-  try {
-    // Convert SVG element to XML string
-    const svgXml = new XMLSerializer().serializeToString(svgElement);
 
-    // Create a canvas element
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    // Create an image element
-    const img = new Image();
-
-    // Set up an event listener for the image load
-    img.onload = function () {
-      // Set canvas dimensions to match the SVG element
-      canvas.width = svgElement.width.baseVal.value;
-      canvas.height = svgElement.height.baseVal.value;
-
-      // Draw the image onto the canvas
-      ctx.drawImage(img, 0, 0);
-
-      // Convert the canvas content to a data URL
-      const dataUrl = canvas.toDataURL('image/png');
-
-      // Create a temporary link element
-      const link = document.createElement('a');
-      link.href = dataUrl;
-      link.download = filename;
-
-      // Programmatically click the link to trigger the download
-      link.click();
-    };
-
-    // Set the source of the image to the SVG XML
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgXml);
-  } catch (error) {
-    toast.error("Sorry, can't download chart at this moment", { autoClose: 250, hideProgressBar: true })
-  }
-}
+export const BackendURL = process.env.REACT_APP_TRENDY_WORLD_BACKEND;
 
 function downloadSvgAsJpg(svgElement, filename) {
   try {
@@ -280,7 +245,7 @@ export const flags = {
 }
 
 export const content = `
-**Welcome To The Trendy World** - _Stay Ahead with Daily Search Trends_ 😉
+**Welcome To The Trendy World : Stay Ahead with Daily Search Trends 😉**
 
 Are you ready to unlock the power of daily search trends? At Trendy World, we offer you a gateway to stay at the forefront of what's buzzing and trending in the online world. Whether you're a content creator, marketer, or just a curious mind, our platform provides valuable insights that can drive your success. 💪💼🌐
 
@@ -370,4 +335,43 @@ export function arraysHaveSameElements(array1, array2) {
   }
 
   return true;
+}
+
+export const openNewsModal = (title, country, news, picture) => {
+  news = Array.isArray(news) ? news : [news];
+  axios.defaults.baseURL = BackendURL;
+  Swal.fire({
+    imageUrl: picture,
+    imageWidth: 100,
+    imageHeight: 100,
+    imageAlt: title,
+    title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Latest News</sup>`,
+    html: news.length > 0 ? generateNewsHTMLV1(news) : '<span style="font-size:12px;font-weight:bold;color:red;">Sorry, results not found</span>',
+    showCloseButton: true,
+    showDenyButton: true,
+    confirmButtonText: 'Hot News',
+    denyButtonText: 'Copy keyword'
+  })
+    .then((result) => {
+      if (result.isConfirmed) {
+        const toastID = toast.loading("Processing, Please Wait...")
+        axios.get(`/hotnews/${title}?region=${codes[country]}`)
+          .then(res => {
+            const data = res.data || [];
+            toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
+            Swal.fire({
+              title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Hot News</sup>`,
+              html: data.length > 0 ? generateNewsHTMLV2(data) : '<span style="font-size:16px;font-weight:bold;color:red;">Sorry, results not found</span>',
+              showConfirmButton: false,
+              showCloseButton: true
+            })
+          })
+          .catch(err => {
+            toast.update(toastID, { render: err.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
+          })
+      }
+      else if (result.isDenied) {
+        copyToClipboard(title)
+      }
+    })
 }

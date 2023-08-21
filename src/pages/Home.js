@@ -9,7 +9,7 @@ import Modal from "../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import Select from "react-select";
 import CountriesSearch from "../components/CountriesSearch";
-import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation, content, arraysHaveSameElements, generateNewsHTMLV1, generateNewsHTMLV2 } from "../utils/commons";
+import { copyToClipboard, downloadChart, isLarge, isMobile, formatNumberAbbreviation, content, arraysHaveSameElements, BackendURL, openNewsModal } from "../utils/commons";
 import PieChartModal from "../components/PieChartModal";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -18,9 +18,10 @@ import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps
 import HomeTagCloudM from "../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
 import CountryLable from "../components/CountryLabel";
-import Swal from "sweetalert2";
 
 export default function Home() {
+
+    axios.defaults.baseURL = BackendURL;
 
     const columns = [
         {
@@ -63,7 +64,7 @@ export default function Home() {
             sortable: true
         },
         {
-            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + row.title.replaceAll(' ', '+')} className="w3-button w3-light-gray w3-round-large" title="Google" ><i style={{ color: '#fbbc05' }} className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + encodeURIComponent(row.title)} className="w3-button w3-light-gray w3-round-large" title="Google" ><i style={{ color: '#fbbc05' }} className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -267,7 +268,7 @@ export default function Home() {
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
-                const res = await axios.post('https://claudeapi-1-t7350571.deta.app/trends', {
+                const res = await axios.post('/trends', {
                     codes: selectedCountries.length > 0 ? selectedCountries : ["IN", "US", "ID", "BR", "RU"]
                 });
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
@@ -441,43 +442,6 @@ export default function Home() {
         )
     }
 
-    const openNewsModal = (title, count, news, picture) => {
-        news = Array.isArray(news) ? news : [news]
-        Swal.fire({
-            imageUrl: picture,
-            imageWidth: 100,
-            imageHeight: 100,
-            imageAlt: title,
-            title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Latest News</sup>`,
-            html: generateNewsHTMLV1(news),
-            showCloseButton: true,
-            showDenyButton: true,
-            confirmButtonText: 'Hot News',
-            denyButtonText: 'Copy keyword'
-        })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    const toastID = toast.loading("Processing, Please Wait...")
-                    axios.get(`https://claudeapi-1-t7350571.deta.app/gnews/${title}`)
-                        .then(res => {
-                            toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                            Swal.fire({
-                                title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Hot News</sup>`,
-                                html: generateNewsHTMLV2(res.data),
-                                showConfirmButton: false,
-                                showCloseButton: true
-                            })
-                        })
-                        .catch(err => {
-                            toast.update(toastID, { render: err.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                        })
-                }
-                else if (result.isDenied) {
-                    copyToClipboard(title)
-                }
-            })
-    }
-
     return (
         <div className="">
             <ToastContainer />
@@ -555,7 +519,7 @@ export default function Home() {
                                 maxSize={isMobile() ? 15 : 36}
                                 tags={tagCloudData}
                                 className="w3-tag w3-transparent"
-                                onClick={({ value, count, news, picture }) => { openNewsModal(value, count, news, picture); }}
+                                onClick={({ value, country, news, picture }) => { openNewsModal(value, country, news, picture); }}
                                 renderer={customRenderer}
                             />
                         </p>

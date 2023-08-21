@@ -6,7 +6,7 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { Treemap } from 'recharts';
 import CustomizedContent from "../components/CustomContentTreemap";
-import { downloadChart, copyToClipboard, isMobile, generateNewsHTMLV1, generateNewsHTMLV2, flags } from "../utils/commons";
+import { downloadChart, copyToClipboard, isMobile, openNewsModal, BackendURL, codes } from "../utils/commons";
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import CountriesSearch from "../components/CountriesSearch";
@@ -18,6 +18,8 @@ import Swal from "sweetalert2";
 export default function Country() {
 
     let { country } = useParams();
+
+    axios.defaults.baseURL = BackendURL;
 
     let CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -79,7 +81,7 @@ export default function Country() {
             sortable: true
         },
         {
-            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + row.title.replaceAll(' ', '+')} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
+            cell: row => <Link target="_blank" to={'https://www.google.com/search?q=' + encodeURIComponent(row.title)} lassName="w3-circle"><i className="fa fa-google" aria-hidden="true"></i>oogle</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -198,14 +200,14 @@ export default function Country() {
             setTreeMapData(trendingsearches.map(({ title, traffic }) => ({ name: title, size: traffic })))
             setTagCloudData(null)
             setTimeout(() => {
-                setTagCloudData(trendingsearches.map(({ title, traffic, picture, news }) => ({ value: title, count: traffic, picture: picture, news })))
+                setTagCloudData(trendingsearches.map(({ title, traffic, picture, news, }) => ({ value: title, count: traffic, picture: picture, news })))
             }, 100)
         }
 
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
-                const res = await axios.get(`https://claudeapi-1-t7350571.deta.app/trend?code=${codes[country]}`);
+                const res = await axios.get(`/trend?code=${codes[country]}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -279,7 +281,7 @@ export default function Country() {
             let prompt = 'Explain these keywords in English\n'
             prompt += keywordsStr.slice(0, -2);
             setProcessing(true);
-            const res = await axios.post('https://claudeapi-1-t7350571.deta.app?engine=Llama', { prompt }, {
+            const res = await axios.post('/ai?engine=Llama', { prompt }, {
                 auth: {
                     username: process.env.REACT_APP_UNAME,
                     password: process.env.REACT_APP_PWORD
@@ -300,43 +302,6 @@ export default function Country() {
                 {tag.value}<sup style={{ fontWeight: 500, color: '#111' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
-    }
-
-    const openNewsModal = (title, count, news, picture) => {
-        news = Array.isArray(news) ? news : [news]
-        Swal.fire({
-            imageUrl: picture,
-            imageWidth: 100,
-            imageHeight: 100,
-            imageAlt: title,
-            title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Latest News</sup>`,
-            html: generateNewsHTMLV1(news),
-            showCloseButton: true,
-            showDenyButton: true,
-            confirmButtonText: 'Hot News',
-            denyButtonText: 'Copy keyword'
-        })
-            .then((result) => {
-                if (result.isConfirmed) {
-                    const toastID = toast.loading("Processing, Please Wait...")
-                    axios.get(`https://claudeapi-1-t7350571.deta.app/gnews/${title}`)
-                        .then(res => {
-                            toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                            Swal.fire({
-                                title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Hot News</sup>`,
-                                html: generateNewsHTMLV2(res.data),
-                                showConfirmButton: false,
-                                showCloseButton: true
-                            })
-                        })
-                        .catch(err => {
-                            toast.update(toastID, { render: err.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
-                        })
-                }
-                else if (result.isDenied) {
-                    copyToClipboard(title)
-                }
-            })
     }
 
     return (
@@ -377,11 +342,18 @@ export default function Country() {
                                         tags={tagCloudData}
                                         renderer={customRenderer}
                                         className=""
-                                        onClick={({ value, count, news, picture }) => { openNewsModal(value, count, news, picture); }}
+                                        onClick={({ value, count, news, picture }) => { openNewsModal(value, country, news, picture); }}
                                     />
                                 </p>
                             </div>
                         )
+                    }
+                    {/* barchart  */}
+                    {
+                        barData &&
+                        <div className="w3-center" >
+                            <CanvasJSChart options={barData} />
+                        </div>
                     }
                     {/* datatable  */}
                     {
@@ -393,13 +365,6 @@ export default function Country() {
                                 pagination
                                 responsive
                             />
-                        </div>
-                    }
-                    {/* barchart  */}
-                    {
-                        barData &&
-                        <div className="w3-center" >
-                            <CanvasJSChart options={barData} />
                         </div>
                     }
                     {/* treemap  */}

@@ -2061,7 +2061,7 @@ a {
 
 /* Tooltip text */
 .tooltip .tooltiptext {
-  font-size: medium;
+  font-size: small;
   visibility: hidden;
   width: 120px;
   background-color: #999;

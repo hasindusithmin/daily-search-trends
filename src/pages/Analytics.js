@@ -7,11 +7,13 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area, Area
 import DataTable from 'react-data-table-component';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { downloadChart, copyToClipboard, isMobile } from '../utils/commons';
+import { downloadChart, copyToClipboard, isMobile, BackendURL } from '../utils/commons';
 import CountriesSearch from '../components/CountriesSearch';
 
 
 export default function Analytics() {
+
+    axios.defaults.baseURL = BackendURL;
 
     const columns = [
         {
@@ -103,7 +105,7 @@ export default function Analytics() {
             try {
                 setOverview('')
                 setOverviewErr('')
-                const res = await axios.get(`https://claudeapi-1-t7350571.deta.app/quora/${keyword}`);
+                const res = await axios.get(`/quora/${keyword}`);
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
             } catch (error) {
@@ -178,7 +180,7 @@ export default function Analytics() {
         setOverviewErr('')
         setAnalyzing(true)
         try {
-            const res = await axios.post('https://claudeapi-1-t7350571.deta.app', { prompt }, {
+            const res = await axios.post('/ai', { prompt }, {
                 auth: {
                     username: process.env.REACT_APP_UNAME,
                     password: process.env.REACT_APP_PWORD
