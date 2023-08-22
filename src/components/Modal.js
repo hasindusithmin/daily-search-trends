@@ -35,7 +35,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                 />
             </p>
             <div className='w3-padding w3-center'>
-                <button className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '-treemap') }}>Download ⤵</button>
+                <button title='Click to download the treemap' className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart(country + '-treemap') }}>Download ⤵</button>
             </div>
         </Rodal>
     )

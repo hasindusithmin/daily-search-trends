@@ -12,7 +12,7 @@ export default function HomeTagCloudM({ toast, showTC, setShowTC }) {
 
     const customRenderer = (tag, size, color) => {
         return (
-            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '3px', padding: '3px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
+            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size * 0.75}px`, margin: '3px', padding: '3px', cursor: 'cell' }} className='w3-tag w3-transparent' title={tag.value}>
                 {tag.value}<sup style={{ fontWeight: 500, color: '#111' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
@@ -29,7 +29,7 @@ export default function HomeTagCloudM({ toast, showTC, setShowTC }) {
             onClose={() => { setShowTC(null) }}
         >
             <div className='w3-padding'>
-                <p className='w3-center' style={{ fontWeight: 500, textDecoration: 'underline' }}>Explore the Latest {flag}{codes[country]} <sup style={{ fontWeight: 500 }}>{formatNumberAbbreviation(trends.reduce((sum, item) => sum + item.traffic, 0))}+</sup> Trending Keywords</p>
+                <p className='w3-center' style={{ fontWeight: 500, textDecoration: 'underline' }}>Explore the Latest <span title={country}>{flag}{codes[country]}</span> <sup style={{ fontWeight: 500 }}>{formatNumberAbbreviation(trends.reduce((sum, item) => sum + item.traffic, 0))}+</sup> Trending Keywords</p>
                 <TagCloud
                     className='w3-padding'
                     minSize={12}

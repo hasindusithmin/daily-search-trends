@@ -207,7 +207,7 @@ export default function Analytics() {
                         <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                     </p>
                     <CountriesSearch />
-                    <Link to="/" className='w3-button w3-small w3-round-large'>↩ Back To Home</Link>
+                    <Link to="/" className='w3-button w3-small w3-border w3-round-xlarge'>↩ Back To Home</Link>
                 </div>
                 <div className="w3-content w3-padding-64">
                     {
