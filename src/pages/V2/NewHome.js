@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
 import { Treemap } from 'recharts';
@@ -9,7 +9,6 @@ import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import CountriesSearch from "../../components/CountriesSearch";
 import { downloadChart, isLarge, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags } from "../../utils/commons";
-import { scaleLinear } from "d3-scale";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
@@ -84,7 +83,6 @@ export default function NewHome() {
     const [maxTraffic, setMaxTraffic] = useState(0);
     const [tagCloudData, setTagCloudData] = useState(null);
     const [rawData, setRawData] = useState([]);
-    const [countryColors, setCountryColors] = useState({});
 
     function formatToBrowserTimezone(datetimeString) {
         const options = {
@@ -119,7 +117,7 @@ export default function NewHome() {
                 return result;
             }, {});
             setRawData(groupedData);
-            const dataTable = [], treeMap = [], pieChart = [], geoMap = [], tagCloud = [], colors = {};
+            const dataTable = [], treeMap = [], pieChart = [], geoMap = [], tagCloud = [];
             for (const [countryCode, trends] of Object.entries(groupedData)) {
                 const country = iso[countryCode];
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
@@ -135,8 +133,6 @@ export default function NewHome() {
                 return item.totalTraffic > max ? item.totalTraffic : max;
             }, 0))
             treeMap.sort((a, b) => b.size - a.size);
-            treeMap.forEach(({ name }) => colors[name] = uniqolor.random()['color'])
-            setCountryColors(colors)
             setTreeMapData(treeMap)
             setGeoMapData(geoMap)
             setTblData(dataTable.sort((a, b) => b.traffic - a.traffic));
@@ -231,11 +227,6 @@ export default function NewHome() {
         setTblData(tblDataCopy);
     }
 
-    const popScale = useMemo(
-        () => scaleLinear().domain([0, maxTraffic]).range([0, 24]),
-        [maxTraffic]
-    );
-
     const [showTagCloud, setShowTagCloud] = useState(null);
     const openModal = (code) => {
         try {
@@ -259,11 +250,10 @@ export default function NewHome() {
     const [chartData, setChartData] = useState(null);
 
     const treeMapHandler = (e) => {
-        const data = rawData[e.name]
+        const data = rawData[e.name] || [];
         if (data.length === 0) return
+        data.sort((a, b) => b.traffic - a.traffic);
         setCountry(iso[e.name]);
-        console.log(countryColors);
-        setColor(countryColors[e.name]);
         setChartData(data.map(({ title, traffic }) => ({ name: title, size: traffic })));
     }
 
@@ -304,11 +294,9 @@ export default function NewHome() {
                                     {geoMapData.map(({ country, totalTraffic, lnglat }) => {
                                         return (
                                             <Marker key={country} coordinates={lnglat} onClick={() => openModal(codes[country])}>
-                                                <circle fill="#F53" stroke="#FFF" r={popScale(totalTraffic)} />
+                                                <circle fill={uniqolor.random()['color']}  r={2.5} />
                                                 <text
-                                                    textAnchor="middle"
-                                                    y={5}
-                                                    style={{ fontFamily: "system-ui", fill: "#5D5A6D", fontSize: 10, fontWeight: 550, cursor: 'cell' }}
+                                                    style={{ fontFamily: "system-ui", fill: '#5D5A6D', fontSize: 10, fontWeight: 550, cursor: 'cell' }}
                                                 >
                                                     {codes[country]}
                                                 </text>
@@ -398,7 +386,6 @@ export default function NewHome() {
                                     data={treeMapData}
                                     dataKey="size"
                                     aspectRatio={4 / 3}
-                                    stroke="#fff"
                                     content={<CustomizedContent colors={treeMapData.map(data => uniqolor.random()['color'])} />}
                                     onClick={treeMapHandler}
                                     style={{ cursor: 'pointer' }}

@@ -4,7 +4,7 @@ import { Typewriter } from 'react-simple-typewriter';
 import { downloadChart, copyToClipboard } from '../utils/commons';
 import CustomizedContent from './CustomContentTreemap';
 import { isMobile } from "../utils/commons";
-
+import uniqolor from 'uniqolor';
 
 export default function BarModal({ country, color, chartData, setChartData }) {
 
@@ -28,8 +28,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
                     data={chartData}
                     dataKey="size"
                     aspectRatio={4 / 3}
-                    stroke="#fff"
-                    content={<CustomizedContent colors={new Array(20).fill(color)} />}
+                    content={<CustomizedContent colors={chartData.map(()=>uniqolor.random()['color'])} />}
                     style={{ cursor: 'pointer' }}
                     onClick={e => { copyToClipboard(e['name']) }}
                 />

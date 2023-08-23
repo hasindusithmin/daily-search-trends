@@ -18,6 +18,7 @@ import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps
 import HomeTagCloudM from "../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
 import CountryLable from "../components/CountryLabel";
+import uniqolor from "uniqolor";
 
 export default function Home() {
 
@@ -548,8 +549,7 @@ export default function Home() {
                                     data={treeMapData1}
                                     dataKey="size"
                                     aspectRatio={4 / 3}
-                                    stroke="#fff"
-                                    content={<CustomizedContent colors={colors} />}
+                                    content={<CustomizedContent colors={treeMapData1.map(()=>uniqolor.random()['color'])} />}
                                     onClick={treeMapHandler1}
                                     style={{ cursor: 'pointer' }}
                                 />
