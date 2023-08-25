@@ -2098,3 +2098,9 @@ a {
   visibility: visible;
   opacity: 1;
 }
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

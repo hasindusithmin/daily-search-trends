@@ -8,11 +8,17 @@ import CustomizedContent from "../../components/CustomContentTreemap";
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
 import CountriesSearch from "../../components/CountriesSearch";
-import { downloadChart, isLarge, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags } from "../../utils/commons";
+import { downloadChart, isLarge, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
 import uniqolor from 'uniqolor';
+import moment from "moment";
+import Swal from "sweetalert2";
+import CountrySelectModal from "../../components/CountrySelectModal";
+import { Grid } from 'react-loader-spinner'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 export default function NewHome() {
 
@@ -49,7 +55,7 @@ export default function NewHome() {
             name: 'public date',
             width: '200px',
             selector: row => row.pubDate,
-            format: row => formatToBrowserTimezone(row.pubDate),
+            format: row => <div title={formatToBrowserTimezone(row.pubDate)}>{formatToBrowserTimezone(row.pubDate)}</div>,
             sortable: true
         },
         {
@@ -80,7 +86,6 @@ export default function NewHome() {
     const [tblDataCopy, setTblDataCopy] = useState([]);
     const [treeMapData, setTreeMapData] = useState(null);
     const [geoMapData, setGeoMapData] = useState(null);
-    const [maxTraffic, setMaxTraffic] = useState(0);
     const [tagCloudData, setTagCloudData] = useState(null);
     const [rawData, setRawData] = useState([]);
 
@@ -97,11 +102,16 @@ export default function NewHome() {
         return new Date(datetimeString).toLocaleString(undefined, options);
     }
 
+    const [fromTime, setFromTime] = useState(moment().startOf('day').valueOf());
+    const [toTime, setToTime] = useState(moment().valueOf());
+    const [countries, setCountries] = useState([]);
+    const [isFilterChanged, setIsFilterChanges] = useState(false);
+
     useEffect(() => {
         initialize();
-    }, []);
+    }, [isFilterChanged]);
 
-    const initialize = () => {
+    const initialize = async () => {
         const changeState = (trendingsearches) => {
             setTimeout(() => {
                 document.title = `Trendy world | V2`
@@ -129,22 +139,22 @@ export default function NewHome() {
                     dataTable.push({ ...trend, country })
                 }
             }
-            setMaxTraffic(geoMap.reduce((max, item) => {
-                return item.totalTraffic > max ? item.totalTraffic : max;
-            }, 0))
             treeMap.sort((a, b) => b.size - a.size);
             setTreeMapData(treeMap)
             setGeoMapData(geoMap)
             setTblData(dataTable.sort((a, b) => b.traffic - a.traffic));
             setTblDataCopy(dataTable.sort((a, b) => b.traffic - a.traffic));
             setTagCloudData(tagCloud);
+            setIsFilterChanges(false);
         }
 
         const getDataFromAPI = async () => {
             const toastID = toast.loading("Processing, Please Wait...")
             try {
                 const res = await axios.post('/getTrends', {
-                    fromTime: new Date().setHours(0, 0, 0, 0) - 24 * 60 * 60 * 1000
+                    fromTime,
+                    toTime,
+                    countries
                 });
                 toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
                 return res.data
@@ -165,29 +175,27 @@ export default function NewHome() {
             changeState(apiData);
             // save data in local storage 
             const store_data = {
-                "created": Date.now(),
-                "resource": JSON.stringify(apiData)
+                "resource": JSON.stringify(apiData),
+                "from_time": fromTime,
+                "to_time": toTime,
+                "countries_": JSON.stringify(countries)
             }
             sessionStorage.setItem('treasureV2', JSON.stringify(store_data))
         }
 
         const treasure = sessionStorage.getItem('treasureV2');
-        if (!treasure) {
+        if (!treasure || isFilterChanged) {
             // If there is no data in the local storage or requests new list
-            console.log('there is no data in the local storage');
-            fetchRenderSave()
+            console.log(isFilterChanged ? 'filter changed(start fetching...)' : 'data does not exist in session storage(start fetching...)');
+            await fetchRenderSave()
+            setIsFilterChanges(false)
             return
         }
-        const { created, resource } = JSON.parse(treasure);
-        const now = Date.now();
-        const is_data_old = (now - created) > (15 * 60 * 1000)
-        if (is_data_old) {
-            // If the data is more than 15 minutes old
-            console.log('data is more than 15 minutes old');
-            fetchRenderSave();
-            return
-        }
-        // do state changes 
+        console.log('data exists in session storage');
+        const { resource, from_time, to_time, countries_ } = JSON.parse(treasure);
+        setFromTime(from_time)
+        setToTime(to_time)
+        setCountries(JSON.parse(countries_))
         changeState(JSON.parse(resource));
     }
 
@@ -257,6 +265,51 @@ export default function NewHome() {
         setChartData(data.map(({ title, traffic }) => ({ name: title, size: traffic })));
     }
 
+    const [openCounSelectModal, setOpenCounSelectModal] = useState(false);
+    const openFilterModal = async (type) => {
+        if (type === "FromDate") {
+            await Swal.fire({
+                title: 'Enter From Date',
+                html: `<input id="FromDate" class="swal2-input" type="datetime-local" max=${moment().subtract(1, 'day').format("YYYY-MM-DDTHH:mm:ss")}>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    const datetimeString = document.getElementById('FromDate').value;
+                    if (!datetimeString) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Entering the datetime is mandatory'
+                        })
+                        return
+                    }
+                    setFromTime(new Date(datetimeString).getTime())
+                }
+            })
+        }
+        if (type === "ToDate") {
+            await Swal.fire({
+                title: 'Enter To Date',
+                html: `<input id="ToDate" class="swal2-input" type="datetime-local" max=${moment().format("YYYY-MM-DDTHH:mm:ss")}>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    const datetimeString = document.getElementById('ToDate').value;
+                    if (!datetimeString) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Entering the datetime is mandatory'
+                        })
+                        return
+                    }
+                    setToTime(new Date(datetimeString).getTime())
+                }
+            })
+        }
+        if (type === "Countries") {
+            setOpenCounSelectModal(true)
+        }
+    }
+
     return (
         <div className="">
             <ToastContainer />
@@ -268,131 +321,219 @@ export default function NewHome() {
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
                 <CountriesSearch />
-                <Link to="/" className='w3-button w3-small w3-border w3-round-xlarge'>↩ Back To Home</Link>
+                <Link to="/v1" className='w3-button w3-small w3-border w3-round-xlarge'>↩ V1</Link>
             </div>
 
-            {/* geo map  */}
-            {
-                geoMapData && (
-                    <div className="w3-content" style={{ paddingTop: 15 }}>
-                        <div className="w3-center">
-                            <div className="chart-details">Explore Locations and Discover Insights Worldwide.</div>
-                        </div>
-                        <p>
-                            <button title="Click to download the symbol map" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
-                        </p>
-                        <div id="geoChart" className="w3-center">
-                            <div className="w3-border w3-round-xlarge" style={{ backgroundColor: '#607d8bc4' }}>
-                                <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
-                                    <Geographies geography={"/geo.json"}>
-                                        {({ geographies }) =>
-                                            geographies.map((geo) => (
-                                                <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
-                                            ))
-                                        }
-                                    </Geographies>
-                                    {geoMapData.map(({ country, totalTraffic, lnglat }) => {
-                                        return (
-                                            <Marker key={country} coordinates={lnglat} onClick={() => openModal(codes[country])}>
-                                                <circle fill={uniqolor.random()['color']}  r={2.5} />
-                                                <text
-                                                    style={{ fontFamily: "system-ui", fill: '#5D5A6D', fontSize: 10, fontWeight: 550, cursor: 'cell' }}
-                                                >
-                                                    {codes[country]}
-                                                </text>
-                                            </Marker>
-                                        );
-                                    })}
-                                </ComposableMap>
+            <div className="w3-content" style={{ fontWeight: 400 }}>
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
+            </div>
+
+            <div className="w3-content w3-margin-top">
+                <div className="w3-row-padding">
+                    {
+                        fromTime &&
+                        (
+                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("FromDate") }}>
+                                <div className="w3-padding w3-round-xlarge w3-blue w3-opacity-min">
+                                    <div className="w3-left">
+                                        <i className="fa fa-calendar-plus-o w3-xxxlarge" />
+                                    </div>
+                                    <div className="w3-right">
+                                        <h3><b>From Date</b></h3>
+                                    </div>
+                                    <div className="w3-clear" />
+                                    <h4>{moment(fromTime).format('MMMM Do YYYY, h:mm A')}</h4>
+                                </div>
                             </div>
-                        </div>
+                        )
+                    }
+                    {
+                        toTime &&
+                        (
+                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("ToDate") }}>
+                                <div className="w3-padding w3-round-xlarge w3-green w3-opacity-min">
+                                    <div className="w3-left">
+                                        <i className="fa fa-calendar-minus-o w3-xxxlarge" />
+                                    </div>
+                                    <div className="w3-right">
+                                        <h3><b>To Date</b></h3>
+                                    </div>
+                                    <div className="w3-clear" />
+                                    <h4>{moment(toTime).format('MMMM Do YYYY, h:mm A')}</h4>
+                                </div>
+                            </div>
+                        )
+                    }
+                    {
+                        countries &&
+                        (
+                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("Countries") }}>
+                                <div className="w3-padding w3-round-xlarge w3-grey w3-text-white w3-opacity-min">
+                                    <div className="w3-left">
+                                        <i className="fa fa-flag w3-xxxlarge" />
+                                    </div>
+                                    <div className="w3-right">
+                                        <h3><b>Countries</b></h3>
+                                    </div>
+                                    <div className="w3-clear" />
+                                    <h4 className={countries.length > 10 ? 'w3-small' : ''} >{countries.length > 0 ? countries.map(coun => flags[coun]).join(" ") : "ALL"}</h4>
+                                </div>
+                            </div>
+                        )
+                    }
+                </div>
+                <div className="w3-row-padding">
+                    <div className="w3-padding">
+                        <button className="w3-btn w3-blue-grey w3-opacity w3-large w3-round-large w3-right" title="Get Filter Results" onClick={() => { setIsFilterChanges(true) }}>
+                            <i className="fa fa-filter"></i>
+                        </button>
                     </div>
+                </div>
+            </div>
+
+            {
+                isFilterChanged &&
+                (
+                   <div className="loader-container w3-padding-32">
+                     <Grid
+                        height="80"
+                        width="80"
+                        color={uniqolor.random()['color']}
+                        ariaLabel="grid-loading"
+                        radius="12.5"
+                        wrapperStyle={{ }}
+                        wrapperClass=""
+                        visible={true}
+                    />
+                   </div>
                 )
             }
 
-            {/* tag cloud  */}
             {
-                tagCloudData && (
-                    <div className="w3-content w3-padding-32" >
-                        <div className="w3-center w3-padding">
-                            <div className="chart-details">Discover What's Hot and Relevant Now.</div>
-                        </div>
-                        <p style={{ lineHeight: 1.8 }} className="w3-justify">
-                            <TagCloud
-                                minSize={isMobile() ? 7 : 15}
-                                maxSize={isMobile() ? 15 : 36}
-                                tags={tagCloudData}
-                                className="w3-tag w3-transparent"
-                                onClick={({ value }) => { openModal(codes[value]); }}
-                                renderer={customRenderer}
-                            />
-                        </p>
-                    </div>
-                )
-            }
-            {/* data table  */}
-            {
-                tblData && (
-                    <div className="">
-                        <div className="w3-content w3-padding-32">
-                            <div className="w3-center w3-padding">
-                                <div className="chart-details">Organized Information at a Glance.</div>
-                            </div>
-                            <p style={{ paddingBottom: 32 }}>
-                                <span className="w3-right">
-                                    <input
-                                        type="text"
-                                        size="25"
-                                        value={filterText}
-                                        className="w3-border"
-                                        placeholder="Search keyword..."
-                                        style={{ padding: '10px 5px' }}
-                                        onInput={filterKeywords}
+                !isFilterChanged &&
+                (
+                    <>
+                        {/* geo map  */}
+                        {
+                            geoMapData && (
+                                <div className="w3-content" style={{ paddingTop: 15 }}>
+                                    <div className="w3-center">
+                                        <div className="chart-details">Explore Locations and Discover Insights Worldwide.</div>
+                                    </div>
+                                    <p>
+                                        <button title="Click to download the symbol map" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
+                                    </p>
+                                    <div id="geoChart" className="w3-center">
+                                        <div className="w3-border w3-round-xlarge" style={{ backgroundColor: '#607d8bc4' }}>
+                                            <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
+                                                <Geographies geography={"/geo.json"}>
+                                                    {({ geographies }) =>
+                                                        geographies.map((geo) => (
+                                                            <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
+                                                        ))
+                                                    }
+                                                </Geographies>
+                                                {geoMapData.map(({ country, totalTraffic, lnglat }) => {
+                                                    return (
+                                                        <Marker key={country} coordinates={lnglat} onClick={() => openModal(codes[country])}>
+                                                            <circle fill={uniqolor.random()['color']} r={2.5} />
+                                                            <text
+                                                                style={{ fontFamily: "system-ui", fill: '#5D5A6D', fontSize: 10, fontWeight: 550, cursor: 'cell' }}
+                                                            >
+                                                                {codes[country]}
+                                                            </text>
+                                                        </Marker>
+                                                    );
+                                                })}
+                                            </ComposableMap>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        {/* tag cloud  */}
+                        {
+                            tagCloudData && (
+                                <div className="w3-content w3-padding-32" >
+                                    <div className="w3-center w3-padding">
+                                        <div className="chart-details">Discover What's Hot and Relevant Now.</div>
+                                    </div>
+                                    <p style={{ lineHeight: 1.8 }} className="w3-justify">
+                                        <TagCloud
+                                            minSize={isMobile() ? 7 : 15}
+                                            maxSize={isMobile() ? 15 : 36}
+                                            tags={tagCloudData}
+                                            className="w3-tag w3-transparent"
+                                            onClick={({ value }) => { openModal(codes[value]); }}
+                                            renderer={customRenderer}
+                                        />
+                                    </p>
+                                </div>
+                            )
+                        }
+                        {/* data table  */}
+                        {
+                            tblData && (
+                                <div className="w3-content w3-padding-32">
+                                    <div className="w3-center w3-padding">
+                                        <div className="chart-details">Organized Information at a Glance.</div>
+                                    </div>
+                                    <p style={{ paddingBottom: 32 }}>
+                                        <span className="w3-right">
+                                            <input
+                                                type="text"
+                                                size="25"
+                                                value={filterText}
+                                                className="w3-border"
+                                                placeholder="Search keyword..."
+                                                style={{ padding: '10px 5px' }}
+                                                onInput={filterKeywords}
+                                            />
+                                            <button
+                                                className="w3-button w3-border w3-blue"
+                                                style={{ padding: '10px' }}
+                                                onClick={resetFilter}
+                                                title="Clear"
+                                            >✖</button>
+                                        </span>
+                                    </p>
+                                    <DataTable
+                                        columns={columns}
+                                        data={tblData}
+                                        pagination
+                                        responsive
                                     />
-                                    <button
-                                        className="w3-button w3-border w3-blue"
-                                        style={{ padding: '10px' }}
-                                        onClick={resetFilter}
-                                        title="Clear"
-                                    >✖</button>
-                                </span>
-                            </p>
-                            <DataTable
-                                columns={columns}
-                                data={tblData}
-                                pagination
-                                responsive
-                            />
-                        </div>
-                    </div>
-                )
-            }
+                                </div>
+                            )
+                        }
 
-            {/* treemap  */}
-            {
-                treeMapData && window && (
-                    <div className="">
-                        <div className="w3-content w3-padding-32">
-                            <div className="w3-center">
-                                <div className="chart-details">Exploring Hierarchical Data in a Compact View.</div>
-                            </div>
-                            <p>
-                                <button title="Click to download the treemap" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
-                            </p>
-                            <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
-                                <Treemap
-                                    width={isLarge() ? 1280 : window.innerWidth}
-                                    height={isLarge() ? 640 : window.innerWidth / 2}
-                                    data={treeMapData}
-                                    dataKey="size"
-                                    aspectRatio={4 / 3}
-                                    content={<CustomizedContent colors={treeMapData.map(data => uniqolor.random()['color'])} />}
-                                    onClick={treeMapHandler}
-                                    style={{ cursor: 'pointer' }}
-                                />
-                            </div>
-                        </div>
-                    </div>
+                        {/* treemap  */}
+                        {
+                            treeMapData && window && (
+                                <div className="w3-content w3-padding-32">
+                                    <div className="w3-center">
+                                        <div className="chart-details">Exploring Hierarchical Data in a Compact View.</div>
+                                    </div>
+                                    <p>
+                                        <button title="Click to download the treemap" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
+                                    </p>
+                                    <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
+                                        <Treemap
+                                            width={isLarge() ? 1280 : window.innerWidth}
+                                            height={isLarge() ? 640 : window.innerWidth / 2}
+                                            data={treeMapData}
+                                            dataKey="size"
+                                            aspectRatio={4 / 3}
+                                            content={<CustomizedContent colors={treeMapData.map(data => uniqolor.random()['color'])} />}
+                                            onClick={treeMapHandler}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        }
+                    </>
                 )
             }
 
@@ -406,6 +547,13 @@ export default function NewHome() {
                     <HomeTagCloudM toast={toast} showTC={showTagCloud} setShowTC={setShowTagCloud} />
                 )
             }
+
+            <CountrySelectModal
+                openCounSelectModal={openCounSelectModal}
+                setOpenCounSelectModal={setOpenCounSelectModal}
+                setCountries={setCountries}
+            />
+
         </div>
     );
 }

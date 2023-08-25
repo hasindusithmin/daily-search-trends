@@ -401,7 +401,7 @@ export default function Home() {
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
                 <CountriesSearch />
-                <Link to="/v2" className='w3-button w3-small w3-border w3-round-xlarge'>↪ Worldwide 🗺</Link>
+                <Link to="/" className='w3-button w3-small w3-border w3-round-xlarge'>↪ V2</Link>
             </div>
             <div className="w3-content" style={{ fontWeight: 400 }}>
                 <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
