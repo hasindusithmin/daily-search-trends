@@ -424,8 +424,8 @@ export default function NewHome() {
                                         <button title="Click to download the symbol map" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
                                     </p>
                                     <div id="geoChart" className="w3-center">
-                                        <div className="w3-border w3-round-xlarge" style={{ backgroundColor: '#607d8bc4' }}>
-                                            <ComposableMap projectionConfig={{ rotate: [-20, 0, 0] }}>
+                                        <div>
+                                            <ComposableMap projectionConfig={{ rotate: [-20, 0, 0], center:[5,7] }} height={410}>
                                                 <Geographies geography={"/geo.json"}>
                                                     {({ geographies }) =>
                                                         geographies.map((geo) => (
