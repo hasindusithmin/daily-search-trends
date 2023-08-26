@@ -7,7 +7,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../../components/CustomContentTreemap";
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import CountriesSearch from "../../components/CountriesSearch";
 import { downloadChart, isLarge, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
@@ -310,22 +309,48 @@ export default function NewHome() {
         }
     }
 
+    const convertArrayOfObjectsToCSV = (array) => {
+        const header = Object.keys(array[0]).join(',');
+        const rows = array.map(obj => Object.values(obj).map((value = "") => value.replaceAll(",",";")).join(','));
+        return `${header}\n${rows.join('\n')}`;
+    }
+
+    const downloadTblData = () => {
+        const arrayOfObjects = []
+        tblData.forEach(tbl => {
+            delete tbl['news']
+            tbl['traffic'] = tbl['traffic'].toString()
+            arrayOfObjects.push(tbl)
+        })
+        const csv = convertArrayOfObjectsToCSV(arrayOfObjects);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `${Date.now()}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
     return (
-        <div className="">
+        <div style={{ color: '#34495E' }}>
             <ToastContainer />
-            <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
+            <div className="w3-center w3-padding-32">
                 <div className="w3-xlarge">
-                    <b className="w3-opacity">TRENDY WORLD</b>
+                    <b>TRENDY WORLD</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                 </p>
-                <CountriesSearch />
                 <Link to="/v1" className='w3-button w3-small w3-border w3-round-xlarge'>↩ V1</Link>
             </div>
 
-            <div className="w3-content" style={{ fontWeight: 400 }}>
-                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
+            <div className="w3-content" style={{ fontWeight: 500, fontSize: 16 }}>
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-text-metro-light-blue w3-transparent w3-padding w3-leftbar w3-topbar w3-border-sand w3-round" />
             </div>
 
             <div className="w3-content w3-margin-top">
@@ -333,7 +358,7 @@ export default function NewHome() {
                     {
                         fromTime &&
                         (
-                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("FromDate") }}>
+                            <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("FromDate") }}>
                                 <div className="w3-padding w3-round-xlarge w3-blue w3-opacity-min">
                                     <div className="w3-left">
                                         <i className="fa fa-calendar-plus-o w3-xxxlarge" />
@@ -350,7 +375,7 @@ export default function NewHome() {
                     {
                         toTime &&
                         (
-                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("ToDate") }}>
+                            <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("ToDate") }}>
                                 <div className="w3-padding w3-round-xlarge w3-green w3-opacity-min">
                                     <div className="w3-left">
                                         <i className="fa fa-calendar-minus-o w3-xxxlarge" />
@@ -367,8 +392,8 @@ export default function NewHome() {
                     {
                         countries &&
                         (
-                            <div className="w3-third" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("Countries") }}>
-                                <div className="w3-padding w3-round-xlarge w3-grey w3-text-white w3-opacity-min">
+                            <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("Countries") }}>
+                                <div className="w3-padding w3-round-xlarge w3-cyan w3-text-white w3-opacity-min">
                                     <div className="w3-left">
                                         <i className="fa fa-flag w3-xxxlarge" />
                                     </div>
@@ -394,18 +419,18 @@ export default function NewHome() {
             {
                 isFilterChanged &&
                 (
-                   <div className="loader-container w3-padding-32">
-                     <Grid
-                        height="80"
-                        width="80"
-                        color={uniqolor.random()['color']}
-                        ariaLabel="grid-loading"
-                        radius="12.5"
-                        wrapperStyle={{ }}
-                        wrapperClass=""
-                        visible={true}
-                    />
-                   </div>
+                    <div className="loader-container w3-padding-32">
+                        <Grid
+                            height="80"
+                            width="80"
+                            color={uniqolor.random()['color']}
+                            ariaLabel="grid-loading"
+                            radius="12.5"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                            visible={true}
+                        />
+                    </div>
                 )
             }
 
@@ -421,11 +446,11 @@ export default function NewHome() {
                                         <div className="chart-details">Explore Locations and Discover Insights Worldwide.</div>
                                     </div>
                                     <p>
-                                        <button title="Click to download the symbol map" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('geoChart') }}>download ⤵</button>
+                                        <button title="Click to download the symbol map" className='w3-btn w3-blue-grey w3-round-large' onClick={() => { downloadChart('geoMap') }}>download ⤵</button>
                                     </p>
-                                    <div id="geoChart" className="w3-center">
+                                    <div id="geoMap" className="w3-center">
                                         <div>
-                                            <ComposableMap projectionConfig={{ rotate: [-20, 0, 0], center:[5,7] }} height={410}>
+                                            <ComposableMap projectionConfig={{ rotate: [-20, 0, 0], center: [5, 7] }} height={410}>
                                                 <Geographies geography={"/geo.json"}>
                                                     {({ geographies }) =>
                                                         geographies.map((geo) => (
@@ -479,6 +504,9 @@ export default function NewHome() {
                                     <div className="w3-center w3-padding">
                                         <div className="chart-details">Organized Information at a Glance.</div>
                                     </div>
+                                    <p>
+                                        <button title="Click to download the csv" className='w3-btn w3-blue-grey w3-round-large' onClick={downloadTblData}>download ⤵</button>
+                                    </p>
                                     <p style={{ paddingBottom: 32 }}>
                                         <span className="w3-right">
                                             <input
@@ -516,7 +544,7 @@ export default function NewHome() {
                                         <div className="chart-details">Exploring Hierarchical Data in a Compact View.</div>
                                     </div>
                                     <p>
-                                        <button title="Click to download the treemap" className='w3-button w3-round-large' style={{ backgroundColor: '#8cafbfcf', color: '#ffffff' }} onClick={() => { downloadChart('treemap') }}>download ⤵</button>
+                                        <button title="Click to download the treemap" className='w3-btn w3-blue-grey w3-round-large'  onClick={() => { downloadChart('treemap') }}>download ⤵</button>
                                     </p>
                                     <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
                                         <Treemap

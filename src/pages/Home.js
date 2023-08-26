@@ -395,7 +395,7 @@ export default function Home() {
             <ToastContainer />
             <div className="w3-center w3-padding-32" style={{ color: '#2196F3' }}>
                 <div className="w3-xlarge">
-                    <b className="w3-opacity">TRENDY WORLD</b>
+                    <b className="w3-opacity">TRENDY WORLD (deprecated)</b>
                 </div>
                 <p>
                     <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
