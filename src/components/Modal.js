@@ -15,7 +15,7 @@ export default function BarModal({ country, color, chartData, setChartData }) {
             height={isMobile() ? window.innerHeight : window.innerHeight * 0.75}
             showMask={true}
             closeOnEsc={true}
-            className='w3-padding-64 w3-mobile'
+            className='w3-padding-64 w3-mobile w3-text-black'
             onClose={() => { setChartData(null) }}
         >
             <div className='w3-center w3-padding-32 w3-large w3-opacity' style={{ textDecoration: 'underline' }}>

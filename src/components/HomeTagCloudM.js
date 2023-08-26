@@ -1,7 +1,6 @@
 import Rodal from 'rodal';
 import { isMobile, codes, formatNumberAbbreviation, openNewsModal, BackendURL } from '../utils/commons';
 import { TagCloud } from 'react-tagcloud'
-import Swal from 'sweetalert2';
 import axios from 'axios';
 
 export default function HomeTagCloudM({ toast, showTC, setShowTC }) {
@@ -25,7 +24,7 @@ export default function HomeTagCloudM({ toast, showTC, setShowTC }) {
             height={isMobile() ? window.innerHeight : window.innerHeight * 0.5}
             showMask={true}
             closeOnEsc={true}
-            className='w3-padding-64 w3-mobile'
+            className='w3-padding-64 w3-mobile w3-text-black'
             onClose={() => { setShowTC(null) }}
         >
             <div className='w3-padding'>
