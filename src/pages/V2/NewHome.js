@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
-import { Treemap } from 'recharts';
+import { Bar, BarChart, ComposedChart, LabelList, Scatter, Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
 import CustomizedContent from "../../components/CustomContentTreemap";
 import Modal from "../../components/Modal";
@@ -19,6 +19,7 @@ import { Grid } from 'react-loader-spinner'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { GithubPicker } from "react-color";
+import { XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 export default function NewHome() {
 
@@ -87,7 +88,7 @@ export default function NewHome() {
     const [treeMapData, setTreeMapData] = useState(null);
     const [geoMapData, setGeoMapData] = useState(null);
     const [tagCloudData, setTagCloudData] = useState(null);
-    const [rawData, setRawData] = useState([]);
+    const [rawData, setRawData] = useState(null);
 
     function formatToBrowserTimezone(datetimeString) {
         const options = {
@@ -114,7 +115,7 @@ export default function NewHome() {
     const initialize = async () => {
         const changeState = (trendingsearches) => {
             setTimeout(() => {
-                document.title = `Trendy world | V2`
+                document.title = `Trendy World | V2`
             }, 250)
             const groupedData = trendingsearches.reduce((result, itemGroup) => {
                 itemGroup.forEach(item => {
@@ -339,6 +340,20 @@ export default function NewHome() {
 
     const darkColors = ["b80000", "db3e00", "008b02", "006b76", "1273de", "004dcf", "5300eb"];
 
+    const renderCustomizedLabel = (props) => {
+        const { x, y, width, height, value } = props;
+        const radius = 10;
+
+        return (
+            <g>
+                <circle cx={x + width / 2} cy={y - radius} r={radius} fill="#F1F1F1" />
+                <text x={x + width / 2} y={y - radius} fill="#fff" textAnchor="middle" dominantBaseline="middle">
+                    {flags[value]}
+                </text>
+            </g>
+        );
+    };
+
     return (
         <div
             style={{
@@ -368,7 +383,7 @@ export default function NewHome() {
                 <GithubPicker
                     width={220}
                     color={color}
-                    onChangeComplete={c => { setColor(c.hex.slice(1));}}
+                    onChangeComplete={c => { setColor(c.hex.slice(1)); }}
                 />
             </div>
 
@@ -457,6 +472,36 @@ export default function NewHome() {
                 !isFilterChanged &&
                 (
                     <>
+                        {/* Bar Chart For Results Status  */}
+                        {
+                            rawData && (
+                                <div className="w3-content w3-padding-32" >
+                                    <div className="w3-center w3-padding">
+                                        <div className="chart-details">Results Status View.</div>
+                                    </div>
+
+                                    <div style={{ overflow: "scroll" }} className="bar-chart" >
+                                        <ComposedChart
+                                            width={window.innerWidth}
+                                            height={window.innerWidth / 4}
+                                            layout="horizontal"
+                                            data={Object.entries(rawData).map(([key, value]) => ({ country: key, "Keyword Count": value.length, median: value.length > 0 ? value.length / 2 : 0 }))}
+
+                                        >
+                                            <CartesianGrid strokeDasharray="2 2" />
+                                            <XAxis dataKey="country" />
+                                            <YAxis tickLine={false} />
+                                            <Tooltip />
+                                            <Bar dataKey="Keyword Count" fill="#999" minPointSize={5}>
+                                                <LabelList dataKey="country" content={renderCustomizedLabel} />
+                                            </Bar>
+                                            <Scatter tooltipType="none" dataKey="median" fill="#4CAF50" />
+                                        </ComposedChart>
+                                    </div>
+                                </div>
+                            )
+                        }
+
                         {/* geo map  */}
                         {
                             geoMapData && (
@@ -516,6 +561,7 @@ export default function NewHome() {
                                 </div>
                             )
                         }
+
                         {/* data table  */}
                         {
                             tblData && (
