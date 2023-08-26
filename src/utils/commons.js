@@ -483,3 +483,11 @@ export const selectOptions = [
   { "label": "United States", "value": "US" },
   { "label": "Vietnam", "value": "VN" }
 ]
+
+export function ranLightColor() {
+  const hexTab = "6789ABCDEF"; // lighter color range
+  let r = hexTab[ Math.floor( Math.random() * hexTab.length) ];
+  let g = hexTab[ Math.floor( Math.random() * hexTab.length) ];
+  let b = hexTab[ Math.floor( Math.random() * hexTab.length) ];
+  return r + g + b;
+}

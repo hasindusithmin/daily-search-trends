@@ -18,6 +18,7 @@ import CountrySelectModal from "../../components/CountrySelectModal";
 import { Grid } from 'react-loader-spinner'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { GithubPicker } from "react-color";
 
 export default function NewHome() {
 
@@ -253,7 +254,7 @@ export default function NewHome() {
     }
 
     const [country, setCountry] = useState(null);
-    const [color, setColor] = useState('');
+    const [color, setColor] = useState('DDD');
     const [chartData, setChartData] = useState(null);
 
     const treeMapHandler = (e) => {
@@ -311,7 +312,7 @@ export default function NewHome() {
 
     const convertArrayOfObjectsToCSV = (array) => {
         const header = Object.keys(array[0]).join(',');
-        const rows = array.map(obj => Object.values(obj).map((value = "") => value.replaceAll(",",";")).join(','));
+        const rows = array.map(obj => Object.values(obj).map((value = "") => value.replaceAll(",", ";")).join(','));
         return `${header}\n${rows.join('\n')}`;
     }
 
@@ -336,21 +337,39 @@ export default function NewHome() {
         }
     }
 
+    const darkColors = ["b80000", "db3e00", "008b02", "006b76", "1273de", "004dcf", "5300eb"];
+
     return (
-        <div style={{ color: '#34495E' }}>
+        <div
+            style={{
+                color: `${darkColors.includes(color) ? '#ffffff' : '#34495E'}`,
+                opacity: `${darkColors.includes(color) ? 0.75 : 1}`,
+                backgroundRepeat: "repeat",
+                backgroundSize: "50px",
+                backgroundImage: `url(https://svggen-1-b2762192.deta.app?color=${color})`
+            }}
+        >
             <ToastContainer />
-            <div className="w3-center w3-padding-32">
-                <div className="w3-xlarge">
-                    <b>TRENDY WORLD</b>
+            <div className="w3-padding-32">
+                <div className="w3-center">
+                    <b className="w3-xlarge">TRENDY WORLD</b>
+                    <p>
+                        <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
+                    </p>
+                    <Link to="/v1" className='w3-button w3-small w3-border w3-round-xlarge'>↩ V1</Link>
                 </div>
-                <p>
-                    <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
-                </p>
-                <Link to="/v1" className='w3-button w3-small w3-border w3-round-xlarge'>↩ V1</Link>
             </div>
 
             <div className="w3-content" style={{ fontWeight: 500, fontSize: 16 }}>
                 <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-text-metro-light-blue w3-transparent w3-padding w3-leftbar w3-topbar w3-border-sand w3-round" />
+            </div>
+
+            <div className="w3-content loader-container">
+                <GithubPicker
+                    width={220}
+                    color={color}
+                    onChangeComplete={c => { setColor(c.hex.slice(1));}}
+                />
             </div>
 
             <div className="w3-content w3-margin-top">
@@ -454,7 +473,7 @@ export default function NewHome() {
                                                 <Geographies geography={"/geo.json"}>
                                                     {({ geographies }) =>
                                                         geographies.map((geo) => (
-                                                            <Geography key={geo.rsmKey} geography={geo} fill="#DDD" />
+                                                            <Geography key={geo.rsmKey} geography={geo} fill="#F1F1F1" />
                                                         ))
                                                     }
                                                 </Geographies>
@@ -544,7 +563,7 @@ export default function NewHome() {
                                         <div className="chart-details">Exploring Hierarchical Data in a Compact View.</div>
                                     </div>
                                     <p>
-                                        <button title="Click to download the treemap" className='w3-btn w3-blue-grey w3-round-large'  onClick={() => { downloadChart('treemap') }}>download ⤵</button>
+                                        <button title="Click to download the treemap" className='w3-btn w3-blue-grey w3-round-large' onClick={() => { downloadChart('treemap') }}>download ⤵</button>
                                     </p>
                                     <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
                                         <Treemap
