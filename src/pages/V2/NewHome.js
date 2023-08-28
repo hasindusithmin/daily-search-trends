@@ -2,12 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
-import { Bar, BarChart, ComposedChart, LabelList, Scatter, Treemap } from 'recharts';
 import { toast, ToastContainer } from 'react-toastify';
-import CustomizedContent from "../../components/CustomContentTreemap";
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart, isLarge, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content } from "../../utils/commons";
+import { downloadChart, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
@@ -19,7 +17,10 @@ import { Grid } from 'react-loader-spinner'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { GithubPicker } from "react-color";
-import { XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import EPieChart from "../../components/charts/EPieChart";
+import EBarChart from "../../components/charts/EBarChart";
+import E3Map from "../../components/charts/E3Map";
+import { Tooltip } from 'react-tooltip';
 
 export default function NewHome() {
 
@@ -258,14 +259,6 @@ export default function NewHome() {
     const [color, setColor] = useState('DDD');
     const [chartData, setChartData] = useState(null);
 
-    const treeMapHandler = (e) => {
-        const data = rawData[e.name] || [];
-        if (data.length === 0) return
-        data.sort((a, b) => b.traffic - a.traffic);
-        setCountry(iso[e.name]);
-        setChartData(data.map(({ title, traffic }) => ({ name: title, size: traffic })));
-    }
-
     const [openCounSelectModal, setOpenCounSelectModal] = useState(false);
     const openFilterModal = async (type) => {
         if (type === "FromDate") {
@@ -340,20 +333,6 @@ export default function NewHome() {
 
     const darkColors = ["b80000", "db3e00", "008b02", "006b76", "1273de", "004dcf", "5300eb"];
 
-    const renderCustomizedLabel = (props) => {
-        const { x, y, width, height, value } = props;
-        const radius = 10;
-
-        return (
-            <g>
-                <circle cx={x + width / 2} cy={y - radius} r={radius} fill="#F1F1F1" />
-                <text x={x + width / 2} y={y - radius} fill="#fff" textAnchor="middle" dominantBaseline="middle">
-                    {flags[value]}
-                </text>
-            </g>
-        );
-    };
-
     return (
         <div
             style={{
@@ -377,14 +356,6 @@ export default function NewHome() {
 
             <div className="w3-content" style={{ fontWeight: 500, fontSize: 16 }}>
                 <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-text-metro-light-blue w3-transparent w3-padding w3-leftbar w3-topbar w3-border-sand w3-round" />
-            </div>
-
-            <div className="w3-content loader-container">
-                <GithubPicker
-                    width={220}
-                    color={color}
-                    onChangeComplete={c => { setColor(c.hex.slice(1)); }}
-                />
             </div>
 
             <div className="w3-content w3-margin-top">
@@ -476,27 +447,8 @@ export default function NewHome() {
                         {
                             rawData && (
                                 <div className="w3-content w3-padding-32" >
-                                    <div className="w3-center w3-padding">
-                                        <div className="chart-details">Results Status View.</div>
-                                    </div>
-
-                                    <div style={{ overflow: "scroll" }} className="bar-chart" >
-                                        <ComposedChart
-                                            width={window.innerWidth}
-                                            height={window.innerWidth / 4}
-                                            layout="horizontal"
-                                            data={Object.entries(rawData).map(([key, value]) => ({ country: key, "Keyword Count": value.length, median: value.length > 0 ? value.length / 2 : 0 }))}
-
-                                        >
-                                            <CartesianGrid strokeDasharray="2 2" />
-                                            <XAxis dataKey="country" />
-                                            <YAxis tickLine={false} />
-                                            <Tooltip />
-                                            <Bar dataKey="Keyword Count" fill="#999" minPointSize={5}>
-                                                <LabelList dataKey="country" content={renderCustomizedLabel} />
-                                            </Bar>
-                                            <Scatter tooltipType="none" dataKey="median" fill="#4CAF50" />
-                                        </ComposedChart>
+                                    <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
+                                        <EBarChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
                                 </div>
                             )
@@ -506,9 +458,6 @@ export default function NewHome() {
                         {
                             geoMapData && (
                                 <div className="w3-content" style={{ paddingTop: 15 }}>
-                                    <div className="w3-center">
-                                        <div className="chart-details">Explore Locations and Discover Insights Worldwide.</div>
-                                    </div>
                                     <p>
                                         <button title="Click to download the symbol map" className='w3-btn w3-blue-grey w3-round-large' onClick={() => { downloadChart('geoMap') }}>download ⤵</button>
                                     </p>
@@ -562,6 +511,43 @@ export default function NewHome() {
                             )
                         }
 
+                        {/* Pie Chart  */}
+                        {
+                            rawData &&
+                            (
+                                <div className="w3-content">
+                                    <div className="w3-center">
+                                        <div style={{ paddingBottom: 20 }} className="w3-hide">
+                                            {
+                                                Object.entries(rawData).map(([key, value]) => (
+                                                    <>
+                                                        <span
+                                                            data-tooltip-id={key}
+                                                            data-tooltip-content={iso[key]}
+                                                            data-tooltip-place="top"
+                                                        >
+                                                            {flags[key]}<sup className="w3-small">{formatNumberAbbreviation(value.reduce((total, item) => total + item.traffic, 0))}+</sup>&nbsp;
+                                                        </span>
+                                                        <Tooltip id={key} />
+                                                    </>
+                                                ))
+                                            }
+                                        </div>
+                                    </div>
+                                    <EPieChart rawData={rawData} />
+                                </div>
+                            )
+                        }
+
+                        {/* treemap  */}
+                        {
+                            rawData && (
+                                <div className="w3-content w3-padding-32 hide-scrollbar" style={{overflow:"scroll"}}>
+                                    <E3Map rawData={rawData} />
+                                </div>
+                            )
+                        }
+
                         {/* data table  */}
                         {
                             tblData && (
@@ -600,35 +586,19 @@ export default function NewHome() {
                                 </div>
                             )
                         }
-
-                        {/* treemap  */}
-                        {
-                            treeMapData && window && (
-                                <div className="w3-content w3-padding-32">
-                                    <div className="w3-center">
-                                        <div className="chart-details">Exploring Hierarchical Data in a Compact View.</div>
-                                    </div>
-                                    <p>
-                                        <button title="Click to download the treemap" className='w3-btn w3-blue-grey w3-round-large' onClick={() => { downloadChart('treemap') }}>download ⤵</button>
-                                    </p>
-                                    <div id="treemap" className={window && isMobile() ? 'w3-responsive' : ''}>
-                                        <Treemap
-                                            width={isLarge() ? 1280 : window.innerWidth}
-                                            height={isLarge() ? 640 : window.innerWidth / 2}
-                                            data={treeMapData}
-                                            dataKey="size"
-                                            aspectRatio={4 / 3}
-                                            content={<CustomizedContent colors={treeMapData.map(data => uniqolor.random()['color'])} />}
-                                            onClick={treeMapHandler}
-                                            style={{ cursor: 'pointer' }}
-                                        />
-                                    </div>
-                                </div>
-                            )
-                        }
                     </>
                 )
             }
+
+            <div className="w3-padding-32">
+                <div className="w3-content">
+                    <GithubPicker
+                        width={220}
+                        color={color}
+                        onChangeComplete={c => { setColor(c.hex.slice(1)); }}
+                    />
+                </div>
+            </div>
 
             {/* modals  */}
             {
@@ -647,6 +617,6 @@ export default function NewHome() {
                 setCountries={setCountries}
             />
 
-        </div>
+        </div >
     );
 }
