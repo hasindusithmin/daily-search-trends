@@ -47,7 +47,7 @@ export default function NewHome() {
             sortable: true
         },
         {
-            name: 'traffic',
+            name: 'Searches',
             width: '150px',
             selector: row => row.traffic,
             format: row => formatNumberAbbreviation(row.traffic) + '+',
@@ -129,23 +129,6 @@ export default function NewHome() {
                 return result;
             }, {});
             setRawData(groupedData);
-            console.log(groupedData);
-            // const array = [];
-            // Object.values(groupedData).forEach(arr => {
-            //     array.push(...arr)
-            // })
-            // const ranges = [
-            //     { min: 100, max: 1000, name: "Low" },
-            //     { min: 1000, max: 10000, name: "Moderate" },
-            //     { min: 10000, max: 100000, name: "High" },
-            //     { min: 100000, max: 1000000, name: "Intense" },
-            //     { min: 1000000, max: 10000000, name: "Extreme" }
-            // ]
-            // const categorizedData = ranges.map(range => ({
-            //     traffic: range.name,
-            //     data: array.filter(obj => obj.traffic >= range.min && obj.traffic <= range.max),
-            // }));
-            // console.log(categorizedData);
             const dataTable = [], treeMap = [], pieChart = [], geoMap = [], tagCloud = [];
             for (const [countryCode, trends] of Object.entries(groupedData)) {
                 const country = iso[countryCode];
@@ -507,7 +490,7 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* tag cloud  */}
+                        {/* Tag Cloud  */}
                         {
                             tagCloudData && (
                                 <div className="w3-content w3-padding" >
@@ -528,7 +511,7 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* Pie Chart  */}
+                        {/* Pie Chart - Total Traffic View */}
                         {
                             rawData &&
                             (
@@ -561,7 +544,7 @@ export default function NewHome() {
                         {/* treemap  */}
                         {
                             rawData && (
-                                <div className="w3-content hide-scrollbar" style={{ overflow: "scroll", paddingTop:50 }}>
+                                <div className="w3-content hide-scrollbar" style={{ overflow: "scroll", paddingTop: 50 }}>
                                     <E3Map rawData={rawData} />
                                 </div>
                             )

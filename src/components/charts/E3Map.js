@@ -3,7 +3,7 @@ import { flags } from "../../utils/commons";
 export default function E3Map({ rawData }) {
     const options = {
         title: {
-            text: 'Hierarchical Trend Analysis of Popular Searches',
+            text: 'Hierarchical Trends Analysis of Popular Searches',
             subtext: 'Easily Spot Patterns in Trending Searches',
             left: ''
         },

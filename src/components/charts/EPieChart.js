@@ -4,10 +4,15 @@ import { useState } from "react";
 import TtModal from "../Modals/TtModal";
 export default function EPieChart({ rawData }) {
 
+  const totalTraffic = formatNumberAbbreviation(
+    Object.values(rawData)
+      .reduce((acc, array) => acc + array.reduce((subAcc, { traffic }) => subAcc + traffic, 0), 0)
+  )
+
   const options = {
     title: {
-      text: 'TOTAL TRAFFIC',
-      subtext: "By Country",
+      text: 'Worldwide Reach in One Slice',
+      subtext: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
       left: 'right'
     },
     tooltip: {

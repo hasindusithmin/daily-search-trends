@@ -93,7 +93,13 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
                 style={{ width: window.innerWidth, height: 500 }}
                 onEvents={onEvents}
             />
-            <RoModal code={code} data={data} setData={setData} />
+            <RoModal
+                code={code} 
+                data={data} 
+                setData={setData}
+                fromTime={fromTime}
+                toTime={toTime}
+            />
         </>
     )
 }

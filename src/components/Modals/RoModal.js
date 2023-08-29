@@ -1,12 +1,13 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { flags, iso } from "../../utils/commons";
-export default function RoModal({ code, data, setData }) {
+import { copyToClipboard, flags, iso } from "../../utils/commons";
+import moment from "moment";
+export default function RoModal({ code, data, setData, fromTime, toTime }) {
 
     const options = {
         title: {
-            text: 'Trending searches',
-            subtext: `In ${iso[code]} ${flags[code]}`,
+            text: `${data && data.length} trending searches in ${iso[code]} ${flags[code]}`,
+            subtext: `from ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} to ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
         tooltip: {},
@@ -24,6 +25,12 @@ export default function RoModal({ code, data, setData }) {
 
     const size = window.innerWidth / 3;
 
+    const onEvents = {
+        click: ({ name }) => {
+            copyToClipboard(name)
+        }
+    }
+
     return (
         <Rodal
             visible={data}
@@ -31,11 +38,12 @@ export default function RoModal({ code, data, setData }) {
             width={size}
             height={size}
             animation="door"
-            customStyles={{padding:0}}
+            customStyles={{ padding: 0 }}
         >
             <ReactEcharts
                 option={options}
                 style={{ width: size, height: size }}
+                onEvents={onEvents}
             />
         </Rodal>
 
