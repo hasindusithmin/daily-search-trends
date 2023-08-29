@@ -1,8 +1,15 @@
 import ReactEcharts from "echarts-for-react"
 import { formatNumberAbbreviation, iso } from "../../utils/commons";
+import { useState } from "react";
+import TtModal from "../Modals/TtModal";
 export default function EPieChart({ rawData }) {
 
   const options = {
+    title: {
+      text: 'TOTAL TRAFFIC',
+      subtext: "By Country",
+      left: 'right'
+    },
     tooltip: {
       trigger: 'item',
       formatter: function ({ name, value, percent }) {
@@ -27,10 +34,31 @@ export default function EPieChart({ rawData }) {
     ]
   };
 
+  const [code, setCode] = useState(null);
+  const [data, setData] = useState(null);
+  const [color, setColor] = useState(null);
+
+  const onEvents = {
+    click: ({ name, color }) => {
+      setCode(name);
+      setData(rawData[name]);
+      setColor(color);
+    }
+  }
+
   return (
-    <ReactEcharts
-      option={options}
-      style={{ width:window.innerWidth / 3, height: window.innerWidth / 3 }}
-    />
+    <>
+      <ReactEcharts
+        option={options}
+        style={{ width: window.innerWidth / 3, height: window.innerWidth / 3 }}
+        onEvents={onEvents}
+      />
+      <TtModal
+        code={code}
+        data={data}
+        color={color}
+        setData={setData}
+      />
+    </>
   )
 }

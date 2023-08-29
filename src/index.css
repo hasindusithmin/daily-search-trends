@@ -2116,3 +2116,7 @@ a {
 .hide-scrollbar::-webkit-scrollbar {
   width: 0px;
 }
+
+.rodal-dialog::-webkit-scrollbar{
+  width: 0px;
+}

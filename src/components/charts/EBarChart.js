@@ -53,18 +53,20 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
         series: [
             {
                 type: 'bar',
-                showBackground: false,
+                showBackground: true,
                 itemStyle: {
                     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 1, color: '#2575AC' },
-                        { offset: 0, color: '#C9D706' }
+                        { offset: 1, color: '#355C7D' },
+                        { offset: 0.5, color: '#6C5B7B' },
+                        { offset: 0, color: '#C06C84' }
                     ])
                 },
                 emphasis: {
                     itemStyle: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                            { offset: 0, color: '#2575AC' },
-                            { offset: 1, color: '#C9D706' }
+                            { offset: 0, color: '#355C7D' },
+                            { offset: 0.5, color: '#6C5B7B' },
+                            { offset: 1, color: '#C06C84' }
                         ])
                     }
                 },
