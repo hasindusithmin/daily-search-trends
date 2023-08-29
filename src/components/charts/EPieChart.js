@@ -3,11 +3,6 @@ import { formatNumberAbbreviation, iso } from "../../utils/commons";
 export default function EPieChart({ rawData }) {
 
   const options = {
-    title: {
-      text: 'TOTAL TRAFFIC',
-      subtext: 'By Countries',
-      left: 'center'
-    },
     tooltip: {
       trigger: 'item',
       formatter: function ({ name, value, percent }) {
@@ -19,7 +14,7 @@ export default function EPieChart({ rawData }) {
         name: '',
         type: 'pie',
         radius: '80%',
-        center: ['40%', '50%'],
+        center: ['50%', '50%'],
         data: Object.entries(rawData).map(([key, value]) => ({ name: key, value: value.reduce((total, item) => total + item.traffic, 0) })),
         emphasis: {
           itemStyle: {
@@ -35,7 +30,7 @@ export default function EPieChart({ rawData }) {
   return (
     <ReactEcharts
       option={options}
-      style={{ width:window.innerWidth, height: 500 }}
-    ></ReactEcharts>
+      style={{ width:window.innerWidth / 3, height: window.innerWidth / 3 }}
+    />
   )
 }

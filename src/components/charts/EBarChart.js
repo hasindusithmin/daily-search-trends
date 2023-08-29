@@ -1,7 +1,9 @@
 import ReactEcharts from "echarts-for-react"
 import * as echarts from 'echarts/core';
-import { flags, iso } from "../../utils/commons";
+import { flags, isMobile, iso } from "../../utils/commons";
 import moment from "moment";
+import { useState } from "react";
+import RoModal from "../Modals/RoModal";
 export default function EBarCharart({ rawData, fromTime, toTime }) {
 
     const options = {
@@ -71,10 +73,25 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
         ]
     };
 
+    const [code, setCode] = useState(null);
+    const [data, setData] = useState(null);
+
+    const onEvents = {
+        click: ({ name }) => {
+            if (isMobile()) return
+            setCode(name);
+            setData(rawData[name]);
+        }
+    }
+
     return (
-        <ReactEcharts
-            option={options}
-            style={{ width: window.innerWidth, height: 500 }}
-        ></ReactEcharts>
+        <>
+            <ReactEcharts
+                option={options}
+                style={{ width: window.innerWidth, height: 500 }}
+                onEvents={onEvents}
+            />
+            <RoModal code={code} data={data} setData={setData} />
+        </>
     )
 }

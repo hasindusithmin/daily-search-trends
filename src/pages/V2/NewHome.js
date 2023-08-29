@@ -129,6 +129,23 @@ export default function NewHome() {
                 return result;
             }, {});
             setRawData(groupedData);
+            console.log(groupedData);
+            // const array = [];
+            // Object.values(groupedData).forEach(arr => {
+            //     array.push(...arr)
+            // })
+            // const ranges = [
+            //     { min: 100, max: 1000, name: "Low" },
+            //     { min: 1000, max: 10000, name: "Moderate" },
+            //     { min: 10000, max: 100000, name: "High" },
+            //     { min: 100000, max: 1000000, name: "Intense" },
+            //     { min: 1000000, max: 10000000, name: "Extreme" }
+            // ]
+            // const categorizedData = ranges.map(range => ({
+            //     traffic: range.name,
+            //     data: array.filter(obj => obj.traffic >= range.min && obj.traffic <= range.max),
+            // }));
+            // console.log(categorizedData);
             const dataTable = [], treeMap = [], pieChart = [], geoMap = [], tagCloud = [];
             for (const [countryCode, trends] of Object.entries(groupedData)) {
                 const country = iso[countryCode];
@@ -443,7 +460,7 @@ export default function NewHome() {
                 !isFilterChanged &&
                 (
                     <>
-                        {/* Bar Chart For Results Status  */}
+                        {/* Bar Chart - Results OverView  */}
                         {
                             rawData && (
                                 <div className="w3-content w3-padding-32" >
@@ -493,7 +510,7 @@ export default function NewHome() {
                         {/* tag cloud  */}
                         {
                             tagCloudData && (
-                                <div className="w3-content w3-padding-32" >
+                                <div className="w3-content w3-padding" >
                                     <div className="w3-center w3-padding">
                                         <div className="chart-details">Discover What's Hot and Relevant Now.</div>
                                     </div>
@@ -515,9 +532,9 @@ export default function NewHome() {
                         {
                             rawData &&
                             (
-                                <div className="w3-content">
+                                <div className="">
                                     <div className="w3-center">
-                                        <div style={{ paddingBottom: 20 }} className="w3-hide">
+                                        <div style={{ paddingBottom: 10 }} className="w3-hide">
                                             {
                                                 Object.entries(rawData).map(([key, value]) => (
                                                     <>
@@ -534,7 +551,9 @@ export default function NewHome() {
                                             }
                                         </div>
                                     </div>
-                                    <EPieChart rawData={rawData} />
+                                    <div className="loader-container">
+                                        <EPieChart rawData={rawData} />
+                                    </div>
                                 </div>
                             )
                         }
@@ -542,7 +561,7 @@ export default function NewHome() {
                         {/* treemap  */}
                         {
                             rawData && (
-                                <div className="w3-content w3-padding-32 hide-scrollbar" style={{overflow:"scroll"}}>
+                                <div className="w3-content hide-scrollbar" style={{ overflow: "scroll", paddingTop:50 }}>
                                     <E3Map rawData={rawData} />
                                 </div>
                             )
