@@ -1,6 +1,6 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { flags, iso, openNewsModal } from "../../utils/commons";
+import { flags, formatNumberAbbreviation, formatToBrowserTimezone, iso, openNewsModal } from "../../utils/commons";
 import { useState } from "react";
 import Swal from "sweetalert2";
 export default function TtModal({ code, data, color, setData }) {
@@ -20,7 +20,7 @@ export default function TtModal({ code, data, color, setData }) {
 
     const initOption = {
         title: {
-            subtext: 'Classification By Traffic',
+            subtext: 'Classification By Searches',
             text: `${iso[code]} ${flags[code]}`,
             left: 'left'
         },
@@ -55,7 +55,11 @@ export default function TtModal({ code, data, color, setData }) {
                 color: '#999'
             }
         },
-        tooltip: {},
+        tooltip: {
+            formatter: function ({ name, value }) {
+                return `Range: ${name}<br>Count: ${value} keywords`
+            }
+        },
         series: [
             {
                 type: 'bar',
@@ -82,14 +86,19 @@ export default function TtModal({ code, data, color, setData }) {
                     subtext: `${iso[code]} ${flags[code]}`,
                     left: 'left'
                 },
-                tooltip: {},
+                tooltip: {
+                    formatter: function (props) {
+                        const { name, value, date } = props.data;
+                        return `${name}<br>${formatNumberAbbreviation(value)}+ searches<br>${formatToBrowserTimezone(date)}`
+                    }
+                },
                 series: [
                     {
                         name: '',
                         type: 'pie',
                         radius: "75%",
                         center: ['50%', '50%'],
-                        data: filteredData.map(({ title, traffic }) => ({ name: title, value: traffic })),
+                        data: filteredData.map(({ title, traffic, pubDate }) => ({ name: title, value: traffic, date: pubDate })),
                         emphasis: {}
                     }
                 ]

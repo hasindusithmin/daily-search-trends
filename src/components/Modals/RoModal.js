@@ -1,6 +1,6 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { copyToClipboard, flags, iso } from "../../utils/commons";
+import { copyToClipboard, flags, formatNumberAbbreviation, formatToBrowserTimezone, iso } from "../../utils/commons";
 import moment from "moment";
 export default function RoModal({ code, data, setData, fromTime, toTime }) {
 
@@ -10,14 +10,19 @@ export default function RoModal({ code, data, setData, fromTime, toTime }) {
             subtext: `from ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} to ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
-        tooltip: {},
+        tooltip: {
+            formatter: function (props) {
+                const { name, value, date } = props.data;
+                return `${name}<br>${formatNumberAbbreviation(value)}+ searches<br>${formatToBrowserTimezone(date)}`
+            }
+        },
         series: [
             {
                 name: '',
                 type: 'pie',
                 radius: "75%",
                 center: ['50%', '50%'],
-                data: data ? data.map(({ title, traffic }) => ({ name: title, value: traffic })) : null,
+                data: data ? data.map(({ title, traffic, pubDate }) => ({ name: title, value: traffic, date: pubDate })) : null,
                 emphasis: {}
             }
         ]

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
+import { downloadChart, isMobile, formatNumberAbbreviation, formatToBrowserTimezone, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
@@ -90,19 +90,6 @@ export default function NewHome() {
     const [geoMapData, setGeoMapData] = useState(null);
     const [tagCloudData, setTagCloudData] = useState(null);
     const [rawData, setRawData] = useState(null);
-
-    function formatToBrowserTimezone(datetimeString) {
-        const options = {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric"
-        };
-
-        return new Date(datetimeString).toLocaleString(undefined, options);
-    }
 
     const [fromTime, setFromTime] = useState(moment().startOf('day').valueOf());
     const [toTime, setToTime] = useState(moment().valueOf());

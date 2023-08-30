@@ -341,6 +341,19 @@ export function formatNumberAbbreviation(number) {
   return shortNumber + suffixes[suffixNum];
 }
 
+export function formatToBrowserTimezone(datetimeString) {
+  const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric"
+  };
+
+  return new Date(datetimeString).toLocaleString(undefined, options);
+}
+
 export function generateNewsHTMLV1(news) {
   let html = '<p>';
 
