@@ -397,46 +397,6 @@ export function arraysHaveSameElements(array1, array2) {
   return true;
 }
 
-export const openNewsModal = (title, country, news, picture) => {
-  news = Array.isArray(news) ? news : [news];
-  axios.defaults.baseURL = BackendURL;
-  Swal.fire({
-    imageUrl: picture,
-    imageWidth: 100,
-    imageHeight: 100,
-    imageAlt: title,
-    title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Latest News</sup>`,
-    html: news.length > 0 ? generateNewsHTMLV1(news) : '<span style="font-size:12px;font-weight:bold;color:red;">Sorry, results not found</span>',
-    showCloseButton: true,
-    showDenyButton: true,
-    confirmButtonText: 'Hot News',
-    denyButtonText: 'Copy keyword'
-  })
-    .then((result) => {
-      if (result.isConfirmed) {
-        const toastID = toast.loading("Processing, Please Wait...")
-        axios.get(`/hotnews/${title}?region=${codes[country]}`)
-          .then(res => {
-            const data = res.data || [];
-            toast.update(toastID, { render: "Successfully Completed", type: toast.TYPE.SUCCESS, autoClose: 1000, isLoading: false, hideProgressBar: true })
-            Swal.fire({
-              title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Hot News</sup>`,
-              html: data.length > 0 ? generateNewsHTMLV2(data) : '<span style="font-size:16px;font-weight:bold;color:red;">Sorry, results not found</span>',
-              showConfirmButton: false,
-              showCloseButton: true
-            })
-          })
-          .catch(err => {
-            toast.update(toastID, { render: err.message, type: toast.TYPE.ERROR, autoClose: 1000, isLoading: false, hideProgressBar: true })
-          })
-      }
-      else if (result.isDenied) {
-        copyToClipboard(title)
-      }
-    })
-}
-
-
 export const selectOptions = [
   { "label": "Argentina", "value": "AR" },
   { "label": "Australia", "value": "AU" },
@@ -549,6 +509,48 @@ function CDTemplate({ code, detail }) {
   );
 }
 
+export const openNewsModal = (title, country, news, picture) => {
+  news = Array.isArray(news) ? news : [news];
+  axios.defaults.baseURL = BackendURL;
+  Swal.fire({
+    imageUrl: picture,
+    imageWidth: 100,
+    imageHeight: 100,
+    imageAlt: title,
+    title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Related news</sup>`,
+    html: news.length > 0 ? generateNewsHTMLV1(news) : '<span style="font-size:12px;font-weight:bold;color:red;">Sorry, results not found</span>',
+    showCloseButton: true,
+    showDenyButton: false,
+    confirmButtonText: 'Region-based news',
+    showLoaderOnConfirm: true,
+    preConfirm: () => {
+      return fetch(`${BackendURL}/hotnews/${title}?region=${codes[country]}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(response.statusText)
+          }
+          return response.json()
+        })
+        .catch(error => {
+          Swal.showValidationMessage(error)
+        })
+    },
+    allowOutsideClick: () => !Swal.isLoading()
+  })
+    .then(results => {
+      if (results.isConfirmed) {
+        if (results.value.length > 0) {
+          Swal.fire({
+            title: title,
+            html: generateNewsHTMLV2(results.value),
+            showConfirmButton: false,
+            showDenyButton: false,
+            showCloseButton: true
+          })
+        }
+      }
+    })
+}
 
 export async function openCountryDetailsModal(code) {
   try {
@@ -635,7 +637,7 @@ export function DataTableForBarChart({ data, setData }) {
       onClose={() => { setData([]) }}
       width={width}
       height={height}
-      customStyles={{ padding: 0, overflow:"scroll" }}
+      customStyles={{ padding: 0, overflow: "scroll" }}
     >
       <DataTable
         width={width}
