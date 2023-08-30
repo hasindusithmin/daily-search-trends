@@ -1,7 +1,7 @@
 import { toast } from "react-toastify"
 import Swal from "sweetalert2";
 import axios from "axios";
-
+import ReactDOMServer from 'react-dom/server';
 
 export const BackendURL = process.env.REACT_APP_TRENDY_WORLD_BACKEND;
 export const NodeAPI = process.env.REACT_APP_TRENDY_WORLD_NODE_API;
@@ -346,7 +346,7 @@ export function generateNewsHTMLV1(news) {
 
   news.forEach(item => {
     html += `    <div>\n`;
-    html += `        <h5><a href="${item['ht:news_item_url'] || item['url']}" target="_blank" >${item['ht:news_item_title'] || item['title']}</a></h5>\n`;
+    html += `        <h5><a href="${item['ht:news_item_url'] || item['url']}" target="_blank" rel="noreferrer">${item['ht:news_item_title'] || item['title']}</a></h5>\n`;
     html += `        <p>${item['ht:news_item_snippet'] || item['snippet']}</p>\n`;
     html += `        <p>Source: <em>${item['ht:news_item_source'] || item['source']}</em></p>\n`;
     html += `    </div>\n`;
@@ -363,7 +363,7 @@ export function generateNewsHTMLV2(news) {
 
   news.forEach(item => {
     html += `    <div>\n`;
-    html += `        <h5><a href="${item['link']}" target="_blank" >${item['title']}</a></h5>\n`;
+    html += `        <h5><a href="${item['link']}" target="_blank" rel="noreferrer">${item['title']}</a></h5>\n`;
     html += `        <p>💡${item['source']} | ⏰${item['time']} </p>\n`;
     html += `    </div>\n`;
     html += `    <hr>\n`;
@@ -486,8 +486,107 @@ export const selectOptions = [
 
 export function ranLightColor() {
   const hexTab = "6789ABCDEF"; // lighter color range
-  let r = hexTab[ Math.floor( Math.random() * hexTab.length) ];
-  let g = hexTab[ Math.floor( Math.random() * hexTab.length) ];
-  let b = hexTab[ Math.floor( Math.random() * hexTab.length) ];
+  let r = hexTab[Math.floor(Math.random() * hexTab.length)];
+  let g = hexTab[Math.floor(Math.random() * hexTab.length)];
+  let b = hexTab[Math.floor(Math.random() * hexTab.length)];
   return r + g + b;
+}
+
+function CDTemplate({ code, detail }) {
+
+  const {
+    name,
+    currencies,
+    capital,
+    region,
+    subregion,
+    languages,
+    latlng,
+    landlocked,
+    borders = [],
+    area,
+    maps,
+    population,
+    timezones = [],
+    continents,
+    coatOfArms,
+    startOfWeek,
+  } = detail;
+
+  return (
+    <div>
+      <div className="w3-center w3-padding">
+        <img src={coatOfArms.svg} alt="coat of arms" width={100} height={100} />
+      </div>
+      <div style={{ textAlign: "left" }}>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-blue">Official name</span> {name.official}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-green">Capital</span> {capital[0]}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-teal">Region</span> {region} ({subregion})</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-red">Languages</span> {Object.keys(languages).join(', ')}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-cyan w3-text-white">Continents</span>: {continents.join(', ')}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-dark-gray">Latitude</span> {latlng[0]}, <span className="w3-tag w3-round w3-dark-gray">Longitude</span> {latlng[1]}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-purple">Landlocked</span>: {landlocked ? 'Yes' : 'No'}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-indigo">Area</span> {area}<sup>sqkm</sup></div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-orange w3-text-white">Population</span> {formatNumberAbbreviation(population)}+</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-blue-gray">Timezones</span> <span className={timezones.length > 2 ? 'w3-small' : ''}>{timezones.join(', ')}</span></div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-aqua w3-text-white">Borders</span> <span className={borders.length > 2 ? 'w3-small' : ''}>{borders.join(', ')}</span></div>
+        <div style={{ padding: "5px 0" }}>
+          <span className="w3-tag w3-round w3-amber w3-text-white">Currencies</span> {Object.values(currencies)[0].name}<sup>{Object.values(currencies)[0].symbol}</sup>
+        </div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-brown">Start of Week</span> {startOfWeek}</div>
+        <div style={{ padding: "5px 0" }}>
+          <span className="w3-tag w3-round w3-pink">Maps</span>&nbsp;
+          <a href={maps.openStreetMaps} style={{ textDecoration: "none" }} target="_blank" rel="noreferrer">🗺<i className="fa fa-external-link-square" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+export async function openCountryDetailsModal(code) {
+  try {
+    const res = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`)
+    const template = ReactDOMServer.renderToString(<CDTemplate code={code} detail={res.data[0]} />);
+    const title = res.data[0].name.common;
+    Swal.fire({
+      title: title,
+      imageAlt: "Coat of Arms",
+      html: template,
+      showDenyButton: false,
+      showConfirmButton: true,
+      showCloseButton: true,
+      confirmButtonText: "Country Related News",
+      showLoaderOnConfirm: true,
+      preConfirm: () => {
+        return fetch(`${BackendURL}/hotnews/${title}?region=${code}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(response.statusText)
+            }
+            return response.json()
+          })
+          .catch(error => {
+            Swal.showValidationMessage(error)
+          })
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    })
+      .then(results => {
+        if (results.isConfirmed) {
+          if (results.value.length > 0) {
+            Swal.fire({
+              title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Related news</sup>`,
+              html: generateNewsHTMLV2(results.value),
+              showConfirmButton: false,
+              showCloseButton: true
+            })
+          }
+        }
+      })
+  }
+  catch (error) {
+    console.log(error);
+    toast.error(error.message, { autoClose: 1000, hideProgressBar: true })
+  }
 }

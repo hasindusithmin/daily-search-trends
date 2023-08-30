@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content } from "../../utils/commons";
+import { downloadChart, isMobile, formatNumberAbbreviation, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
@@ -247,9 +247,9 @@ export default function NewHome() {
         }
     }
 
-    const customRenderer = (tag, size, color) => {
+    const customRenderer = (tag, size) => {
         return (
-            <span key={tag.value} style={{ color, fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent'>
+            <span key={tag.value} style={{ color : "#016277", fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent'>
                 {tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
@@ -454,7 +454,7 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* geo map  */}
+                        {/* Geo Map - ALL Countries  */}
                         {
                             geoMapData && (
                                 <div className="w3-content" style={{ paddingTop: 15 }}>
@@ -473,8 +473,8 @@ export default function NewHome() {
                                                 </Geographies>
                                                 {geoMapData.map(({ country, totalTraffic, lnglat }) => {
                                                     return (
-                                                        <Marker key={country} coordinates={lnglat} onClick={() => openModal(codes[country])}>
-                                                            <circle fill={uniqolor.random()['color']} r={2.5} />
+                                                        <Marker key={country} coordinates={lnglat} onClick={() => openCountryDetailsModal(codes[country])}>
+                                                            <circle fill="#8BC34A" r={2.5} />
                                                             <text
                                                                 style={{ fontFamily: "system-ui", fill: '#5D5A6D', fontSize: 10, fontWeight: 550, cursor: 'cell' }}
                                                             >
