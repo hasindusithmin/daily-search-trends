@@ -48,7 +48,6 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
             formatter: function ({ name, value }) {
                 return `${flags[name]}${iso[name]} ${value} Results`
             },
-            position: ['35%', '20%'],
         },
         series: [
             {
@@ -80,7 +79,6 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
 
     const onEvents = {
         click: ({ name }) => {
-            if (isMobile()) return
             setCode(name);
             setData(rawData[name]);
         }
@@ -90,7 +88,7 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
         <>
             <ReactEcharts
                 option={options}
-                style={{ width: window.innerWidth, height: 500 }}
+                style={{ width: (options.xAxis.data.length) * 50, height: 500 }}
                 onEvents={onEvents}
             />
             <RoModal

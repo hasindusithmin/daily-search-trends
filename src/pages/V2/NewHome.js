@@ -21,6 +21,7 @@ import EPieChart from "../../components/charts/EPieChart";
 import EBarChart from "../../components/charts/EBarChart";
 import E3Map from "../../components/charts/E3Map";
 import { Tooltip } from 'react-tooltip';
+import EBChart from "../../components/charts/EBChart";
 
 export default function NewHome() {
 
@@ -47,7 +48,7 @@ export default function NewHome() {
             sortable: true
         },
         {
-            name: 'Searches',
+            name: 'searches',
             width: '150px',
             selector: row => row.traffic,
             format: row => formatNumberAbbreviation(row.traffic) + '+',
@@ -236,7 +237,7 @@ export default function NewHome() {
 
     const customRenderer = (tag, size) => {
         return (
-            <span key={tag.value} style={{ color : "#016277", fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent'>
+            <span key={tag.value} style={{ color: "#016277", fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent'>
                 {tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup>
             </span>
         )
@@ -401,7 +402,7 @@ export default function NewHome() {
                 </div>
                 <div className="w3-row-padding">
                     <div className="w3-padding">
-                        <button className="w3-btn w3-blue-grey w3-opacity w3-large w3-round-large w3-right" title="Get Filter Results" onClick={() => { setIsFilterChanges(true) }}>
+                        <button disabled={isFilterChanged} className="w3-btn w3-blue-grey w3-opacity w3-large w3-round-large w3-right" title="Get Filter Results" onClick={() => { setIsFilterChanges(true) }}>
                             <i className="fa fa-filter"></i>
                         </button>
                     </div>
@@ -433,7 +434,7 @@ export default function NewHome() {
                         {/* Bar Chart - Results OverView  */}
                         {
                             rawData && (
-                                <div className="w3-content w3-padding-32" >
+                                <div className="w3-content w3-padding-32 loader-container" >
                                     <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
                                         <EBarChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
@@ -472,6 +473,17 @@ export default function NewHome() {
                                                 })}
                                             </ComposableMap>
                                         </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+
+                        {/* Bar Chart - Classification By Searches (Nested)  */}
+                        {
+                            rawData && (
+                                <div className="w3-content w3-padding-32" >
+                                    <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
+                                        <EBChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
                                 </div>
                             )
@@ -571,6 +583,8 @@ export default function NewHome() {
                                         data={tblData}
                                         pagination
                                         responsive
+                                        paginationRowsPerPageOptions={[5, 10, 15, 20, 25]}
+                                        paginationPerPage={5}
                                     />
                                 </div>
                             )

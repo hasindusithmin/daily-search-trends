@@ -2,6 +2,8 @@ import { toast } from "react-toastify"
 import Swal from "sweetalert2";
 import axios from "axios";
 import ReactDOMServer from 'react-dom/server';
+import DataTable from "react-data-table-component";
+import Rodal from "rodal";
 
 export const BackendURL = process.env.REACT_APP_TRENDY_WORLD_BACKEND;
 export const NodeAPI = process.env.REACT_APP_TRENDY_WORLD_NODE_API;
@@ -343,12 +345,12 @@ export function formatNumberAbbreviation(number) {
 
 export function formatToBrowserTimezone(datetimeString) {
   const options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric"
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric"
   };
 
   return new Date(datetimeString).toLocaleString(undefined, options);
@@ -538,7 +540,7 @@ function CDTemplate({ code, detail }) {
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-red">Languages</span> {Object.keys(languages).join(', ')}</div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-cyan w3-text-white">Continents</span>: {continents.join(', ')}</div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-dark-gray">Latitude</span> {latlng[0]}, <span className="w3-tag w3-round w3-dark-gray">Longitude</span> {latlng[1]}</div>
-        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-purple">Landlocked</span>: {landlocked ? 'Yes' : 'No'}</div>
+        <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-purple">Landlocked</span> {landlocked ? 'Yes' : 'No'}</div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-indigo">Area</span> {area}<sup>sqkm</sup></div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-orange w3-text-white">Population</span> {formatNumberAbbreviation(population)}+</div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-blue-gray">Timezones</span> <span className={timezones.length > 2 ? 'w3-small' : ''}>{timezones.join(', ')}</span></div>
@@ -602,4 +604,54 @@ export async function openCountryDetailsModal(code) {
     console.log(error);
     toast.error(error.message, { autoClose: 1000, hideProgressBar: true })
   }
+}
+
+export function DataTableForBarChart({ data, setData }) {
+
+  const columns = [
+    {
+      cell: row => <img src={row.picture} width="30px" className="w3-circle" />,
+      width: '30px',
+      style: {
+        padding: ''
+      }
+    },
+    {
+      name: 'keyword',
+      width: '150px',
+      selector: row => <div title={row.title}>{row.title}</div>,
+      sortable: true
+    },
+    {
+      name: 'searches',
+      width: '150px',
+      selector: row => row.traffic,
+      format: row => formatNumberAbbreviation(row.traffic) + '+',
+      sortable: true
+    },
+    {
+      name: 'public date',
+      width: '250px',
+      selector: row => row.pubDate,
+      format: row => <div>{formatToBrowserTimezone(row.pubDate)}</div>,
+      sortable: true
+    }
+  ];
+  const width = window.innerWidth / 3, height = window.innerHeight / 4;
+  return (
+    <Rodal
+      visible={data.length > 0}
+      onClose={() => { setData([]) }}
+      width={width}
+      height={height}
+      customStyles={{ padding: 0, overflow:"scroll" }}
+    >
+      <DataTable
+        width={width}
+        height={height}
+        columns={columns}
+        data={data}
+      />
+    </Rodal>
+  )
 }
