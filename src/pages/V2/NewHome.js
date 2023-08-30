@@ -343,7 +343,7 @@ export default function NewHome() {
             </div>
 
             <div className="w3-content" style={{ fontWeight: 500, fontSize: 16 }}>
-                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-text-metro-light-blue w3-transparent w3-padding w3-leftbar w3-topbar w3-border-sand w3-round" />
+                <ReactMarkdown children={content} remarkPlugins={[remarkGfm]} className="w3-text-metro-light-blue w3-transparent w3-padding w3-leftbar w3-topbar w3-round" />
             </div>
 
             <div className="w3-content w3-margin-top">
@@ -352,12 +352,12 @@ export default function NewHome() {
                         fromTime &&
                         (
                             <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("FromDate") }}>
-                                <div className="w3-padding w3-round-xlarge w3-blue w3-opacity-min">
+                                <div className="w3-padding w3-round-xlarge" style={{ backgroundImage: 'linear-gradient(to right, #FC466B, #3F5EFB)', color: "#ffffff" }}>
                                     <div className="w3-left">
                                         <i className="fa fa-calendar-plus-o w3-xxxlarge" />
                                     </div>
                                     <div className="w3-right">
-                                        <h3><b>From Date</b></h3>
+                                        <h3><b>Date from</b></h3>
                                     </div>
                                     <div className="w3-clear" />
                                     <h4>{moment(fromTime).format('MMMM Do YYYY, h:mm A')}</h4>
@@ -369,12 +369,12 @@ export default function NewHome() {
                         toTime &&
                         (
                             <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("ToDate") }}>
-                                <div className="w3-padding w3-round-xlarge w3-green w3-opacity-min">
+                                <div className="w3-padding w3-round-xlarge" style={{ backgroundImage: 'linear-gradient(to right, #00F260, #0575E6)', color: "#ffffff" }}>
                                     <div className="w3-left">
                                         <i className="fa fa-calendar-minus-o w3-xxxlarge" />
                                     </div>
                                     <div className="w3-right">
-                                        <h3><b>To Date</b></h3>
+                                        <h3><b>Date to</b></h3>
                                     </div>
                                     <div className="w3-clear" />
                                     <h4>{moment(toTime).format('MMMM Do YYYY, h:mm A')}</h4>
@@ -386,7 +386,7 @@ export default function NewHome() {
                         countries &&
                         (
                             <div className="w3-third w3-margin-bottom" style={{ cursor: 'pointer' }} onClick={() => { openFilterModal("Countries") }}>
-                                <div className="w3-padding w3-round-xlarge w3-cyan w3-text-white w3-opacity-min">
+                                <div className="w3-padding w3-round-xlarge" style={{ backgroundImage: 'linear-gradient(to right, #00d2ff, #3a7bd5)', color: "#ffffff" }}>
                                     <div className="w3-left">
                                         <i className="fa fa-flag w3-xxxlarge" />
                                     </div>

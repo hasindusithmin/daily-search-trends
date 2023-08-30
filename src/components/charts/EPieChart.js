@@ -11,7 +11,7 @@ export default function EPieChart({ rawData }) {
 
   const options = {
     title: {
-      text: 'Worldwide Reach in One Slice',
+      text: 'Worldwide teach in one slice',
       subtext: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
       left: 'right'
     },

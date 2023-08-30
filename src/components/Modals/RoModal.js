@@ -7,7 +7,7 @@ export default function RoModal({ code, data, setData, fromTime, toTime }) {
     const options = {
         title: {
             text: `${data && data.length} trending searches in ${iso[code]} ${flags[code]}`,
-            subtext: `from ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} to ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
+            subtext: `From ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
         tooltip: {
