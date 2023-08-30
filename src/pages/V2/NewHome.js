@@ -434,9 +434,14 @@ export default function NewHome() {
                         {/* Bar Chart - Results OverView  */}
                         {
                             rawData && (
-                                <div className="w3-content w3-padding-32 loader-container" >
-                                    <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
-                                        <EBarChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
+                                <div className="w3-content">
+                                    <div className="w3-center">
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Results overview</div>
+                                    </div>
+                                    <div className="loader-container" >
+                                        <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
+                                            <EBarChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
+                                        </div>
                                     </div>
                                 </div>
                             )
@@ -445,10 +450,10 @@ export default function NewHome() {
                         {/* Geo Map - ALL Countries  */}
                         {
                             geoMapData && (
-                                <div className="w3-content" style={{ paddingTop: 15 }}>
-                                    <p>
-                                        <button title="Click to download the symbol map" className='w3-btn w3-blue-grey w3-round-large' onClick={() => { downloadChart('geoMap') }}>download ⤵</button>
-                                    </p>
+                                <div className="w3-content">
+                                    <div className="w3-center w3-padding-32">
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Brief summary of countries</div>
+                                    </div>
                                     <div id="geoMap" className="w3-center">
                                         <div>
                                             <ComposableMap projectionConfig={{ rotate: [-20, 0, 0], center: [5, 7] }} height={410}>
@@ -481,7 +486,10 @@ export default function NewHome() {
                         {/* Bar Chart - Classification By Searches (Nested)  */}
                         {
                             rawData && (
-                                <div className="w3-content w3-padding-32" >
+                                <div className="w3-content w3-padding" >
+                                    <div className="w3-center">
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Explore the searches</div>
+                                    </div>
                                     <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
                                         <EBChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
@@ -493,8 +501,8 @@ export default function NewHome() {
                         {
                             tagCloudData && (
                                 <div className="w3-content w3-padding" >
-                                    <div className="w3-center w3-padding">
-                                        <div className="chart-details">Discover What's Hot and Relevant Now.</div>
+                                    <div className="w3-center">
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Visual sense of the key terms</div>
                                     </div>
                                     <p style={{ lineHeight: 1.8 }} className="w3-justify">
                                         <TagCloud
@@ -552,12 +560,12 @@ export default function NewHome() {
                         {/* data table  */}
                         {
                             tblData && (
-                                <div className="w3-content w3-padding-32">
-                                    <div className="w3-center w3-padding">
-                                        <div className="chart-details">Organized Information at a Glance.</div>
+                                <div className="w3-content w3-padding">
+                                    <div className="w3-center">
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Organized information at a glance</div>
                                     </div>
                                     <p>
-                                        <button title="Click to download the csv" className='w3-btn w3-blue-grey w3-round-large' onClick={downloadTblData}>download ⤵</button>
+                                        <button title="Click to download the csv" className='w3-btn w3-blue-grey w3-round-large' onClick={downloadTblData}>download csv ⤵</button>
                                     </p>
                                     <p style={{ paddingBottom: 32 }}>
                                         <span className="w3-right">

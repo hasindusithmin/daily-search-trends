@@ -92,6 +92,18 @@ export default function TtModal({ code, data, color, setData }) {
                         return `${name}<br>${formatNumberAbbreviation(value)}+ searches<br>${formatToBrowserTimezone(date)}`
                     }
                 },
+                toolbox: {
+                    feature: {
+                        myTool1: {
+                            show: true,
+                            title: 'Go Back',
+                            icon: 'image://https://user-images.githubusercontent.com/78546078/264288536-baf61f06-4ad0-42f2-8bd5-ed33f7fd6ad4.png',
+                            onclick: function () {
+                                setOption(null)
+                            }
+                        }
+                    }
+                },
                 series: [
                     {
                         name: '',
@@ -135,23 +147,11 @@ export default function TtModal({ code, data, color, setData }) {
                             )
                             :
                             (
-                                <>
-                                    <div style={{ padding: 5 }}>
-                                        <button
-                                            className="w3-btn w3-round-xlarge"
-                                            style={{ fontSize: 16 }}
-                                            onClick={() => { setOption(null) }}
-                                            title="Go back"
-                                        >
-                                            ↩️
-                                        </button>
-                                    </div>
-                                    <ReactEcharts
-                                        option={option}
-                                        style={{ width: size, height: size }}
-                                        onEvents={onEventsV2}
-                                    />
-                                </>
+                                <ReactEcharts
+                                    option={option}
+                                    style={{ width: size, height: size }}
+                                    onEvents={onEventsV2}
+                                />
                             )
                     }
                 </div>

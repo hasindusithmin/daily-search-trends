@@ -24,7 +24,8 @@ export default function HomeTagCloudM({ toast, showTC, setShowTC }) {
             height={window.innerWidth / 3}
             showMask={true}
             closeOnEsc={true}
-            animation='flip'
+            animation='door'
+            duration={1000}
             className='w3-padding-64 w3-mobile w3-text-black'
             onClose={() => { setShowTC(null) }}
         >

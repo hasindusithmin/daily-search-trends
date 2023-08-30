@@ -8,7 +8,7 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
 
     const options = {
         title: {
-            text: 'RESULTS OVERVIEW',
+            text: '',
             subtext: `from ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} to ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
