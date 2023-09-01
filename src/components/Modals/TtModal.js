@@ -2,7 +2,6 @@ import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
 import { flags, formatNumberAbbreviation, formatToBrowserTimezone, iso, openNewsModal } from "../../utils/commons";
 import { useState } from "react";
-import Swal from "sweetalert2";
 export default function TtModal({ code, data, color, setData }) {
 
     const ranges = [
@@ -120,8 +119,8 @@ export default function TtModal({ code, data, color, setData }) {
 
     const onEventsV2 = {
         click: ({ name }) => {
-            const { title, country, news, picture } = data.filter(({ title }) => title === name)[0];
-            openNewsModal(title, country, news, picture)
+            let { title, country, news, picture } = data.filter(({ title }) => title === name)[0];
+            openNewsModal(title, country = iso[country], news, picture)
         }
     }
 

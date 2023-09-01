@@ -347,38 +347,6 @@ export function formatToBrowserTimezone(datetimeString) {
   return new Date(datetimeString).toLocaleString(undefined, options);
 }
 
-export function generateNewsHTMLV1(news) {
-  let html = '<p>';
-
-  news.forEach(item => {
-    html += `    <div>\n`;
-    html += `        <h5><a href="${item['ht:news_item_url'] || item['url']}" target="_blank" rel="noreferrer">${item['ht:news_item_title'] || item['title']}</a></h5>\n`;
-    html += `        <p>${item['ht:news_item_snippet'] || item['snippet']}</p>\n`;
-    html += `        <p>Source: <em>${item['ht:news_item_source'] || item['source']}</em></p>\n`;
-    html += `    </div>\n`;
-    html += `    <hr>\n`;
-  });
-
-  html += '</p>';
-
-  return html;
-}
-
-export function generateNewsHTMLV2(news) {
-  let html = '<p>';
-
-  news.forEach(item => {
-    html += `    <div>\n`;
-    html += `        <h5><a href="${item['link']}" target="_blank" rel="noreferrer">${item['title']}</a></h5>\n`;
-    html += `        <p>💡${item['source']} | ⏰${item['time']} </p>\n`;
-    html += `    </div>\n`;
-    html += `    <hr>\n`;
-  });
-
-  html += '</p>';
-
-  return html;
-}
 
 export function arraysHaveSameElements(array1, array2) {
   if (array1.length !== array2.length) {
@@ -450,15 +418,51 @@ export const selectOptions = [
   { "label": "Vietnam", "value": "VN" }
 ]
 
-export function ranLightColor() {
-  const hexTab = "6789ABCDEF"; // lighter color range
-  let r = hexTab[Math.floor(Math.random() * hexTab.length)];
-  let g = hexTab[Math.floor(Math.random() * hexTab.length)];
-  let b = hexTab[Math.floor(Math.random() * hexTab.length)];
-  return r + g + b;
+export function InternalNews({ newsList = [] }) {
+  return (
+    <>
+      {
+        newsList.length > 0 && newsList.map(news => (
+          <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif" }}>
+            <h5>
+              <a href={news['ht:news_item_url'] || news['url']} target="_blank" rel="noreferrer">{news['ht:news_item_title'] || news['title']}</a>
+            </h5>
+            <p>{news['ht:news_item_snippet'] || news['snippet']}</p>
+            <p>source: <em>{news['ht:news_item_source'] || news['source']}</em></p>
+          </div>
+        ))
+      }
+      {
+        newsList.length === 0 &&
+        (
+          <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif" }}>
+            <h5>We're Sorry</h5>
+            <p>something's missing...</p>
+          </div>
+        )
+      }
+    </>
+  )
 }
 
-function CDTemplate({ code, detail }) {
+export function ExternalNews({ newsList = [] }) {
+  return (
+    <>
+      {
+        newsList.length > 0 && newsList.map(news => (
+          <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif" }}>
+            <h5>
+              <a href={news['link']} target="_blank" rel="noreferrer">{news['title']}</a>
+            </h5>
+            <p>💡{news['source']} | ⏰{news['time']} </p>
+          </div>
+        ))
+      }
+    </>
+  )
+}
+
+export function CountryDetail({ detail }) {
 
   const {
     name,
@@ -511,20 +515,25 @@ function CDTemplate({ code, detail }) {
 
 export const openNewsModal = (title, country, news, picture) => {
   news = Array.isArray(news) ? news : [news];
-  axios.defaults.baseURL = BackendURL;
   Swal.fire({
     imageUrl: picture,
     imageWidth: 100,
     imageHeight: 100,
     imageAlt: title,
-    title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Related news</sup>`,
-    html: news.length > 0 ? generateNewsHTMLV1(news) : '<span style="font-size:12px;font-weight:bold;color:red;">Sorry, results not found</span>',
+    title: title,
+    html: ReactDOMServer.renderToString(<InternalNews newsList={news} />),
     showCloseButton: true,
     showDenyButton: false,
     confirmButtonText: 'Region-based news',
     showLoaderOnConfirm: true,
     preConfirm: () => {
-      return fetch(`${BackendURL}/hotnews/${title}?region=${codes[country]}`)
+      return fetch(`${BackendURL}/hotnews`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ query: title, region: codes[country] })
+      })
         .then(response => {
           if (!response.ok) {
             throw new Error(response.statusText)
@@ -542,11 +551,18 @@ export const openNewsModal = (title, country, news, picture) => {
         if (results.value.length > 0) {
           Swal.fire({
             title: title,
-            html: generateNewsHTMLV2(results.value),
+            html: ReactDOMServer.renderToString(<ExternalNews newsList={results.value} />),
             showConfirmButton: false,
             showDenyButton: false,
             showCloseButton: true
           })
+        }
+        else {
+          Swal.fire(
+            "We're Sorry",
+            "something's missing...",
+            'info'
+          )
         }
       }
     })
@@ -555,7 +571,7 @@ export const openNewsModal = (title, country, news, picture) => {
 export async function openCountryDetailsModal(code) {
   try {
     const res = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`)
-    const template = ReactDOMServer.renderToString(<CDTemplate code={code} detail={res.data[0]} />);
+    const template = ReactDOMServer.renderToString(<CountryDetail detail={res.data[0]} />);
     const title = res.data[0].name.common;
     Swal.fire({
       title: title,
@@ -564,10 +580,16 @@ export async function openCountryDetailsModal(code) {
       showDenyButton: false,
       showConfirmButton: true,
       showCloseButton: true,
-      confirmButtonText: "Country Related News",
+      confirmButtonText: "Country-related news",
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        return fetch(`${BackendURL}/hotnews/${title}?region=${code}`)
+        return fetch(`${BackendURL}/hotnews`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ query: title, region: code })
+        })
           .then(response => {
             if (!response.ok) {
               throw new Error(response.statusText)
@@ -584,11 +606,18 @@ export async function openCountryDetailsModal(code) {
         if (results.isConfirmed) {
           if (results.value.length > 0) {
             Swal.fire({
-              title: `<b>${title}</b> <sup style="font-size:15px;color:#34a853;">Related news</sup>`,
-              html: generateNewsHTMLV2(results.value),
+              title: title,
+              html: ReactDOMServer.renderToString(<ExternalNews newsList={results.value} />),
               showConfirmButton: false,
               showCloseButton: true
             })
+          }
+          else {
+            Swal.fire(
+              "We're Sorry",
+              "something's missing...",
+              'info'
+            )
           }
         }
       })
