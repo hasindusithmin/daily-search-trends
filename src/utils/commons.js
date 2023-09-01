@@ -420,12 +420,21 @@ export const selectOptions = [
 
 export function InternalNews({ newsList = [] }) {
   return (
-    <>
+    <div className="w3-panel">
       {
         newsList.length > 0 && newsList.map(news => (
-          <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif" }}>
+          <div className="w3-card w3-round-xlarge w3-padding" style={{ marginTop: 10, marginBottom: 10 }}>
             <h5>
-              <a href={news['ht:news_item_url'] || news['url']} target="_blank" rel="noreferrer">{news['ht:news_item_title'] || news['title']}</a>
+              <a
+                title="Click to Read more"
+                href={news['ht:news_item_url'] || news['url']}
+                className="w3-text-blue"
+                style={{ textDecoration: "none", fontWeight: "500" }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {news['ht:news_item_title'] || news['title']}
+              </a>
             </h5>
             <p>{news['ht:news_item_snippet'] || news['snippet']}</p>
             <p>source: <em>{news['ht:news_item_source'] || news['source']}</em></p>
@@ -441,24 +450,37 @@ export function InternalNews({ newsList = [] }) {
           </div>
         )
       }
-    </>
+    </div>
   )
 }
 
 export function ExternalNews({ newsList = [] }) {
+  const shouldAddScroll = newsList.length > 3;
   return (
-    <>
+    <div
+      className={shouldAddScroll ? 'w3-panel scrollable-container' : 'w3-panel'}
+    >
       {
         newsList.length > 0 && newsList.map(news => (
-          <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, Arial, sans-serif" }}>
-            <h5>
-              <a href={news['link']} target="_blank" rel="noreferrer">{news['title']}</a>
-            </h5>
-            <p>💡{news['source']} | ⏰{news['time']} </p>
+          <div className="w3-card w3-round-xlarge w3-padding" style={{ marginTop: 10, marginBottom: 10 }}>
+            <a
+              title="Click to Read more"
+              href={news.link}
+              className="w3-text-blue"
+              style={{ textDecoration: "none", fontWeight: "500" }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {news.title}
+            </a>
+            <div className="w3-bar w3-padding">
+              <span className="w3-bar-item">💡{news.source}</span>
+              <span className="w3-bar-item">⏰{news.time}</span>
+            </div>
           </div>
         ))
       }
-    </>
+    </div>
   )
 }
 
@@ -501,7 +523,7 @@ export function CountryDetail({ detail }) {
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-blue-gray">Timezones</span> <span className={timezones.length > 2 ? 'w3-small' : ''}>{timezones.join(', ')}</span></div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-aqua w3-text-white">Borders</span> <span className={borders.length > 2 ? 'w3-small' : ''}>{borders.join(', ')}</span></div>
         <div style={{ padding: "5px 0" }}>
-          <span className="w3-tag w3-round w3-amber w3-text-white">Currencies</span> {Object.values(currencies)[0].name}<sup>{Object.values(currencies)[0].symbol}</sup>
+          <span className="w3-tag w3-round w3-amber w3-text-white">Currencies</span> {Object.values(currencies)[0].name}<sup style={{ fontWeight: 500 }}>{Object.values(currencies)[0].symbol}</sup>
         </div>
         <div style={{ padding: "5px 0" }}><span className="w3-tag w3-round w3-brown">Start of Week</span> {startOfWeek}</div>
         <div style={{ padding: "5px 0" }}>
@@ -641,7 +663,15 @@ export function DataTableForBarChart({ data, setData }) {
     {
       name: 'keyword',
       width: '150px',
-      selector: row => <div title={row.title}>{row.title}</div>,
+      selector: row => <div
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          let { title, country, news, picture } = row;
+          openNewsModal(title, country = iso[country], news, picture);
+        }}
+        title={row.title}>
+        {row.title}
+      </div>,
       sortable: true
     },
     {
@@ -666,6 +696,7 @@ export function DataTableForBarChart({ data, setData }) {
       onClose={() => { setData([]) }}
       width={width}
       height={height}
+      animation="door"
       customStyles={{ padding: 0, overflow: "scroll" }}
     >
       <DataTable

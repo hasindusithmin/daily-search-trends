@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import { downloadChart, isMobile, formatNumberAbbreviation, formatToBrowserTimezone, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
+import { isMobile, formatNumberAbbreviation, formatToBrowserTimezone, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
 import HomeTagCloudM from "../../components/HomeTagCloudM";
 import { TagCloud } from 'react-tagcloud'
@@ -22,6 +22,7 @@ import EBarChart from "../../components/charts/EBarChart";
 import E3Map from "../../components/charts/E3Map";
 import { Tooltip } from 'react-tooltip';
 import EBChart from "../../components/charts/EBChart";
+import ETagCloud from "../../components/charts/ETagCloud";
 
 export default function NewHome() {
 
@@ -499,12 +500,12 @@ export default function NewHome() {
 
                         {/* Tag Cloud  */}
                         {
-                            tagCloudData && (
+                            rawData && (
                                 <div className="w3-content w3-padding" >
                                     <div className="w3-center">
                                         <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Visual sense of the key terms</div>
                                     </div>
-                                    <p style={{ lineHeight: 1.8 }} className="w3-justify">
+                                    <p style={{ lineHeight: 1.8 }} className="w3-justify w3-hide">
                                         <TagCloud
                                             minSize={isMobile() ? 7 : 15}
                                             maxSize={isMobile() ? 15 : 36}
@@ -514,6 +515,11 @@ export default function NewHome() {
                                             renderer={customRenderer}
                                         />
                                     </p>
+                                    <div className="loader-container w3-padding">
+                                        <ETagCloud  
+                                            rawData={rawData}
+                                        />
+                                    </div>
                                 </div>
                             )
                         }
