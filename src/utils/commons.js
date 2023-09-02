@@ -258,6 +258,59 @@ export const flags = {
   'VN': '🇻🇳'
 }
 
+const region = {
+  'Argentina': 'SA',
+  'Australia': 'OC',
+  'Austria': 'EU',
+  'Belgium': 'EU',
+  'Brazil': 'SA',
+  'Canada': 'NA',
+  'Chile': 'SA',
+  'Colombia': 'SA',
+  'Czechia': 'EU',
+  'Denmark': 'EU',
+  'Egypt': 'AF',
+  'Finland': 'EU',
+  'France': 'EU',
+  'Germany': 'EU',
+  'Greece': 'EU',
+  'Hong Kong': 'AS',
+  'Hungary': 'EU',
+  'India': 'AS',
+  'Indonesia': 'AS',
+  'Ireland': 'EU',
+  'Israel': 'ME',
+  'Italy': 'EU',
+  'Japan': 'AS',
+  'Kenya': 'AF',
+  'Malaysia': 'AS',
+  'Mexico': 'NA',
+  'Netherlands': 'EU',
+  'New Zealand': 'OC',
+  'Nigeria': 'AF',
+  'Norway': 'EU',
+  'Peru': 'SA',
+  'Philippines': 'AS',
+  'Poland': 'EU',
+  'Portugal': 'EU',
+  'Romania': 'EU',
+  'Russia': 'EU/AS',
+  'Saudi Arabia': 'ME',
+  'Singapore': 'AS',
+  'South Africa': 'AF',
+  'South Korea': 'AS',
+  'Spain': 'EU',
+  'Sweden': 'EU',
+  'Switzerland': 'EU',
+  'Taiwan': 'AS',
+  'Thailand': 'AS',
+  'Türkiye': 'ME',
+  'Ukraine': 'EU',
+  'United Kingdom': 'EU',
+  'United States': 'NA',
+  'Vietnam': 'AS'
+ }
+ 
 export const coordinates = {
   Argentina: [-63.616672, -38.416097],
   Australia: [133.775136, -25.274398],
@@ -557,7 +610,7 @@ export const openNewsModal = (title, country, news, picture) => {
     html: ReactDOMServer.renderToString(<InternalNews newsList={news} />),
     showCloseButton: true,
     showDenyButton: false,
-    confirmButtonText: 'Region-based news',
+    confirmButtonText: `(${flags[codes[country]]}/${region[country]}) Region-based news`,
     showLoaderOnConfirm: true,
     preConfirm: () => {
       return fetch(`${BackendURL}/hotnews`, {
@@ -613,7 +666,7 @@ export async function openCountryDetailsModal(code) {
       showDenyButton: false,
       showConfirmButton: true,
       showCloseButton: true,
-      confirmButtonText: "Country-related news",
+      confirmButtonText: "Country-based news",
       showLoaderOnConfirm: true,
       preConfirm: () => {
         return fetch(`${BackendURL}/hotnews`, {
