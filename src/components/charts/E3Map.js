@@ -1,10 +1,14 @@
 import ReactEcharts from "echarts-for-react"
-import { flags } from "../../utils/commons";
-export default function E3Map({ rawData }) {
+import { flags, getDevice } from "../../utils/commons";
+import moment from "moment";
+export default function E3Map({ rawData, fromTime, toTime }) {
+
+    const { device, width } = getDevice()
+
     const options = {
         title: {
-            text: 'Hierarchical trends analysis of popular searches (beta)',
-            subtext: 'Easily Spot Patterns in Trending Searches',
+            text: 'Hierarchical Trends Analysis',
+            subtext: `From ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
             left: ''
         },
         tooltip: {},
@@ -13,8 +17,9 @@ export default function E3Map({ rawData }) {
                 name: 'countries',
                 type: 'treemap',
                 visibleMin: 300,
-                zoomLock:true,
-                left:0,
+                zoomLock: true,
+                roam: false,
+                left: 0,
                 data: Object.entries(rawData).map(([key, value]) => ({ name: flags[key], children: value.map(obj => ({ name: `${flags[key]}.${obj.title}`, value: obj.traffic })) })),
                 leafDepth: 1,
                 levels: [
@@ -51,7 +56,7 @@ export default function E3Map({ rawData }) {
     return (
         <ReactEcharts
             option={options}
-            style={{ width: 1600, height: 500 }}
+            style={{ width: device === "SM" ? width : width >= 1280 ? 1600 : 1.225 * width, height: 500 }}
         ></ReactEcharts>
     )
 }

@@ -1,8 +1,11 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { flags, formatNumberAbbreviation, formatToBrowserTimezone, iso, openNewsModal } from "../../utils/commons";
+import { flags, formatNumberAbbreviation, formatToBrowserTimezone, getDevice, iso, openNewsModal } from "../../utils/commons";
 import { useState } from "react";
-export default function TtModal({ code, data, color, setData }) {
+export default function EPieChartModal({ code, data, color, setData }) {
+
+    const { device, width, height } = getDevice();
+    const size = device === "SM" ?  width : 600;
 
     const ranges = [
         { min: 100, max: 1000, name: "0.1K - 1K" },
@@ -19,8 +22,8 @@ export default function TtModal({ code, data, color, setData }) {
 
     const initOption = {
         title: {
-            subtext: 'Classification By Searches',
-            text: `${iso[code]} ${flags[code]}`,
+            text: `Classification By Searches ${flags[code]}`,
+            subtext: `${width} x ${height}`,
             left: 'left'
         },
         grid: {
@@ -74,15 +77,13 @@ export default function TtModal({ code, data, color, setData }) {
 
     const [option, setOption] = useState(null);
 
-    const size = window.innerWidth / 3;
-
     const onEvents = {
         click: ({ name }) => {
             const filteredData = categorizedData.filter(({ level }) => level === name)[0]['data'];
             setOption({
                 title: {
-                    text: name,
-                    subtext: `${iso[code]} ${flags[code]}`,
+                    text: `Range: ${name}`,
+                    subtext: `${width} x ${height}`,
                     left: 'left'
                 },
                 tooltip: {

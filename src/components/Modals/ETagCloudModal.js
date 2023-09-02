@@ -1,12 +1,14 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { flags, iso, openNewsModal } from "../../utils/commons";
+import { flags, getDevice, iso, openNewsModal } from "../../utils/commons";
 
 export default function ETagCloudModal({ code, color, data, setData }) {
-    const size = window.innerWidth / 3.5;
+    const { device, width, height } = getDevice();
+    const size = device === "SM" ? width : 600;
     const option = {
         title: {
             text: `${iso[code]} ${flags[code]}`,
+            subtext: `${width}x${height}`,
             left: 'left',
             textStyle: {
                 fontSize: 20,

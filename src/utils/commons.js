@@ -88,6 +88,17 @@ export function isLarge() {
   return window.innerWidth >= 1280;
 }
 
+export function getDevice() {
+  const width = window.innerWidth, height = window.innerHeight;
+  if (width < 601)
+    return { device: "SM", width, height }
+  else if (width >= 601 && width <= 992)
+    return { device: "MD", width, height }
+  else
+    return { device: "LG", width, height }
+
+}
+
 export const codes = {
   'Argentina': 'AR',
   'Australia': 'AU',
@@ -664,12 +675,13 @@ export function DataTableForBarChart({ data, setData }) {
       name: 'keyword',
       width: '150px',
       selector: row => <div
-        style={{ cursor: "pointer" }}
+        style={{ cursor: "zoom-in" }}
         onClick={() => {
           let { title, country, news, picture } = row;
           openNewsModal(title, country = iso[country], news, picture);
         }}
-        title={row.title}>
+        title="Click to view news"
+      >
         {row.title}
       </div>,
       sortable: true
@@ -689,19 +701,20 @@ export function DataTableForBarChart({ data, setData }) {
       sortable: true
     }
   ];
-  const width = window.innerWidth / 3, height = window.innerHeight / 4;
+  const { device, width } = getDevice()
+  const W = device === "SM" ? width : 600, H = 200;
   return (
     <Rodal
       visible={data.length > 0}
       onClose={() => { setData([]) }}
-      width={width}
-      height={height}
+      width={W}
+      height={H}
       animation="door"
       customStyles={{ padding: 0, overflow: "scroll" }}
     >
       <DataTable
-        width={width}
-        height={height}
+        width={W}
+        height={H}
         columns={columns}
         data={data}
       />

@@ -1,7 +1,7 @@
 import ReactEcharts from "echarts-for-react"
-import { formatNumberAbbreviation, iso } from "../../utils/commons";
+import { formatNumberAbbreviation, getDevice, iso } from "../../utils/commons";
 import { useState } from "react";
-import TtModal from "../Modals/TtModal";
+import EPieChartModal from "../Modals/EPieChartModal";
 export default function EPieChart({ rawData }) {
 
   const totalTraffic = formatNumberAbbreviation(
@@ -9,11 +9,13 @@ export default function EPieChart({ rawData }) {
       .reduce((acc, array) => acc + array.reduce((subAcc, { traffic }) => subAcc + traffic, 0), 0)
   )
 
+  const { device, width } = getDevice()
+
   const options = {
     title: {
-      text: 'Worldwide teach in one slice',
+      text: 'Worldwide Teach In One Slice',
       subtext: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
-      left: 'right'
+      left: device === "SM" ? "left" : "right"
     },
     tooltip: {
       trigger: 'item',
@@ -55,10 +57,10 @@ export default function EPieChart({ rawData }) {
     <>
       <ReactEcharts
         option={options}
-        style={{ width: window.innerWidth / 3, height: window.innerWidth / 3 }}
+        style={{ width: device === "SM" ? width : 600, height: device === "SM" ? width : 600 }}
         onEvents={onEvents}
       />
-      <TtModal
+      <EPieChartModal
         code={code}
         data={data}
         color={color}

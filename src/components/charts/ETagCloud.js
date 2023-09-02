@@ -1,12 +1,12 @@
-import * as echarts from 'echarts';
 import 'echarts-wordcloud';
 import ReactEcharts from "echarts-for-react"
-import { codes, iso } from '../../utils/commons';
+import { codes, getDevice, iso } from '../../utils/commons';
 import { useState } from 'react';
 import ETagCloudModal from '../Modals/ETagCloudModal';
 
 export default function ETagCloud({ rawData }) {
-    const size = window.innerWidth / 3;
+    const { device, width } = getDevice();
+    const size = device === "SM" ? width : 600;
     const option = {
         tooltip: {},
         series: [
@@ -15,7 +15,7 @@ export default function ETagCloud({ rawData }) {
                 shape: 'apple',
                 width: size,
                 height: size,
-                sizeRange: [25, 50],
+                sizeRange: device === "SM" ? [15, 40] : [25, 50],
                 rotationRange: [-90, 90],
                 rotationStep: 90,
                 gridSize: 15,

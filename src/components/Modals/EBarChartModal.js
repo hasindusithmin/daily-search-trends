@@ -1,13 +1,13 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { copyToClipboard, flags, formatNumberAbbreviation, formatToBrowserTimezone, iso } from "../../utils/commons";
-import moment from "moment";
-export default function RoModal({ code, data, setData, fromTime, toTime }) {
+import { copyToClipboard, flags, formatNumberAbbreviation, formatToBrowserTimezone, getDevice, iso } from "../../utils/commons";
 
+export default function EBarChartModal({ code, data, setData }) {
+    const { device, width, height } = getDevice();
     const options = {
         title: {
             text: `${data && data.length} trending searches in ${iso[code]} ${flags[code]}`,
-            subtext: `From ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
+            subtext: `${width} x ${height}`,
             left: 'left'
         },
         tooltip: {
@@ -28,7 +28,7 @@ export default function RoModal({ code, data, setData, fromTime, toTime }) {
         ]
     };
 
-    const size = window.innerWidth / 3;
+    const size = device === "SM" ? width : 600
 
     const onEvents = {
         click: ({ name }) => {

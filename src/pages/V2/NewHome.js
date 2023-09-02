@@ -3,12 +3,9 @@ import { useEffect, useState } from "react";
 import DataTable from 'react-data-table-component';
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
-import Modal from "../../components/Modal";
 import { Typewriter } from 'react-simple-typewriter';
-import { isMobile, formatNumberAbbreviation, formatToBrowserTimezone, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal } from "../../utils/commons";
+import { formatNumberAbbreviation, formatToBrowserTimezone, NodeAPI, codes, iso, coordinates, flags, content, openCountryDetailsModal, openNewsModal } from "../../utils/commons";
 import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
-import HomeTagCloudM from "../../components/HomeTagCloudM";
-import { TagCloud } from 'react-tagcloud'
 import uniqolor from 'uniqolor';
 import moment from "moment";
 import Swal from "sweetalert2";
@@ -39,7 +36,19 @@ export default function NewHome() {
         {
             name: 'keyword',
             width: '150px',
-            selector: row => <div title={row.title}>{row.title}</div>,
+            selector: row =>
+            (
+                <div
+                    title="Click to view news"
+                    style={{ cursor: "zoom-in" }}
+                    onClick={() => {
+                        let { title, country, news, picture } = row;
+                        openNewsModal(title, country, news, picture);
+                    }}
+                >
+                    {row.title}
+                </div>
+            ),
             sortable: true
         },
         {
@@ -88,9 +97,7 @@ export default function NewHome() {
 
     const [tblData, setTblData] = useState(null);
     const [tblDataCopy, setTblDataCopy] = useState([]);
-    const [treeMapData, setTreeMapData] = useState(null);
     const [geoMapData, setGeoMapData] = useState(null);
-    const [tagCloudData, setTagCloudData] = useState(null);
     const [rawData, setRawData] = useState(null);
 
     const [fromTime, setFromTime] = useState(moment().startOf('day').valueOf());
@@ -118,24 +125,19 @@ export default function NewHome() {
                 return result;
             }, {});
             setRawData(groupedData);
-            const dataTable = [], treeMap = [], pieChart = [], geoMap = [], tagCloud = [];
+            const dataTable = [], pieChart = [], geoMap = [];
             for (const [countryCode, trends] of Object.entries(groupedData)) {
                 const country = iso[countryCode];
                 const totalTraffic = trends.reduce((sum, item) => sum + item.traffic, 0)
                 pieChart.push({ name: country, value: totalTraffic })
-                treeMap.push({ name: codes[country], size: totalTraffic })
                 geoMap.push({ country, totalTraffic, lnglat: coordinates[country] })
-                tagCloud.push({ value: country, count: totalTraffic })
                 for (const trend of trends) {
                     dataTable.push({ ...trend, country })
                 }
             }
-            treeMap.sort((a, b) => b.size - a.size);
-            setTreeMapData(treeMap)
             setGeoMapData(geoMap)
             setTblData(dataTable.sort((a, b) => b.traffic - a.traffic));
             setTblDataCopy(dataTable.sort((a, b) => b.traffic - a.traffic));
-            setTagCloudData(tagCloud);
             setIsFilterChanges(false);
         }
 
@@ -226,27 +228,7 @@ export default function NewHome() {
         setTblData(tblDataCopy);
     }
 
-    const [showTagCloud, setShowTagCloud] = useState(null);
-    const openModal = (code) => {
-        try {
-            let country = iso[code], trends = rawData[code], flag = flags[code];
-            setShowTagCloud({ country, trends, flag });
-        } catch (error) {
-            console.log(error.message);
-        }
-    }
-
-    const customRenderer = (tag, size) => {
-        return (
-            <span key={tag.value} style={{ color: "#016277", fontWeight: 400, fontSize: `${size}px`, margin: '1px', paddingRight: '3px', cursor: 'cell' }} className='w3-tag w3-transparent'>
-                {tag.value}<sup style={{ color: '#333' }}>{formatNumberAbbreviation(tag.count)}+</sup>
-            </span>
-        )
-    }
-
-    const [country, setCountry] = useState(null);
     const [color, setColor] = useState('DDD');
-    const [chartData, setChartData] = useState(null);
 
     const [openCounSelectModal, setOpenCounSelectModal] = useState(false);
     const openFilterModal = async (type) => {
@@ -432,12 +414,12 @@ export default function NewHome() {
                 !isFilterChanged &&
                 (
                     <>
-                        {/* Bar Chart - Results OverView  */}
+                        {/* Bar Chart View - Results OverView  */}
                         {
                             rawData && (
                                 <div className="w3-content">
                                     <div className="w3-center">
-                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Results overview</div>
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Results Overview</div>
                                     </div>
                                     <div className="loader-container" >
                                         <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
@@ -448,12 +430,12 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* Geo Map - ALL Countries  */}
+                        {/* Geo Map View - ALL Countries  */}
                         {
                             geoMapData && (
                                 <div className="w3-content">
                                     <div className="w3-center w3-padding-32">
-                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Brief summary of countries</div>
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Brief Summary Of Countries 🗺</div>
                                     </div>
                                     <div id="geoMap" className="w3-center">
                                         <div>
@@ -484,12 +466,12 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* Bar Chart - Classification By Searches (Nested)  */}
+                        {/* Bar Chart View - Classification By Searches (nested)  */}
                         {
                             rawData && (
                                 <div className="w3-content w3-padding" >
                                     <div className="w3-center">
-                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Explore the searches</div>
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Explore The Trending Searches</div>
                                     </div>
                                     <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
                                         <EBChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
@@ -498,25 +480,15 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* Tag Cloud  */}
+                        {/* Tag Cloud View - Total traffic by country */}
                         {
                             rawData && (
                                 <div className="w3-content w3-padding" >
                                     <div className="w3-center">
-                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Visual sense of the key terms</div>
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Visual Sense Of The Key Terms</div>
                                     </div>
-                                    <p style={{ lineHeight: 1.8 }} className="w3-justify w3-hide">
-                                        <TagCloud
-                                            minSize={isMobile() ? 7 : 15}
-                                            maxSize={isMobile() ? 15 : 36}
-                                            tags={tagCloudData}
-                                            className="w3-tag w3-transparent"
-                                            onClick={({ value }) => { openModal(codes[value]); }}
-                                            renderer={customRenderer}
-                                        />
-                                    </p>
                                     <div className="loader-container w3-padding">
-                                        <ETagCloud  
+                                        <ETagCloud
                                             rawData={rawData}
                                         />
                                     </div>
@@ -524,7 +496,7 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* Pie Chart - Total Traffic View */}
+                        {/* Pie Chart View - Total traffic by country  */}
                         {
                             rawData &&
                             (
@@ -554,24 +526,27 @@ export default function NewHome() {
                             )
                         }
 
-                        {/* treemap  */}
+                        {/* Treemap View - Total traffic by country  */}
                         {
                             rawData && (
                                 <div className="w3-content hide-scrollbar" style={{ overflow: "scroll", paddingTop: 50 }}>
-                                    <E3Map rawData={rawData} />
+                                    <E3Map rawData={rawData}
+                                        fromTime={fromTime}
+                                        toTime={toTime}
+                                    />
                                 </div>
                             )
                         }
 
-                        {/* data table  */}
+                        {/* Data Table View  */}
                         {
                             tblData && (
                                 <div className="w3-content w3-padding">
                                     <div className="w3-center">
-                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Organized information at a glance</div>
+                                        <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Interactive Data Visualization</div>
                                     </div>
                                     <p>
-                                        <button title="Click to download the csv" className='w3-btn w3-blue-grey w3-round-large' onClick={downloadTblData}>download csv ⤵</button>
+                                        <button title="Click to download the csv" className='w3-btn w3-blue-grey w3-round-large' onClick={downloadTblData}>download as csv ⤵</button>
                                     </p>
                                     <p style={{ paddingBottom: 32 }}>
                                         <span className="w3-right">
@@ -616,17 +591,6 @@ export default function NewHome() {
                     />
                 </div>
             </div>
-
-            {/* modals  */}
-            {
-                country && chartData &&
-                <Modal country={country} color={color} chartData={chartData} setChartData={setChartData} />
-            }
-            {
-                showTagCloud && (
-                    <HomeTagCloudM toast={toast} showTC={showTagCloud} setShowTC={setShowTagCloud} />
-                )
-            }
 
             <CountrySelectModal
                 openCounSelectModal={openCounSelectModal}

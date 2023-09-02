@@ -1,10 +1,10 @@
 import ReactEcharts from "echarts-for-react"
 import * as echarts from 'echarts/core';
-import { flags, isMobile, iso } from "../../utils/commons";
+import { flags, iso } from "../../utils/commons";
 import moment from "moment";
 import { useState } from "react";
-import RoModal from "../Modals/RoModal";
-export default function EBarCharart({ rawData, fromTime, toTime }) {
+import EBarChartModal from "../Modals/EBarChartModal";
+export default function EBarChart({ rawData, fromTime, toTime }) {
 
     const options = {
         title: {
@@ -91,12 +91,10 @@ export default function EBarCharart({ rawData, fromTime, toTime }) {
                 style={{ width: (options.xAxis.data.length) * 50, height: 500 }}
                 onEvents={onEvents}
             />
-            <RoModal
+            <EBarChartModal
                 code={code} 
                 data={data} 
                 setData={setData}
-                fromTime={fromTime}
-                toTime={toTime}
             />
         </>
     )
