@@ -364,6 +364,112 @@ export const coordinates = {
   Vietnam: [108.277199, 14.058324]
 }
 
+export const selectOptions = [
+  { "label": "Argentina", "value": "AR" },
+  { "label": "Australia", "value": "AU" },
+  { "label": "Austria", "value": "AT" },
+  { "label": "Belgium", "value": "BE" },
+  { "label": "Brazil", "value": "BR" },
+  { "label": "Canada", "value": "CA" },
+  { "label": "Chile", "value": "CL" },
+  { "label": "Colombia", "value": "CO" },
+  { "label": "Czechia", "value": "CZ" },
+  { "label": "Denmark", "value": "DK" },
+  { "label": "Egypt", "value": "EG" },
+  { "label": "Finland", "value": "FI" },
+  { "label": "France", "value": "FR" },
+  { "label": "Germany", "value": "DE" },
+  { "label": "Greece", "value": "GR" },
+  { "label": "Hong Kong", "value": "HK" },
+  { "label": "Hungary", "value": "HU" },
+  { "label": "India", "value": "IN" },
+  { "label": "Indonesia", "value": "ID" },
+  { "label": "Ireland", "value": "IE" },
+  { "label": "Israel", "value": "IL" },
+  { "label": "Italy", "value": "IT" },
+  { "label": "Japan", "value": "JP" },
+  { "label": "Kenya", "value": "KE" },
+  { "label": "Malaysia", "value": "MY" },
+  { "label": "Mexico", "value": "MX" },
+  { "label": "Netherlands", "value": "NL" },
+  { "label": "New Zealand", "value": "NZ" },
+  { "label": "Nigeria", "value": "NG" },
+  { "label": "Norway", "value": "NO" },
+  { "label": "Peru", "value": "PE" },
+  { "label": "Philippines", "value": "PH" },
+  { "label": "Poland", "value": "PL" },
+  { "label": "Portugal", "value": "PT" },
+  { "label": "Romania", "value": "RO" },
+  { "label": "Russia", "value": "RU" },
+  { "label": "Saudi Arabia", "value": "SA" },
+  { "label": "Singapore", "value": "SG" },
+  { "label": "South Africa", "value": "ZA" },
+  { "label": "South Korea", "value": "KR" },
+  { "label": "Spain", "value": "ES" },
+  { "label": "Sweden", "value": "SE" },
+  { "label": "Switzerland", "value": "CH" },
+  { "label": "Taiwan", "value": "TW" },
+  { "label": "Thailand", "value": "TH" },
+  { "label": "Türkiye", "value": "TR" },
+  { "label": "Ukraine", "value": "UA" },
+  { "label": "United Kingdom", "value": "GB" },
+  { "label": "United States", "value": "US" },
+  { "label": "Vietnam", "value": "VN" }
+]
+
+export const languages = {
+  "AR": "es",
+  "AU": "en",
+  "AT": "de",
+  "BE": "nl",
+  "BR": "pt",
+  "CA": "en",
+  "CL": "es",
+  "CO": "es",
+  "CZ": "cs",
+  "DK": "da",
+  "EG": "ar",
+  "FI": "fi",
+  "FR": "fr",
+  "DE": "de",
+  "GR": "el",
+  "HK": "zh",
+  "HU": "hu",
+  "IN": "en",
+  "ID": "id",
+  "IE": "en",
+  "IL": "he",
+  "IT": "it",
+  "JP": "ja",
+  "KE": "sw",
+  "MY": "ms",
+  "MX": "es",
+  "NL": "nl",
+  "NZ": "en",
+  "NG": "en",
+  "NO": "nb",
+  "PE": "es",
+  "PH": "en",
+  "PL": "pl",
+  "PT": "pt",
+  "RO": "ro",
+  "RU": "ru",
+  "SA": "ar",
+  "SG": "en",
+  "ZA": "en",
+  "KR": "ko",
+  "ES": "es",
+  "SE": "sv",
+  "CH": "de",
+  "TW": "zh",
+  "TH": "th",
+  "TR": "tr",
+  "UA": "uk",
+  "GB": "en",
+  "US": "en",
+  "VN": "vi"
+}
+
 export const content = `
 **Welcome to the trendy world**
 
@@ -429,59 +535,6 @@ export function arraysHaveSameElements(array1, array2) {
   return true;
 }
 
-export const selectOptions = [
-  { "label": "Argentina", "value": "AR" },
-  { "label": "Australia", "value": "AU" },
-  { "label": "Austria", "value": "AT" },
-  { "label": "Belgium", "value": "BE" },
-  { "label": "Brazil", "value": "BR" },
-  { "label": "Canada", "value": "CA" },
-  { "label": "Chile", "value": "CL" },
-  { "label": "Colombia", "value": "CO" },
-  { "label": "Czechia", "value": "CZ" },
-  { "label": "Denmark", "value": "DK" },
-  { "label": "Egypt", "value": "EG" },
-  { "label": "Finland", "value": "FI" },
-  { "label": "France", "value": "FR" },
-  { "label": "Germany", "value": "DE" },
-  { "label": "Greece", "value": "GR" },
-  { "label": "Hong Kong", "value": "HK" },
-  { "label": "Hungary", "value": "HU" },
-  { "label": "India", "value": "IN" },
-  { "label": "Indonesia", "value": "ID" },
-  { "label": "Ireland", "value": "IE" },
-  { "label": "Israel", "value": "IL" },
-  { "label": "Italy", "value": "IT" },
-  { "label": "Japan", "value": "JP" },
-  { "label": "Kenya", "value": "KE" },
-  { "label": "Malaysia", "value": "MY" },
-  { "label": "Mexico", "value": "MX" },
-  { "label": "Netherlands", "value": "NL" },
-  { "label": "New Zealand", "value": "NZ" },
-  { "label": "Nigeria", "value": "NG" },
-  { "label": "Norway", "value": "NO" },
-  { "label": "Peru", "value": "PE" },
-  { "label": "Philippines", "value": "PH" },
-  { "label": "Poland", "value": "PL" },
-  { "label": "Portugal", "value": "PT" },
-  { "label": "Romania", "value": "RO" },
-  { "label": "Russia", "value": "RU" },
-  { "label": "Saudi Arabia", "value": "SA" },
-  { "label": "Singapore", "value": "SG" },
-  { "label": "South Africa", "value": "ZA" },
-  { "label": "South Korea", "value": "KR" },
-  { "label": "Spain", "value": "ES" },
-  { "label": "Sweden", "value": "SE" },
-  { "label": "Switzerland", "value": "CH" },
-  { "label": "Taiwan", "value": "TW" },
-  { "label": "Thailand", "value": "TH" },
-  { "label": "Türkiye", "value": "TR" },
-  { "label": "Ukraine", "value": "UA" },
-  { "label": "United Kingdom", "value": "GB" },
-  { "label": "United States", "value": "US" },
-  { "label": "Vietnam", "value": "VN" }
-]
-
 export function InternalNews({ newsList = [] }) {
   return (
     <div className="w3-panel">
@@ -531,15 +584,27 @@ export function ExternalNews({ newsList = [] }) {
               title="Click to Read more"
               href={news.link}
               className="w3-text-blue"
-              style={{ textDecoration: "none", fontWeight: "500" }}
+              style={{ textDecoration: "none", fontWeight: "540" }}
               target="_blank"
               rel="noopener noreferrer"
             >
               {news.title}
             </a>
-            <div className="w3-bar w3-padding">
-              <span className="w3-bar-item">💡{news.source}</span>
-              <span className="w3-bar-item">⏰{news.time}</span>
+            <div className="w3-padding w3-left-align">
+              <a
+                title="Click to Read more"
+                href={news.source['@url']}
+                className=""
+                style={{ textDecoration: "none", fontWeight: "500" }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💡 {news.source['#text']}
+              </a>
+              <br />
+              <span>
+                ⏰ {formatToBrowserTimezone(news.pubDate)}
+              </span>
             </div>
           </div>
         ))
@@ -610,15 +675,15 @@ export const openNewsModal = (title, country, news, picture) => {
     html: ReactDOMServer.renderToString(<InternalNews newsList={news} />),
     showCloseButton: true,
     showDenyButton: false,
-    confirmButtonText: `Region-based news (${region[country]})`,
+    confirmButtonText: `Region-based news`,
     showLoaderOnConfirm: true,
     preConfirm: () => {
-      return fetch(`${BackendURL}/hotnews`, {
+      return fetch(`${BackendURL}/hotnews/v2`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ query: title, region: codes[country] })
+        body: JSON.stringify({ query: title, language: languages[codes[country]], country: codes[country], ceid: `${codes[country]}:${languages[codes[country]]}` })
       })
         .then(response => {
           if (!response.ok) {
@@ -669,12 +734,12 @@ export async function openCountryDetailsModal(code) {
       confirmButtonText: "Country-based news",
       showLoaderOnConfirm: true,
       preConfirm: () => {
-        return fetch(`${BackendURL}/hotnews`, {
+        return fetch(`${BackendURL}/hotnews/v2`, {
           method: "POST",
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ query: title, region: code })
+          body: JSON.stringify({ query: title, language: languages[code], country: code, ceid: `${code}:${languages[code]}` })
         })
           .then(response => {
             if (!response.ok) {
