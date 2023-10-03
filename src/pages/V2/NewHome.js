@@ -86,7 +86,7 @@ export default function NewHome() {
             }
         },
         {
-            cell: row => <Link to={`/analytics/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="Quora" ><i style={{ color: '#a82400' }} className="fa fa-quora" aria-hidden="true"></i>uora</Link>,
+            cell: row => <Link to={`/analytics/v2/${row.title}`} className="w3-button w3-light-gray w3-round-large" title="Quora" ><i style={{ color: '#a82400' }} className="fa fa-quora" aria-hidden="true"></i>uora</Link>,
             allowOverflow: true,
             button: true,
             style: {
@@ -321,7 +321,6 @@ export default function NewHome() {
                     <p>
                         <Typewriter words={["Embark on a Journey to Discover the World's Current Search Trends!"]} cursor />
                     </p>
-                    <Link to="/v1" className='w3-button w3-small w3-border w3-round-xlarge'>↩ V1</Link>
                 </div>
             </div>
 

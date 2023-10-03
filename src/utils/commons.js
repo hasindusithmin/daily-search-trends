@@ -839,3 +839,42 @@ export function DataTableForBarChart({ data, setData }) {
     </Rodal>
   )
 }
+
+export function truncateText(text, maxLength, ellipsis = '...') {
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return text.slice(0, maxLength - ellipsis.length) + ellipsis;
+}
+
+const Template = ({ question, profilImage, profileUrl, profileName, link }) => {
+  return (
+    <div className="poppins">
+      <header className="w3-container w3-light-grey">
+        <h3>
+          <a href={profileUrl} target="_blank" className="w3-button w3-round-large" title="visit profile">
+            {profileName}
+          </a>
+        </h3>
+      </header>
+      <div className="w3-container scrollable-container">
+        <hr />
+        <a href={profileUrl} target="_blank" className="" title="visit profile">
+          <img src={profilImage} width={150} height="auto" alt="Avatar" className="w3-left w3-circle w3-padding" />
+        </a>
+        <p className="w3-justify">{question}</p>
+      </div>
+      <a href={link} target="_blank" className="w3-button w3-block w3-dark-grey">+ Read More</a>
+    </div>
+  )
+}
+
+export function showQuestionModal({question, profilImage, profileUrl, profileName, link}) {
+  Swal.fire({
+    html: ReactDOMServer.renderToString(<Template question={question} profilImage={profilImage} profileUrl={profileUrl} profileName={profileName} link={link} />),
+    showConfirmButton: false,
+    showCloseButton: true,
+    width: window.innerWidth * 0.33
+  })
+}
