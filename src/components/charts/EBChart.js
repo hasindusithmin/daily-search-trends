@@ -80,7 +80,16 @@ export default function EBChart({ rawData }) {
                 },
                 data: categorizedData.map(({ data }) => data.length)
             }
-        ]
+        ],
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                saveAsImage: {}
+            }
+        },
     };
 
     const [dueOption, setDueOption] = useState(null);
@@ -108,7 +117,7 @@ export default function EBChart({ rawData }) {
                     containLabel: true
                 },
                 xAxis: {
-                    data: sortedCategorized.map(({level})=>level),
+                    data: sortedCategorized.map(({ level }) => level),
                     axisLabel: {
                         inside: true,
                         color: '#ffffff'
@@ -139,6 +148,7 @@ export default function EBChart({ rawData }) {
                 },
                 toolbox: {
                     feature: {
+                        // saveAsImage: {},
                         myTool1: {
                             show: true,
                             title: 'Go Back',
@@ -238,6 +248,7 @@ export default function EBChart({ rawData }) {
                 },
                 toolbox: {
                     feature: {
+                        // saveAsImage: {},
                         myTool1: {
                             show: true,
                             title: 'Go Back',

@@ -25,7 +25,12 @@ export default function EBarChartModal({ code, data, setData }) {
                 data: data ? data.map(({ title, traffic, pubDate }) => ({ name: title, value: traffic, date: pubDate })) : null,
                 emphasis: {}
             }
-        ]
+        ],
+        toolbox: {
+            feature: {
+                saveAsImage: {},
+            }
+        },
     };
 
     const size = device === "SM" ? width : 600

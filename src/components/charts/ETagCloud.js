@@ -38,7 +38,15 @@ export default function ETagCloud({ rawData }) {
                     value: trends.reduce((sum, item) => sum + item.traffic, 0)
                 }))
             }
-        ]
+        ],
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                saveAsImage: {},
+            }
+        },
     };
 
     const [data, setData] = useState([]);

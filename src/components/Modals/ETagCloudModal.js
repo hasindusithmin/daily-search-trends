@@ -39,7 +39,12 @@ export default function ETagCloudModal({ code, color, data, setData }) {
                     value: traffic
                 }))
             }
-        ]
+        ],
+        toolbox: {
+            feature: {
+                saveAsImage: {},
+            }
+        },
     };
 
     const onEvents = {

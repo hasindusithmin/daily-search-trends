@@ -500,24 +500,6 @@ export default function NewHome() {
                             rawData &&
                             (
                                 <div className="">
-                                    <div className="w3-center">
-                                        <div style={{ paddingBottom: 10 }} className="w3-hide">
-                                            {
-                                                Object.entries(rawData).map(([key, value]) => (
-                                                    <>
-                                                        <span
-                                                            data-tooltip-id={key}
-                                                            data-tooltip-content={iso[key]}
-                                                            data-tooltip-place="top"
-                                                        >
-                                                            {flags[key]}<sup className="w3-small">{formatNumberAbbreviation(value.reduce((total, item) => total + item.traffic, 0))}+</sup>&nbsp;
-                                                        </span>
-                                                        <Tooltip id={key} />
-                                                    </>
-                                                ))
-                                            }
-                                        </div>
-                                    </div>
                                     <div className="loader-container">
                                         <EPieChart rawData={rawData} />
                                     </div>

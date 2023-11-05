@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function EPieChartModal({ code, data, color, setData }) {
 
     const { device, width, height } = getDevice();
-    const size = device === "SM" ?  width : 600;
+    const size = device === "SM" ? width : 600;
 
     const ranges = [
         { min: 100, max: 1000, name: "0.1K - 1K" },
@@ -72,7 +72,12 @@ export default function EPieChartModal({ code, data, color, setData }) {
                 emphasis: {},
                 data: categorizedData.map(({ data }) => data.length)
             }
-        ]
+        ],
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
     };
 
     const [option, setOption] = useState(null);
@@ -94,6 +99,7 @@ export default function EPieChartModal({ code, data, color, setData }) {
                 },
                 toolbox: {
                     feature: {
+                        // saveAsImage: {},
                         myTool1: {
                             show: true,
                             title: 'Go Back',

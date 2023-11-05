@@ -71,7 +71,15 @@ export default function EBarChart({ rawData, fromTime, toTime }) {
                 },
                 data: Object.values(rawData).map(array => array.length)
             }
-        ]
+        ],
+        toolbox: {
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                saveAsImage: {},
+            }
+        },
     };
 
     const [code, setCode] = useState(null);
@@ -92,8 +100,8 @@ export default function EBarChart({ rawData, fromTime, toTime }) {
                 onEvents={onEvents}
             />
             <EBarChartModal
-                code={code} 
-                data={data} 
+                code={code}
+                data={data}
                 setData={setData}
             />
         </>

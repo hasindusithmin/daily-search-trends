@@ -15,7 +15,7 @@ export default function EPieChart({ rawData }) {
     title: {
       text: 'Worldwide Teach In One Slice',
       subtext: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
-      left: device === "SM" ? "left" : "right"
+      // left: device === "SM" ? "left" : "right"
     },
     tooltip: {
       trigger: 'item',
@@ -38,7 +38,12 @@ export default function EPieChart({ rawData }) {
           }
         }
       }
-    ]
+    ],
+    toolbox: {
+      feature: {
+          saveAsImage: {},
+      }
+  },
   };
 
   const [code, setCode] = useState(null);
