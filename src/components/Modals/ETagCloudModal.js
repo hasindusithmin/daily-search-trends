@@ -43,6 +43,14 @@ export default function ETagCloudModal({ code, color, data, setData }) {
         toolbox: {
             feature: {
                 saveAsImage: {},
+                myTool1: {
+                    show: true,
+                    title: 'Close',
+                    icon: 'path://M 20,4 3,21 33,50 3,80 20,97 49,67 79,97 95,80 65,50 95,20 80,4 50,34 z',
+                    onclick: function () {
+                        setData([])
+                    }
+                }
             }
         },
     };
@@ -61,6 +69,7 @@ export default function ETagCloudModal({ code, color, data, setData }) {
         <Rodal
             visible={data.length > 0}
             onClose={() => { setData([]) }}
+            showCloseButton={false}
             width={size}
             height={size}
             animation="flip"

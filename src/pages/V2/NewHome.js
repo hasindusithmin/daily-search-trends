@@ -563,7 +563,7 @@ export default function NewHome() {
                 )
             }
 
-            <div className="w3-padding-32">
+            {/* <div className="w3-padding-32">
                 <div className="w3-content">
                     <GithubPicker
                         width={220}
@@ -571,7 +571,9 @@ export default function NewHome() {
                         onChangeComplete={c => { setColor(c.hex.slice(1)); }}
                     />
                 </div>
-            </div>
+            </div> */}
+
+            <div className="w3-padding-32"></div>
 
             <CountrySelectModal
                 openCounSelectModal={openCounSelectModal}

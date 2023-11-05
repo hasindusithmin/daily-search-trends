@@ -720,8 +720,10 @@ export const openNewsModal = (title, country, news, picture) => {
 }
 
 export async function openCountryDetailsModal(code) {
+  const toastID = toast.loading("Processing, Please Wait...")
   try {
     const res = await axios.get(`https://restcountries.com/v3.1/alpha/${code}`)
+    toast.update(toastID, { render: "", type: toast.TYPE.SUCCESS, autoClose: 500, isLoading: false, hideProgressBar: true })
     const template = ReactDOMServer.renderToString(<CountryDetail detail={res.data[0]} />);
     const title = res.data[0].name.common;
     Swal.fire({
@@ -774,8 +776,7 @@ export async function openCountryDetailsModal(code) {
       })
   }
   catch (error) {
-    console.log(error);
-    toast.error(error.message, { autoClose: 1000, hideProgressBar: true })
+    toast.update(toastID, { render: "", type: toast.TYPE.ERROR, autoClose: 500, isLoading: false, hideProgressBar: true })
   }
 }
 
