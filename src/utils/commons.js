@@ -886,11 +886,11 @@ export async function openAnalysisModal(title, text, keywords, method, callback)
     text: text,
     showDenyButton: false,
     showConfirmButton: true,
-    confirmButtonText: "Get Analyse",
+    confirmButtonText: "Analyze",
     showCloseButton: true,
     showLoaderOnConfirm: true,
     preConfirm: () => {
-      return fetch("https://whoami-1-w7727518.deta.app/analysis", {
+      return fetch("https://whoami-1-w7727518.deta.app/analysis/v2", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -901,13 +901,14 @@ export async function openAnalysisModal(title, text, keywords, method, callback)
         })
       })
         .then(async (res) => {
-          const { detail } = await res.json();
-          if (!res.ok) throw detail;
-          callback(detail, null)
+          if (!res.ok) throw Error("The feature is not supported for this language");
+          const { candidates } = await res.json();
+          if (candidates.length === 0) throw Error("The feature is not supported for this language");
+          callback(candidates[0]['output'], null)
 
         })
         .catch(error => {
-          callback(null, error)
+          callback(null, error.message)
         })
     },
     allowOutsideClick: () => !Swal.isLoading()
