@@ -871,11 +871,45 @@ const Template = ({ question, profilImage, profileUrl, profileName, link }) => {
   )
 }
 
-export function showQuestionModal({question, profilImage, profileUrl, profileName, link}) {
+export function showQuestionModal({ question, profilImage, profileUrl, profileName, link }) {
   Swal.fire({
     html: ReactDOMServer.renderToString(<Template question={question} profilImage={profilImage} profileUrl={profileUrl} profileName={profileName} link={link} />),
     showConfirmButton: false,
     showCloseButton: true,
     width: window.innerWidth * 0.33
+  })
+}
+
+export async function openAnalysisModal(title, text, keywords, method, callback) {
+  Swal.fire({
+    title: title,
+    text: text,
+    showDenyButton: false,
+    showConfirmButton: true,
+    confirmButtonText: "Get Analyse",
+    showCloseButton: true,
+    showLoaderOnConfirm: true,
+    preConfirm: () => {
+      return fetch("https://whoami-1-w7727518.deta.app/analysis", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          "keywords": keywords,
+          "method": method
+        })
+      })
+        .then(async (res) => {
+          const { detail } = await res.json();
+          if (!res.ok) throw detail;
+          callback(detail, null)
+
+        })
+        .catch(error => {
+          callback(null, error)
+        })
+    },
+    allowOutsideClick: () => !Swal.isLoading()
   })
 }
