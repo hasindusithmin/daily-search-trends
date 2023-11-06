@@ -59,7 +59,7 @@ export default function EBarChartModal({ code, data, setData }) {
                 myTool2: {
                     show: true,
                     title: 'Sentiment Analysis',
-                    icon: 'path://M26,2C12.8,2,2,12.8,2,26.1c0,13.3,10.8,24.1,24,24.1s24-10.8,24-24.1C50,12.8,39.2,2,26,2z M17,15 c1.7,0,3,1.8,3,4c0,2.2-1.3,4-3,4c-1.7,0-3-1.8-3-4C14,16.8,15.3,15,17,15z M14,38.7c0.5-6.1,5-11.2,12.1-11.2 c7,0,11.4,5.1,11.9,11.2H14z M35,23c-1.7,0-3-1.8-3-4c0-2.2,1.3-4,3-4c1.7,0,3,1.8,3,4C38,21.2,36.7,23,35,23z',
+                    icon: 'path://M94.9 71.35c-8.08-7.63-21.82-13.99-30.91-18.2c-1.54-.71-2.93-1.35-4.11-1.92c-3.43-1.65-8.12-6.22-6.1-11.47c1.36-3.55 4.81-5.34 10.27-5.34c1.75 0 3.67.2 5.72.58c7.12 1.33 12.52 3.99 15.58 5.5c.38.19.82.21 1.22.07c.39-.15.72-.45.89-.84l7.01-15.81c.31-.69.07-1.51-.57-1.93c-4.94-3.28-17.27-8.15-30.97-8.15c-1.98 0-3.95.1-5.87.3c-10.92 1.12-21.86 4.03-27.92 17.64c-3.78 8.47-3.77 18.01.01 24.89c4.04 7.51 10.66 10.87 19.04 15.11l1.08.55c6.05 3.02 13.3 6.38 18.07 8.59c7.05 3.4 9.66 9.44 8.04 13.08c-2.61 5.87-8.38 7.16-18.36 4.33c-8.81-2.39-16.94-9.14-19.21-11.15c-.34-.3-.79-.44-1.25-.38c-.45.06-.85.32-1.1.69L24.6 104.14c-.41.63-.32 1.46.22 1.98c5.63 5.43 10.22 8.59 18.17 12.5c5.35 2.63 13.18 4.21 20.95 4.21c8.12 0 27.95-1.88 36.65-19.26c5.55-11.12 3.48-22.84-5.69-32.22z',
                     onclick: function () {
                         const title = "Sentiment Analysis"
                         const text = "Understand the overall sentiment expressed in the keywords."
@@ -81,11 +81,34 @@ export default function EBarChartModal({ code, data, setData }) {
                 },
                 myTool3: {
                     show: true,
-                    title: 'Content Classification',
+                    title: 'Topic Modeling',
+                    icon: 'path://M111.84 15.36H16.16c-1.24 0-2.24 1-2.24 2.24v17.99c0 1.24 1 2.24 2.24 2.24h34.65v80.73c0 1.24 1 2.24 2.24 2.24h21.9c1.24 0 2.24-1 2.24-2.24V37.83h34.65c1.24 0 2.24-1 2.24-2.24V17.6c0-1.24-1-2.24-2.24-2.24z',
+                    onclick: function () {
+                        const title = "Topic Modeling"
+                        const text = "Identify common themes and topics in the keywords."
+                        const keywords = data.map(({ title }) => title)
+                        openAnalysisModal(title, text, keywords, "T", function (result, error) {
+                            if (result) {
+                                Swal.fire({
+                                    title: title,
+                                    html: ReactDOMServer.renderToString(<ReactMarkdown children={result.replaceAll("\n", "\n\n")} remarkPlugins={[remarkGfm]} className="w3-justify scrollable-container" />),
+                                    showConfirmButton: false,
+                                    showCloseButton: true,
+                                })
+                            }
+                            else {
+                                Swal.showValidationMessage(error)
+                            }
+                        })
+                    }
+                },
+                myTool4: {
+                    show: true,
+                    title: 'Clustering',
                     icon: 'path://M17.023 9.216s-.386-3.293-3.955-3.385c-3.57-.091-5.402 2.47-5.402 6.13 0 3.66 2.026 6.588 5.498 6.588 3.473 0 3.86-3.66 3.86-3.66l6.656.366s.391 3.306-2.394 5.828C18.5 23.605 15.082 24.017 12.694 24c-2.388-.018-5.698.034-8.9-2.969C.595 18.03.05 15.113.05 12.248c0-2.866.607-6.661 4.414-9.54C7.05.754 9.673.033 12.296.033 23.246.032 23.98 9.28 23.98 9.28z',
                     onclick: function () {
-                        const title = "Content Classification"
-                        const text = "Identify content categories that apply to the keywords."
+                        const title = "Clustering"
+                        const text = "Group similar keywords together based on their content"
                         const keywords = data.map(({ title }) => title)
                         openAnalysisModal(title, text, keywords, "C", function (result, error) {
                             if (result) {
@@ -102,7 +125,7 @@ export default function EBarChartModal({ code, data, setData }) {
                         })
                     }
                 },
-                myTool4: {
+                myTool5: {
                     show: true,
                     title: 'Close',
                     icon: 'path://M 20,4 3,21 33,50 3,80 20,97 49,67 79,97 95,80 65,50 95,20 80,4 50,34 z',
