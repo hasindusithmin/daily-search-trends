@@ -2,7 +2,8 @@ import ReactEcharts from "echarts-for-react"
 import { useState } from "react";
 import { DataTableForBarChart, iso } from "../../utils/commons";
 import * as echarts from 'echarts/core';
-export default function EBChart({ rawData }) {
+import moment from "moment";
+export default function EBChart({ rawData, fromTime, toTime }) {
 
     const ranges = [
         { min: 100, max: 1000, name: "0.1K - 1K" },
@@ -19,7 +20,8 @@ export default function EBChart({ rawData }) {
 
     const unoOption = {
         title: {
-            subtext: "Classification By Searches",
+            text: "Classification By Searches",
+            subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
             left: 'left'
         },
         grid: {
@@ -32,13 +34,13 @@ export default function EBChart({ rawData }) {
             data: categorizedData.map(({ level }) => level),
             axisLabel: {
                 inside: true,
-                color: '#ffffff'
+                color: '#ffffff',
             },
             axisTick: {
                 show: true
             },
             axisLine: {
-                show: false
+                show: false,
             },
             z: 10,
         },
@@ -107,7 +109,8 @@ export default function EBChart({ rawData }) {
             setDueCategorized(sortedCategorized);
             setDueOption({
                 title: {
-                    subtext: `${name} Range Searches`,
+                    text: `${name} Range Searches`,
+                    subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
                     left: 'left'
                 },
                 grid: {
@@ -207,7 +210,8 @@ export default function EBChart({ rawData }) {
             setDueOption(null);
             setTreOption({
                 title: {
-                    subtext: `Searches Classification By Countries (${name}+)`,
+                    text: `Searches Classification By Countries (${name}+)`,
+                    subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
                     left: 'left'
                 },
                 grid: {
@@ -297,7 +301,7 @@ export default function EBChart({ rawData }) {
 
 
     return (
-        <div className="hide-scrollbar loader-container">
+        <div className="hide-scrollbar svg-container">
             {
                 !dueOption && !treOption &&
                 (
@@ -313,7 +317,7 @@ export default function EBChart({ rawData }) {
                 (
                     <ReactEcharts
                         option={dueOption}
-                        style={{ width: (dueOption.xAxis.data.length) * 100, height: 500 }}
+                        style={{ width: (dueOption.xAxis.data.length) * 150, height: 500 }}
                         onEvents={onEventsDue}
                     />
                 )

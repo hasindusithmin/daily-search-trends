@@ -2107,7 +2107,7 @@ a {
   opacity: 1;
 }
 
-.loader-container {
+.svg-container {
   display: flex;
   justify-content: center;
   align-items: center;

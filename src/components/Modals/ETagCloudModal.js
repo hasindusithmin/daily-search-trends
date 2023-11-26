@@ -1,14 +1,14 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
 import { flags, getDevice, iso, openNewsModal } from "../../utils/commons";
-
-export default function ETagCloudModal({ code, color, data, setData }) {
+import moment from "moment";
+export default function ETagCloudModal({ code, color, data, setData, fromTime, toTime }) {
     const { device, width, height } = getDevice();
     const size = device === "SM" ? width : 600;
     const option = {
         title: {
             text: `${iso[code]} ${flags[code]}`,
-            subtext: `${width}x${height}`,
+            subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
             left: 'left',
             textStyle: {
                 fontSize: 20,
@@ -19,11 +19,11 @@ export default function ETagCloudModal({ code, color, data, setData }) {
         series: [
             {
                 type: 'wordCloud',
-                shape: 'circle',
-                width: size * 0.9,
-                height: size * 0.9,
+                shape: 'square',
+                width: size,
+                height: size,
                 sizeRange: [15, 30],
-                rotationRange: [-90, 90],
+                rotationRange: [0, 0],
                 // rotationStep: 90,
                 gridSize: 10,
                 drawOutOfBound: true,

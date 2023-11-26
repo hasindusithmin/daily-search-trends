@@ -471,8 +471,6 @@ export const languages = {
 }
 
 export const content = `
-**Welcome to the trendy world**
-
 We offer you a gateway to stay ahead of online trends, allowing you to explore the topics people are—or aren't—following.
 Whether you're a content creator, marketer, or just a curious mind, our platform provides valuable insights that can drive your success.
 

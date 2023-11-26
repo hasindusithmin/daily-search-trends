@@ -8,7 +8,7 @@ export default function E3Map({ rawData, fromTime, toTime }) {
     const options = {
         title: {
             text: 'Hierarchical Trends Analysis',
-            subtext: `From ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
+            subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
             left: ''
         },
         tooltip: {},

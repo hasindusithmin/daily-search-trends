@@ -2,7 +2,8 @@ import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
 import { flags, formatNumberAbbreviation, formatToBrowserTimezone, getDevice, iso, openNewsModal } from "../../utils/commons";
 import { useState } from "react";
-export default function EPieChartModal({ code, data, color, setData }) {
+import moment from "moment";
+export default function EPieChartModal({ code, data, color, setData, fromTime, toTime }) {
 
     const { device, width, height } = getDevice();
     const size = device === "SM" ? width : 600;
@@ -23,7 +24,7 @@ export default function EPieChartModal({ code, data, color, setData }) {
     const initOption = {
         title: {
             text: `Classification By Searches ${flags[code]}`,
-            subtext: `${width} x ${height}`,
+            subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
             left: 'left'
         },
         grid: {
@@ -97,7 +98,7 @@ export default function EPieChartModal({ code, data, color, setData }) {
             setOption({
                 title: {
                     text: `Range: ${name}`,
-                    subtext: `${width} x ${height}`,
+                    subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
                     left: 'left'
                 },
                 tooltip: {

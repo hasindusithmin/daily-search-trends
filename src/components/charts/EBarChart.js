@@ -8,8 +8,8 @@ export default function EBarChart({ rawData, fromTime, toTime }) {
 
     const options = {
         title: {
-            text: '',
-            subtext: `From ${moment(fromTime).format('MMMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMMM Do YYYY, h:mm A')}`,
+            text: 'Results Overview',
+            subtext: `From ${moment(fromTime).format('MMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
         grid: {
@@ -103,6 +103,8 @@ export default function EBarChart({ rawData, fromTime, toTime }) {
                 code={code}
                 data={data}
                 setData={setData}
+                fromTime={fromTime}
+                toTime={toTime}
             />
         </>
     )

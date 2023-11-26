@@ -5,13 +5,14 @@ import Swal from "sweetalert2";
 import ReactDOMServer from 'react-dom/server';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import moment from "moment";
 
-export default function EBarChartModal({ code, data, setData }) {
+export default function EBarChartModal({ code, data, setData, fromTime, toTime }) {
     const { device, width, height } = getDevice();
     const options = {
         title: {
             text: `${data && data.length} trending searches in ${iso[code]} ${flags[code]}`,
-            subtext: `${width} x ${height}`,
+            subtext: `From ${moment(fromTime).format('MMM Do YYYY, h:mm A')} To ${moment(toTime).format('MMM Do YYYY, h:mm A')}`,
             left: 'left'
         },
         tooltip: {

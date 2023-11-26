@@ -2,7 +2,8 @@ import ReactEcharts from "echarts-for-react"
 import { formatNumberAbbreviation, getDevice, iso } from "../../utils/commons";
 import { useState } from "react";
 import EPieChartModal from "../Modals/EPieChartModal";
-export default function EPieChart({ rawData }) {
+import moment from "moment";
+export default function EPieChart({ rawData, fromTime, toTime }) {
 
   const totalTraffic = formatNumberAbbreviation(
     Object.values(rawData)
@@ -13,8 +14,8 @@ export default function EPieChart({ rawData }) {
 
   const options = {
     title: {
-      text: 'Worldwide Teach In One Slice',
-      subtext: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
+      text: `${totalTraffic}+ Searches in ${Object.values(rawData).length} Countries`,
+      subtext: `From ${moment(fromTime).format('MMM Do, h:mm A')} To ${moment(toTime).format('MMM Do, h:mm A')}`,
       // left: device === "SM" ? "left" : "right"
     },
     tooltip: {
@@ -41,9 +42,9 @@ export default function EPieChart({ rawData }) {
     ],
     toolbox: {
       feature: {
-          saveAsImage: {},
+        saveAsImage: {},
       }
-  },
+    },
   };
 
   const [code, setCode] = useState(null);
@@ -70,6 +71,8 @@ export default function EPieChart({ rawData }) {
         data={data}
         color={color}
         setData={setData}
+        fromTime={fromTime}
+        toTime={toTime}
       />
     </>
   )

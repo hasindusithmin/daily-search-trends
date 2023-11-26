@@ -230,51 +230,6 @@ export default function NewHome() {
 
     const [color, setColor] = useState('DDD');
 
-    const [openCounSelectModal, setOpenCounSelectModal] = useState(false);
-    const openFilterModal = async (type) => {
-        if (type === "FromDate") {
-            await Swal.fire({
-                title: 'Enter From Date',
-                html: `<input id="FromDate" class="swal2-input" type="datetime-local" max=${moment().subtract(1, 'day').format("YYYY-MM-DDTHH:mm:ss")}>`,
-                focusConfirm: false,
-                showCancelButton: true,
-                preConfirm: () => {
-                    const datetimeString = document.getElementById('FromDate').value;
-                    if (!datetimeString) {
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Entering the datetime is mandatory'
-                        })
-                        return
-                    }
-                    setFromTime(new Date(datetimeString).getTime())
-                }
-            })
-        }
-        if (type === "ToDate") {
-            await Swal.fire({
-                title: 'Enter To Date',
-                html: `<input id="ToDate" class="swal2-input" type="datetime-local" max=${moment().format("YYYY-MM-DDTHH:mm:ss")}>`,
-                focusConfirm: false,
-                showCancelButton: true,
-                preConfirm: () => {
-                    const datetimeString = document.getElementById('ToDate').value;
-                    if (!datetimeString) {
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Entering the datetime is mandatory'
-                        })
-                        return
-                    }
-                    setToTime(new Date(datetimeString).getTime())
-                }
-            })
-        }
-        if (type === "Countries") {
-            setOpenCounSelectModal(true)
-        }
-    }
-
     const convertArrayOfObjectsToCSV = (array) => {
         const header = Object.keys(array[0]).join(',');
         const rows = array.map(obj => Object.values(obj).map((value = "") => value.replaceAll(",", ";")).join(','));
@@ -304,6 +259,187 @@ export default function NewHome() {
 
     const darkColors = ["b80000", "db3e00", "008b02", "006b76", "1273de", "004dcf", "5300eb"];
 
+
+    const [openCounSelectModal, setOpenCounSelectModal] = useState(false);
+    const expectedFormat = "YYYY-MMM-DD h:mm A"
+
+    const openFilterModal = async (type) => {
+        if (type === "FromDate") {
+            await Swal.fire({
+                customClass: {
+                    "title": "w3-xlarge"
+                },
+                title: 'From Date',
+                input: "text",
+                inputValue: moment(fromTime).format('YYYY-MMM-DD h:mm A'),
+                inputPlaceholder: expectedFormat,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "You need to write something!";
+                    }
+                    const isValidFormat = moment(value, expectedFormat, true).isValid()
+                    if (!isValidFormat) {
+                        return "Please enter the date in the following format: \"YYYY-MMM-DD h:mm A\""
+                    }
+                    const M_from = moment(value, expectedFormat)
+                    const M_to = moment(toTime)
+                    const isBefore = M_from.isBefore(M_to)
+                    if (!isBefore) {
+                        return "\"From Date\" must be before the \"To Date\""
+                    }
+                    const diff = M_to.diff(M_from, "hours")
+                    if (diff > 72) {
+                        return "Please select a valid date range with a maximum duration of 72 hours (3 days)"
+                    }
+                    return null
+                },
+                showCancelButton: true,
+                preConfirm: (value) => {
+                    setFromTime(moment(value, expectedFormat).valueOf())
+                }
+            })
+        }
+        if (type === "ToDate") {
+            await Swal.fire({
+                customClass: {
+                    "title": "w3-xlarge"
+                },
+                title: 'To Date',
+                input: "text",
+                inputValue: moment(toTime).format('YYYY-MMM-DD h:mm A'),
+                inputPlaceholder: "YYYY-MMM-DD h:mm A",
+                inputValidator: (value) => {
+                    if (!value) {
+                        return "You need to write something!";
+                    }
+                    const expectedFormat = "YYYY-MMM-DD h:mm A"
+                    const isValidFormat = moment(value, expectedFormat, true).isValid()
+                    if (!isValidFormat) {
+                        return "Please enter the date in the following format: \"YYYY-MMM-DD h:mm A\""
+                    }
+                    const M_from = moment(fromTime)
+                    const M_to = moment(value, expectedFormat)
+                    const M_now = moment()
+                    const isBefore = M_to.isBefore(M_now)
+                    if (!isBefore) {
+                        return "\"To Date\" must be earlier than the current time"
+                    }
+                    const isAfter = M_to.isAfter(M_from)
+                    if (!isAfter) {
+                        return "\"To Date\" must be later than the the \"From Date\""
+                    }
+                    const diff = M_to.diff(M_from, "hours")
+                    if (diff > 72) {
+                        return "Please select a valid date range with a maximum duration of 72 hours (3 days)"
+                    }
+                },
+                showCancelButton: true,
+                preConfirm: (value) => {
+                    setToTime(moment(value, expectedFormat).valueOf())
+                }
+            })
+        }
+        if (type === "Countries") {
+            setOpenCounSelectModal(true)
+        }
+    }
+
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+        }
+    });
+
+    const showFilter = (position = "center") => {
+        Swal.fire({
+            title: "<i class=\"fa fa-calendar\" aria-hidden=\"true\"></i> DATE FILTER",
+            customClass: {
+                title: "w3-xlarge",
+                htmlContainer: "w3-container",
+                confirmButton: "w3-green",
+                denyButton: "w3-red"
+            },
+            position: position,
+            html: `
+                <label class="w3-left">From Date</label>
+                <input type="text" id="from-date" class="w3-input w3-border" value="${moment(fromTime).format('YYYY-MMM-DD h:mm A')}" placeholder="YYYY-MMM-DD h:mm A">
+                <br>
+                <label class="w3-left">To Date</label>
+                <input type="text" id="to-date" class="w3-input w3-border" value="${moment(toTime).format('YYYY-MMM-DD h:mm A')}" placeholder="YYYY-MMM-DD h:mm A">
+          `,
+            showCloseButton: true,
+            showCancelButton: false,
+            showDenyButton: true,
+            confirmButtonText: "<i class='fa fa-filter'></i>",
+            denyButtonText: "<i class='fa fa-history'></i>",
+            showLoaderOnConfirm: true,
+            showLoaderOnDeny: true,
+            preDeny: () => {
+                const newFrom = moment().startOf("day").valueOf(), newTo = moment().valueOf();
+                setFromTime(newFrom)
+                setToTime(newTo)
+            },
+            preConfirm: () => {
+                const expectedFormat = "YYYY-MMM-DD h:mm A"
+                const from_date = document.getElementById("from-date") ? document.getElementById("from-date").value : moment(fromTime).format('YYYY-MMM-DD h:mm A');
+                const to_date = document.getElementById("from-date") ? document.getElementById("to-date").value : moment(toTime).format('YYYY-MMM-DD h:mm A');
+                const isValidFromDate = moment(from_date, expectedFormat, true).isValid()
+                if (!isValidFromDate) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Please provide a valid from date"
+                    });
+                    return
+                }
+                const isValidToDate = moment(to_date, expectedFormat, true).isValid()
+                if (!isValidToDate) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Please provide a valid to date"
+                    });
+                    return
+                }
+                const M_from = moment(from_date, expectedFormat)
+                const M_to = moment(to_date, expectedFormat)
+                const M_now = moment()
+                const validate_1 = M_to.isBefore(M_now)
+                if (!validate_1) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "To Date must be earlier than the current time"
+                    });
+                    return
+                }
+                const validate_2 = M_to.isAfter(M_from)
+                if (!validate_2) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "To Date must be later than the the From Date"
+                    });
+                    return
+                }
+                const validate_3 = M_to.diff(M_from, "hours")
+                if (validate_3 > 72) {
+                    Toast.fire({
+                        icon: "error",
+                        title: "Please select a valid date range with a maximum duration of 72 hours (3 days)"
+                    });
+                    return
+                }
+                const newFrom = M_from.valueOf(), newTo = M_to.valueOf();
+                setFromTime(newFrom)
+                setToTime(newTo)
+            }
+        });
+    }
+
     return (
         <div
             style={{
@@ -314,6 +450,11 @@ export default function NewHome() {
                 backgroundImage: `url(https://svggen-1-b2762192.deta.app?color=${color})`
             }}
         >
+            <div className="w3-display-topright w3-panel">
+                <button className="w3-button w3-green w3-round-large" onClick={() => showFilter("top-end")}>
+                    <i className="fa fa-filter"></i>
+                </button>
+            </div>
             <ToastContainer />
             <div className="w3-padding-32">
                 <div className="w3-center">
@@ -394,7 +535,7 @@ export default function NewHome() {
             {
                 isFilterChanged &&
                 (
-                    <div className="loader-container w3-padding-32">
+                    <div className="svg-container w3-padding-32">
                         <Grid
                             height="80"
                             width="80"
@@ -420,7 +561,7 @@ export default function NewHome() {
                                     <div className="w3-center">
                                         <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Results Overview</div>
                                     </div>
-                                    <div className="loader-container" >
+                                    <div className="svg-container" >
                                         <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
                                             <EBarChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                         </div>
@@ -472,23 +613,25 @@ export default function NewHome() {
                                     <div className="w3-center">
                                         <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Explore The Trending Searches</div>
                                     </div>
-                                    <div style={{ overflow: "scroll" }} className="hide-scrollbar" >
+                                    <div style={{ overflow: "scroll" }} className="hide-scrollbar w3-margin-top" >
                                         <EBChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
                                 </div>
                             )
                         }
 
-                        {/* Tag Cloud View - Total traffic by country */}
+                        {/* Word Cloud View - Total traffic by country */}
                         {
                             rawData && (
                                 <div className="w3-content w3-padding" >
                                     <div className="w3-center">
                                         <div className="w3-large w3-gray w3-text-white w3-tag w3-round-large">Visual Sense Of The Key Terms</div>
                                     </div>
-                                    <div className="loader-container w3-padding">
+                                    <div className="svg-container scrollable-container w3-padding">
                                         <ETagCloud
                                             rawData={rawData}
+                                            toTime={toTime}
+                                            fromTime={fromTime}
                                         />
                                     </div>
                                 </div>
@@ -500,8 +643,8 @@ export default function NewHome() {
                             rawData &&
                             (
                                 <div className="">
-                                    <div className="loader-container">
-                                        <EPieChart rawData={rawData} />
+                                    <div className="svg-container">
+                                        <EPieChart rawData={rawData} toTime={toTime} fromTime={fromTime} />
                                     </div>
                                 </div>
                             )
