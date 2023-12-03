@@ -1,11 +1,12 @@
 import ReactEcharts from "echarts-for-react"
 import Rodal from "rodal";
-import { copyToClipboard, flags, formatNumberAbbreviation, formatToBrowserTimezone, openAnalysisModal, getDevice, iso } from "../../utils/commons";
+import { copyToClipboard, flags, formatNumberAbbreviation, formatToBrowserTimezone, openAnalysisModal, getDevice, iso, BackendURL, languages } from "../../utils/commons";
 import Swal from "sweetalert2";
 import ReactDOMServer from 'react-dom/server';
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import moment from "moment";
+import Quora from "../Sw/Quora";
 
 export default function EBarChartModal({ code, data, setData, fromTime, toTime }) {
     const { device, width, height } = getDevice();
@@ -143,6 +144,146 @@ export default function EBarChartModal({ code, data, setData, fromTime, toTime }
     const onEvents = {
         click: ({ name }) => {
             copyToClipboard(name)
+            const { description } = data.find(({ title }) => title === name);
+            if (description !== "") {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "center",
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: false,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                const inputOptions = {};
+                description.split(", ").forEach(query => { inputOptions[query] = query })
+                Swal.fire({
+                    title: "Related Queries",
+                    input: "select",
+                    inputOptions,
+                    inputPlaceholder: "Select a query",
+                    showCancelButton: false,
+                    showCloseButton: true,
+                    showConfirmButton: true,
+                    confirmButtonText: "Related news",
+                    confirmButtonColor: "#2d72d9",
+                    showDenyButton: true,
+                    denyButtonText: "People also ask",
+                    denyButtonColor: "#a82400",
+                    showLoaderOnConfirm: true,
+                    showLoaderOnDeny: true,
+                    allowOutsideClick: true,
+                    inputValidator: (value) => {
+                        if (value === "") {
+                            return "You need to select a query"
+                        }
+                    },
+                    preConfirm: (value) => {
+                        return fetch(`${BackendURL}/hotnews/v2`, {
+                            method: "POST",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ query: value, language: `${languages[code]}-${code}`, country: code, ceid: `${code}:${languages[code]}` })
+                        })
+                            .then(async (res) => {
+                                if (!res.ok) {
+                                    throw new Error(res.statusText)
+                                }
+                                const payload = await res.json();
+                                Swal.fire({
+                                    width: 500,
+                                    title: `${value} <span class="w3-tag w3-small w3-display-topleft">${payload.length} Results found</span>`,
+                                    customClass: {
+                                        title: "w3-large w3-text-dark-grey",
+                                        htmlContainer: "scrollable-container",
+                                    },
+                                    html: `
+                                        ${payload.length > 0 && payload.map(news =>
+                                        `
+                                            <div class="w3-card w3-round-xlarge w3-panel w3-padding" style="margin:10px 5px;">
+                                                <span
+                                                    title="click here to view news"
+                                                    class="w3-text-grey w3-hover-text-dark-grey"
+                                                    style="text-decoration:none;font-weight:bold;cursor:pointer;"
+                                                    onclick="window.open('${news.link}', '_blank', 'width=600,height=400,location=no,menubar=no,toolbar=no')"
+                                                >
+                                                    ${news.title}
+                                                </span>
+                                                <div class="w3-padding w3-left-align">
+                                                    <a
+                                                        href="${news.source['@url']}"
+                                                        class="w3-text-blue"
+                                                        style="text-decoration:none;font-weight:500px;"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <i class="fa fa-rss-square" aria-hidden="true"></i> ${news.source['#text']}
+                                                    </a>
+                                                    <br>
+                                                    <span>
+                                                        <i class="fa fa-clock-o" aria-hidden="true"></i> ${moment(news.pubDate).format("MMM Do YYYY, h:mm A")}
+                                                    </span>
+                                                    <a class="w3-right" href="${news.link}" target="_blank" rel="noreferrer">
+                                                        <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            `
+                                    ).join("")}
+                                    `,
+                                    showCloseButton: true,
+                                    showCancelButton: false,
+                                    showConfirmButton: false
+                                })
+                            })
+                            .catch(error => {
+                                Toast.fire({
+                                    icon: "error",
+                                    title: "Oops! No matching data found"
+                                });
+                            })
+                    },
+                    preDeny: () => {
+                        const value = Swal.getInput().value;
+                        if (!value) {
+                            Swal.showValidationMessage("You need to select a query")
+                            return false
+                        }
+                        return fetch(`${BackendURL}/quora/${value}`, {
+                            method: "GET",
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        })
+                            .then(async (res) => {
+                                if (!res.ok) {
+                                    throw new Error(res.statusText)
+                                }
+                                const payload = await res.json();
+                                Swal.fire({
+                                    title: `Results for ${value}`,
+                                    customClass: {
+                                        title: "w3-large w3-text-dark-grey",
+                                        htmlContainer: "scrollable-container",
+                                    },
+                                    html: ReactDOMServer.renderToString(<Quora results={payload} />),
+                                    showConfirmButton: false,
+                                    showCloseButton: true,
+                                })
+                            })
+                            .catch(error => {
+                                Toast.fire({
+                                    icon: "error",
+                                    title: "Oops! No matching data found"
+                                });
+                            })
+                    }
+                })
+                
+            }
         }
     }
 
